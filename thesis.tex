@@ -1,42 +1,131 @@
 \documentclass{ruthesis}
 \special{papersize=8.5in,11in} % for A4-default configurations on servers
+
+
+\usepackage[utf8]{inputenc}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{amssymb,amsmath,amsfonts}
+\usepackage{amsbsy}
+\usepackage[utf8]{inputenc}
+\graphicspath{ {figures/} }
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{algorithm2e}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{cleveref}
+\usepackage{acronym}
+\usepackage{subcaption}
+
+\acrodef{QoS}{Quality of Service}
+\acrodef{VM}{Virtual Machine}
+\acrodef{UDF}{User Defined Function}
+\acrodef{DAG}{Directed Acyclic Graph}
+\acrodef{CEP}{Complex Event Processing}
+\acrodef{IoT}{Internet of Things}
+\acrodef{DSPE}{Data Stream Processing Engine}
+\acrodef{DSP}{Data Stream Processing}
+\acrodef{FCFS}{First-Come, First-Served}
+\acrodef{SPDG}{Series-Parallel-Decomposable Graphs}
+\acrodef{IPS}{Instructions per Second}
+\acrodef{RTR}{Response Time Rate}
+\acrodef{CR+RP}{Cost Rate with Region Patterns}
+\acrodef{CI}{Cloud Infrastructure}
+\acrodef{EI}{Edge Infrastructure}
+\acrodef{LB}{Taneja et. al.}
+\acrodef{DSP}{Distributed Stream Processing}
+\acrodef{MIPS}{Millions of Instructions per Second}
+\acrodef{SDN}{Software Defined Network}
+\acrodef{SoC}{System on a Chip}
+\acrodef{CDF}{Cumulative distribution function}
+\acrodef{OODA}{Observe Orient Decide Act}
+
+
+
+% set the default code style
+\lstset{
+    frame=tb, % draw a frame at the top and bottom of the code block
+    tabsize=1, % tab space width
+    showstringspaces=false, % don't mark spaces in strings
+    basicstyle=\small,
+    keywordstyle=[1]\color{green},
+    keywordstyle=[2]\color{orange},
+    keywordstyle=[3]\color{blue},
+}
+
+\lstdefinelanguage{mylang}{
+  alsoletter={*,", 10, >=, :, 74,40,-},
+  keywords=[1]{placement, minEndToEndLatency, minDataTransferRate, minMessagingCost},
+  keywords=[2]{core, edge, *},
+  keywords=[3]{new},
+}
+
 \begin{document}
 \phd
 
-\title{The title of my thesis}
-\author{The author of my thesis}
+%\title{Enabling Data-driven Stream Processing Pipelines for Edge Computing}
+\title{Programming and Managing stream processing applications between the edge and the cloud}
+\author{Eduard Gibert Renart}
 \program{Computer Science}
-\director{The principal advisor's name}
+\director{Manish Parashar}
 \approvals{4}
 \submissionyear{2017}
 \submissionmonth{May}
 
-\abstract{This is the abstract}
+\abstract{Due to the proliferation of the Internet of Things (IoT), the number of devices connected to the Internet is growing. These devices are generating unprecedented amounts of data at the edge of the infrastructure. Although the generated data provides great potential, identifying and processing relevant data points hidden in streams of unimportant data, and doing this in near real time, remains a significant challenge. Existing stream processing platforms require the data to be transported to the cloud for processing, resulting in latencies that can prevent timely decision making or may reduce the amount of data processed.
+
+
+To address these challenges, this dissertation presents an IoT Edge Framework, called R-Pulsar, that extends cloud capabilities to local devices and provides a programming model for deciding what, when, where and how data get collected and processed. This thesis makes the following contributions: (1) A content- and location-based programming abstraction for specifying \textbf{what} data gets collected and \textbf{where} the data gets analyzed. (2) A rule-based programming abstraction for specifying \textbf{when} to trigger data-processing tasks based on data observations. (3) A programming abstraction for specifying \textbf{how} to split a given dataflow and place operators across edge and cloud resources. (4) An operator placement strategy that aims to minimize an aggregate cost which covers the end-to-end latency (time for an event to traverse the entire dataflow), the data transfer rate (amount of data transferred between the edge and the cloud) and the messaging cost (number of messages transferred between edge and the cloud). (5) Performance optimizations on the data-processing pipeline in order to achieve real-time performance on constrained devices.
+
+The applicability of this work to real-world IoT applications is validated through a series of experiments where 
+
+heterogeneous, geographically distributed services are composed based on user, resource provider, and application specifications. The results establish the potential impact of a system capable of real-time adaptability to changes in mixed resource environments, including multiple clouds, grids, clusters, supercomputers, and traditional data centers.
+
+
+
+(6) An implementation of the above capabilities as part of the R-Pulsar software stack and its evaluation using embedded devices (Raspberry Pi and Android phone)}
 
 \beforepreface
 \acknowledgements{The body of the acknowledgements}
 \dedication{The body of the dedication}
 \afterpreface
 
+\listoftables
+\listoffigures
+
 \chapter{Introduction}
-Here is the introduction.
+\input{Introduction.tex}
+\chapter{Motivating Applications and Requirements}
+\input{Motivation.tex}
+\chapter{Background and Related Work}
+\input{RelatedWork.tex}
+\chapter{Associative Rendezvous 2.0 (AR)}
+\input{Chapter1.tex}
+\chapter{Enabling Data-driven IoT Applications}
+\input{Chapter2.tex}
+\chapter{Implementation of R-Pulsar}
+\input{Chapter3.tex}
+\chapter{Application to the Distributed Operator Placement Problem}
+\input{Chapter4.tex}
+\chapter{Conclusion and Future Work}
+\input{Conclusion.tex}
 
-\chapter{First chapter}
-\section{Another section}
-\subsection{A subsection}
+\bibliographystyle{ieeetr}
+\bibliography{References}
 
-\begin{vita}
-\heading{The author of my thesis} \vspace{15pt}
+%\begin{vita}
+%\heading{The author of my thesis} \vspace{15pt}
 % Colleges attended, with dates, subjects, degrees
-\begin{descriptionlist}{xxxxx-xxxxx} % reverse chronological order
-\item[200x] Ph. D. in Computer Science, Rutgers University
-\item[200x-0x] B. Sc. in Computer Science from some University
-\item[200x] Graduated from such and such high school.
-\end{descriptionlist}
-\medskip
-\begin{descriptionlist}{xxxxx-xxxxx} %positions held since BS degree
-\item[200x-200y] Teaching assistant, Department of Computer Science, Rutgers University
-\end{descriptionlist}
-\end{vita}
+%\begin{descriptionlist}{xxxxx-xxxxx} % reverse chronological order
+%\item[200x] Ph. D. in Computer Science, Rutgers University
+%\item[200x-0x] B. Sc. in Computer Science from some University
+%\item[200x] Graduated from such and such high school.
+%\end{descriptionlist}
+%\medskip
+%\begin{descriptionlist}{xxxxx-xxxxx} %positions held since BS degree
+%\item[200x-200y] Teaching assistant, Department of Computer Science, Rutgers University
+%\end{descriptionlist}
+%\end{vita}
 
 \end{document}
