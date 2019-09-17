@@ -1,6 +1,5 @@
-\section{AR}
-Associative Rendezvous (AR) is a paradigm for content-based decoupled interactions with programmable reactive behaviors. Rendezvous-based interactions~\cite{AR} provide a mechanism for decoupling senders and receivers. The Rendezvous Point (RP) is the node where rendezvous interactions occur, and it can be an edge node or a cloud node. Senders transmit messages to an RP without knowledge of who or where the receivers are. The associative rendezvous interaction model consists of three elements, messages, associative selection, and reactive behaviors, which are described below. The AR interaction model consists of three elements: messages, associative selection, and reactive
-behaviors, which are described below~\cite{meteor2008}.
+\section{AR} 
+Associative Rendezvous (AR) is a paradigm for content-based decoupled interactions with programmable reactive behaviors. Rendezvous-based interactions~\cite{AR} provide a mechanism for decoupling senders and receivers. The Rendezvous Point (RP) is the node where rendezvous interactions occur, and it can be an edge node or a cloud node. Senders transmit messages to an RP without knowledge of who or where the receivers are. The associative rendezvous interaction model consists of three elements, messages, associative selection, and reactive behaviors, which are described below. The AR interaction model consists of three elements: messages, associative selection, and reactive behaviors, which are described below~\cite{meteor2008}.
 
 \subsection{AR Message}
 An AR message~\cite{meteor2008} is defined as the triplet: (header, action, data). The data field may be empty or may contain the message payload. The header includes a semantic profile in addition to the credentials of the sender, a message context, and the Lifetime of the message. The profile is a set of attributes and/or attribute–value pairs, and defines the set of recipients of the message. The attributes are keywords from the application information space, such as the type of data a sensor produces (temperature or humidity) and/or its location, the type of functionality a service provides and/or its quality of service guarantees, and the capability and/or the cost of a resource, while the values field may be a keyword, partial keyword, wildcard, or range from the same space. At the RP, a profile is classified as a data profile or an interest profile depending on the action field of the message. The data profile corresponds to a message carrying data to be stored in the system. The interest profile corresponds to a query.
@@ -31,7 +30,7 @@ only be executed if the message header contains an appropriate credential. Also 
 message is stored at the rendezvous for a period corresponding to the Lifetime defined in its header.
 In case of multiple matches, the profiles matching are processed in random order.
 
-\subsection{Associative Rendezvous 2.0} 
+\subsection{Associative Rendezvous 2.0}\label{sec:semantics}
 R-Pulsar uses a custom implementation of the original AR semantics~\cite{meteor2008}. In our new implementation of the AR model, we modified to elements: the AR Message and the Reactive Behaviors.
 
 In the AR message is now defined as a quintuplet instead of the original triplet: (header, action, data, location, and data-processing task). The location and data processing task fields have been added in to the already existing fields.

@@ -63,7 +63,7 @@ The streaming analytics pipeline comprises the following layers:
 \hfill\\
 Multiple data collection services are available, such as Apache Kafka~\cite{kafka}, Google Pub/Sub~\cite{google}, Amazon Firehose~\cite{amazon}, and Mosquitto~\cite{mosquitto}. Although some are designed to be deployed on edge devices, these services offer limited performance when deployed in constrained devices due to the limited read and write disk speeds.%low disk I/O performance.
 
-We designed and implemented a custom data collection layer designed specifically for constrained devices using a memory-mapped queue. A memory mapped file is a segment of virtual memory that has been assigned a direct correlation with some portion of a file. This file is physically present on disk, which allows the operating system to ensure data access operations with better performance than standard file access. The core principle of the R-Pulsar queue system emerges from the observation that random memory read is about 3.5x faster than sequential disk read, as measured in Table~\ref{tb:table}. 
+We designed and implemented a custom data collection layer designed specifically for constrained devices using a memory-mapped queue. A memory mapped file is a segment of virtual memory that has been assigned a direct correlation with some portion of a file. This file is physically present on disk, which allows the operating system to ensure data access operations with better performance than standard file access. The core principle of the R-Pulsar queue system emerges from the observation that random memory read is about 3.5x faster than sequential disk read, as measured in Table~\ref{tb:table1}. 
 
 The trade-off of using a memory mapped data collection system is that operating systems decides when to copy data from the main memory to disk. %Our approach is based on the assumption that the MQTT protocol assumes that the client and the server are generally available~\cite{IBM-MQTT}. 
 
@@ -79,7 +79,7 @@ Random write                             & 0.15 MB/s              & 65.88 MB/s  
 \end{tabular}}
 \centering
 
-\caption{Measurements of Disk I/O vs RAM memory performance on a Raspberry Pi.} \label{tb:table}
+\caption{Measurements of Disk I/O vs RAM memory performance on a Raspberry Pi.} \label{tb:table1}
 \vspace{-2ex}
 \end{table}
 
@@ -119,7 +119,7 @@ The following snippet of code shows how developers will express the content-driv
   \centering
   \includegraphics[width=0.7\textwidth]{Figures/RuleTopology.pdf}
   \caption{Trigger topology reaction rule definition.}
-  \label{fig:boat1}
+  \label{fig:RuleTopology}
 \end{figure}
 
 
@@ -131,20 +131,20 @@ Another brief code example of how developers will express the content-driven rul
   \centering
   \includegraphics[width=0.7\textwidth]{Figures/StoreReaction.pdf}
   \caption{Store reaction rule definition.}
-  \label{fig:boat1}
+  \label{fig:StoreReaction}
 \end{figure}
 
 
 The action of this second rule also has two parameters: the first parameter specifies where to store the results of the streaming computation, which in this case, is at one of the edge nodes that are part of the overlay network since we want to be able to get our results quickly. The second parameter specifies how to store the results either one by one (streaming fashion) or batch (several at a time).
 \\
 \\
-Since Apache Storm offers the ability to perform computation in a single tuple at a time and to a group of tuples, we developed two types of Storm data plane bolts: a simple 'IRichBolt' which checks one individual tuple at a time against the rule entries. The second bolt is a 'IWindowedBolt' which checks incoming tuples split into finite sets, or "windows", based on specified criteria such as time and computations, which will be performed on each window of events. Storm developers can now express their data content as an observation overtime (group of tuples). Figure~\ref{fig:win} depicts how to add rules to our rule based windowed bolt.
+Since Apache Storm offers the ability to perform computation in a single tuple at a time and to a group of tuples, we developed two types of Storm data plane bolts: a simple 'IRichBolt' which checks one individual tuple at a time against the rule entries. The second bolt is a 'IWindowedBolt' which checks incoming tuples split into finite sets, or "windows", based on specified criteria such as time and computations, which will be performed on each window of events. Storm developers can now express their data content as an observation overtime (group of tuples). Figure~\ref{fig:WindowBolt} depicts how to add rules to our rule based windowed bolt.
 
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.7\textwidth]{Figures/WindowBolt.pdf}
   \caption{Rule engine window bolt definition.}
-  \label{fig:boat1}
+  \label{fig:WindowBolt}
 \end{figure}
 
 \subsection{Data Quality Rule-Based System}
@@ -153,7 +153,7 @@ Since Apache Storm offers the ability to perform computation in a single tuple a
   \centering
   \includegraphics[width=0.6\textwidth]{Figures/AlgoImg.pdf}
   \caption{Storm topology linewise representation}
-  \label{fig:boat1}
+  \label{fig:AlgoImg}
 \end{figure}
 
 From the workflow described in Section \ref{sec:usecase}, if one does not gave time constraints on how fast the data insights are needed, a highest quality of   image will always be the choice. But getting the highest quality results does not guarantee demanding results. For those reasons, we implemented a QoS mechanism to allow Apache Storm developers to specify tradeoffs between quality and computational complexity.
@@ -163,7 +163,7 @@ Our data quality rule-based system (QoS rule-based system) works similarly to th
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.7\textwidth]{Figures/Algorithm.pdf}
-  \label{fig:boat1}
+  \label{fig:Algorithm}
 \end{figure}
 
 The overall steps of the algorithm are depicted in Algorithm 1. In the first step of execution process the algorithm creates lines of the topology tasks and calculates the relative computing time $T_{comp}^l$ for each line. $T_{comp}^l$ is calculated as the sum of execution times $T_{comp}^l$ of all tasks in the line. $T_{comp}^l$ consists of task runtime $T_{run}^t$ and total input data transfer time $T_{data}^t$. Then we order all the paths according to their relative computing times $T_{comp}^l$ so we only need to check if $T_{comp}^l$ satisfies the deadline $D$. Once we find one path that does not satisfy the deadline $D$, we have our set of paths that satisfies the constraint and we schedule the work. The algorithm is constantly running and reschedules the work if the computation conditions change.
