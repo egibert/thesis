@@ -215,7 +215,7 @@ Figure~\ref{fig:ProducerLineEx} presents an evaluation of the exact query operat
 \subsection{End To End Evaluation}
 
 The disaster response use case has been implemented using R-Pulsar to showcase the ability to express and decide what, where and when data gets collected and processed, using edge and cloud resources, and we compared it against a traditional approach of moving all the data to the cloud for analysis.
-For this experiment, the bandwidth consumption, latency, and performance are evaluated using the disaster response workflow described in Section~\ref{sec:background}.
+For this experiment, the bandwidth consumption, latency, and performance are evaluated using the disaster response workflow described in Chapter~\ref{chap:applications}.
 
 %In this subsection, we evaluate R-Pulsar's ability to decide \textbf{what}, \textbf{where}, and \textbf{when} data gets collected and processed, and we compare it against a traditional approach of moving all the data to the cloud. For this test the bandwidth consumption, latency, and performance for both setups were evaluated using the disaster response workflow described in Section~\ref{sec:background}.
 
@@ -243,3 +243,90 @@ Figure~\ref{fig:EndToEnd} presents the end-to-end evaluation of the disaster rec
 \textbf{Bandwidth Reduction}: The bandwidth consumption between the edge and the cloud was reduced by 82\% when 10 images were sent to the cloud. The bandwidth consumption decreased by 23\% when 70 images were sent to the cloud.
 \\\\
 \textbf{Latency}: Experiments showed that tuples using R-Pulsar experienced a 28\% latency decrease when 10 images were sent to the cloud. When 70 images were sent to the cloud for post-processing, a 19\% increase in the latency was observed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+We have deployed our edge streaming engine framework on a cluster of 32 Intel(r) Xeon(r) e5620 2.40 GHz computers with 25 GB of memory, and a 1~Gbps Ethernet interconnection. In our experiments, each rendezvous point has a multi-queue based on Kafka~\cite{kafka} version 2.10-0.9.0.0, and a streaming engine based on Storm~\cite{storm} version 0.9.3. Our implementation of the overlay network and ARMS uses JXSA~\footnote{https://jxse.kenai.com/} version 2.6.
+
+We have performed two set of experiments to evaluate the proposed framework. First, we evaluated the scalability of our framework and the overheads involved in the basic orchestration mechanisms. Second, we emulated a real scenario to compare our locality-aware approach versus a single cloud approach.
+
+\subsection{Scalability Experiments}
+
+To evaluate the scalability of the framework, we distributed RPs among the physical machines of our cluster to emulate an environment with multiple peers. These experiments were aimed at understanding the overheads involved in the basic orchestration mechanisms of our framework. We performed several experiments in which the system had a different number of RP nodes and amounts of available data.
+
+\subsubsection{Querying Operation}
+
+The first set of experiments measured the overhead involved in performing a location-based query to identify relevant resources around the location of a client node. In our experiments, the location-based query used the GPS coordinates of each RP node and the client to identify the RP around the client.
+As we described in Figure~\ref{fig:example1A}, a location-based query involves sending {\it statistics} action messages to all RP with a matching location, which ask RPs to send their information to the client. In these experiments, we only measured the overhead incurred in querying the database and constructing the ``notify\_interest'' message, i.e., the notification delivery was not measured. For these experiments, we had a total of 1000 RP nodes and we varied the position of the client, resulting in a different number of RP nodes matching the location requirement. Figure~\ref{fig:matching} collects the results of these experiments.
+
+\begin{figure}[htb!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{Figures/locationQuery.pdf}
+  \caption{Location-based query overhead for different number of matches per query.} \label{fig:matching}
+\end{figure}
+
+Figure~\ref{fig:matching} shows that the overhead of performing a location-based query increases linearly with the number of matching RP nodes. Results show a maximum overhead of 10 milliseconds, which occurred when the query found 250 RP nodes being within the specified location.
+
+The second set of experiments measured the overhead involved in the profile matching operation at an RP node. We used a {\it notify\_data} action message for these experiments. We considered different scenarios in which the system had different number of data profiles (i.e. subscriptions) and the request returned a different number of profile matches. As we described in Figure~\ref{fig:example1B}, a {\it notify\_data} request asks an RP to find matching profiles and to send a {\it notify} message to the profile owners -- e.g., requesting to start streaming data. In this experiment, we measured the overhead of performing the matching operation and constructing the ``notify'' messages.  The experiment was conducted using profiles similar to the one described in Figure~\ref{fig:profiles}, which contains sets of complex keyword tuples containing wildcards and/or ranges. Figure~\ref{fig:profileQuery} collects the results of these experiments. 
+
+\begin{figure}[htb!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{Figures/profileQuery.pdf}
+  \caption{Profile matching overhead. Results are grouped based on the matching ratio expressed as a percentage of the total number of stored profiles.} \label{fig:profileQuery}
+\end{figure}
+
+We can observe in Figure~\ref{fig:profileQuery} that, for a moderate database size of up to $10^4$ profiles, the profile-matching operation incurs in an overhead between five and 10 milliseconds. Nonetheless, when we increase to $10^5$ profiles, the overhead increases significantly, as could have been expected given the memory and data access times required to identify and retrieve such a large number of profiles. As a consequence, we need to ensure that the number of profiles that each RP manages is within a manageable range to minimize the overheads. This can be achieved by implementing load-balancing techniques and limiting the knowledge of each RP to its closest neighbors. 
+
+\subsubsection{Propagating New Information through the System}
+
+First we performed a set of experiments to understand the behavior of the system when multiple RP nodes request to join an existing deployment of our system. Specifically, we measured the time from when the RP nodes sent their joint message until all RP nodes existing in the system were updated. In our experiments, we varied both the number of RP nodes wanting to join and the number of existing RP nodes in the system. Figure~\ref{fig:rpDiscovery} collects the results.
+
+\begin{figure}[htb!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{Figures/rpDiscoveryBox.pdf}
+  \caption{Time neccessary to update information of all RP nodes in the system after multiple new RP nodes join.} \label{fig:rpDiscovery}
+\end{figure}
+
+Figure~\ref{fig:rpDiscovery} shows that the time required to have a consistent view of all the new RP nodes after the requests are placed is relatively low, and that it scales properly when increasing the number of existing RP nodes. In the case of a small system with only five existing RP nodes the overhead is around 20 milliseconds on average. The overhead increases to around 70 milliseconds in the case of having a large system with 100 existing RP nodes. Additionally, we can observe that varying the number of requests does not significantly affect the time required to propagate the information in a system with up to 50 RP nodes. In the case of having 100 RP nodes, we observe that increasing the number of requests, increases the overhead as well as the dispersion around the average. Although it is important to maintain an updated view of the system to ensure that we can efficiently process clients' requests, it is not critical for the regular operations of the system. Our system has mechanisms to adapt to changes in the availability of RP nodes to improve data processing efficiency. Therefore, we consider that having an eventually consistent system is sufficient. 
+
+Next, we measured the time required to propagate and store the information of a new topology across all RP nodes in the system. In these experiments, we considered several scenarios involving different number of RP nodes as well as different number of concurrent requests to register new topologies. Figure~\ref{fig:topology} collects the results. 
+
+\begin{figure}[htb!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{Figures/topologyBox.pdf}
+  \caption{Time neccessary to update information of all RP nodes in the system after multiple topologies are registered.} \label{fig:topology}
+    \vspace{-2ex}
+\end{figure}
+
+We can observe that in Figure~\ref{fig:topology} that the time required to propagate and store the information of new topologies across all the RP nodes in the system is relatively low. In particular, it can vary from a few milliseconds to around 100 milliseconds on average when having a large system with 100 RP nodes. The main factor affecting the time required to propagate the information is the number of RP nodes as each individual message is relatively small (around 5KB). As in the case of adding RP nodes to the system, we also consider that updating the information about available topologies is eventually consistent. Moreover, in a real scenario, not every RP node will have the information of every topology, as some of them might not be relevant to all RP nodes.
+
+\subsection{Performance experiments}
+
+In this section we have performed a set of experiments to compare the proposed edge stream processing approach with a traditional approach in which the stream processing is located in a fixed location at the core of the infrastructure. To perform these experiments we deployed two streaming frameworks (based on Apache Kafka plus Apache Storm), one in our local cluster and another one in Amazon AWS. In both cases, Apache Kafka and Storm were deployed in a single machine to avoid any additional latency due to communication across machines of a Kafka or Storm cluster. In Amazon AWS, we used an instance of type  t2.2xlarge, which has similar characteristics to the machines in our local cluster (8 CPUs and 32 GB of memory). Note that we do not assume that the edge will be equipped with similar characteristics, we are only using this type of instance for computational comparison only. When using our approach, our framework was deployed across both infrastructures -- i.e. we had two RP nodes exposing the capabilities of each stream engine. We emulated a scenario inspired by the one described in Section~\ref{sec:usecase} in which a client performs a request to obtain navigation indications. The data-processing workflow (i.e. topology) was composed by three sequential steps (i.e. bolts in Apache Storm terms) that performed some basic data transformations that did not require significant computational time. In our experiments we evaluated the performance of both approaches using three different anonymized workloads consisting of 100, 1000, and 10000 data elements. Each data element is around 1KB of size and is generated sequentially. The client and data source were close to our local cluster. Figures~\ref{fig:perf2} and~\ref{fig:perf1} collect the results of these experiments.
+
+%select site based on location of client and data source
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{Figures/Latency.pdf}
+  \caption{Delay in processing a data element.} \label{fig:perf2}
+\end{figure}
+\begin{figure}[htb!]
+  \centering
+  	\includegraphics[width=0.8\textwidth]{Figures/EdgeVsCloud.pdf}
+  \caption{Completion time for different workloads.} \label{fig:perf1}
+\end{figure}
+
+Figure~\ref{fig:perf2} shows the delay in processing a data element. The delay is measured as the time spent between the data producer generates the data element and the destination queue receives it for processing. We observe that in our case, the latency is up to 78\% less than a traditional approach consisting of sending data for processing to a cloud. The main reason is that our approach is able to dynamically identify different sources of computation and data using the location of the client. Therefore, it chooses to process the data in the place that is closest to the data source and the client. Our approach still incurs some small overheads as we have to identify the best processing site and data has to travel from source to destination. Nonetheless, these overheads are negligible compared with those incurred when transferring data between the edge and the core of the infrastructure.
+
+Figure~\ref{fig:perf1} collects the computational time required to process a stream of data elements. We can observe that our approach is up to 56\% more efficient than a traditional cloud-based approach. In this particular case, this is directly related to the delay mentioned before that the system incurs when processing each data element. Since the delay of each data element is larger than its computational time, the system is often idle waiting for small periods of time until a new data element arrives.

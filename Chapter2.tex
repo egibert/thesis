@@ -111,7 +111,7 @@ Our content-driven rule-based system is inspired by how OpenFlow works~\cite{ope
   \item \textbf{Notify} action allows to notify any node part of the overlay network and stream the results to them.
 \end{enumerate}
 
-\noindent We modified Apache Storm to support our AR messaging system, which is the underlying system behind the rule system. The actions specified in the rule system are transformed into a set of  AR messaging actions, an illustrated example is shown is section \ref{sec:example}. 
+\noindent We modified Apache Storm to support our AR messaging system, which is the underlying system behind the rule system. The actions specified in the rule system are transformed into a set of AR messaging actions, an illustrated example is shown is section \ref{sec:example}. 
 
 The following snippet of code shows how developers will express the content-driven rules to trigger a new topology in the cloud:
 
@@ -156,7 +156,7 @@ Since Apache Storm offers the ability to perform computation in a single tuple a
   \label{fig:AlgoImg}
 \end{figure}
 
-From the workflow described in Section \ref{sec:usecase}, if one does not gave time constraints on how fast the data insights are needed, a highest quality of   image will always be the choice. But getting the highest quality results does not guarantee demanding results. For those reasons, we implemented a QoS mechanism to allow Apache Storm developers to specify tradeoffs between quality and computational complexity.
+From the workflow described in Section \ref{chap:applications}, if one does not gave time constraints on how fast the data insights are needed, a highest quality of   image will always be the choice. But getting the highest quality results does not guarantee demanding results. For those reasons, we implemented a QoS mechanism to allow Apache Storm developers to specify tradeoffs between quality and computational complexity.
 
 Our data quality rule-based system (QoS rule-based system) works similarly to the content-driven rule-based system. It consists of a custom Apache Storm stream grouping and a rule engine. In Apache Storm, part of defining a topology is to define how data is exchanged between components (how streams are consumed by the bolts). A Stream Grouping specifies which streams are consumed by each bolt. A stream grouping tells a topology how to send tuples between two components. The rule engine parses the given rule entries and computes all the possible paths that will satisfy the constraints specified by the rules. In order for the stream grouping to determine all the paths that will satisfy the constraints specified by the rules we developed in an offline training mode where the stream grouping collects execution information, transfers information, etc.. to determine all the paths that will satisfy the constraint. The data quality rule entries contain a tag filed and a deadline filed. The tag filed needs to be part of each of the tuples that needs to processed. The deadline filed specifies how much time each tuple with the corresponding tag has to go through the entire Storm topology. The algorithm consists of following steps: (1) breakdown the Storm topology into lines-paths from the task of the first level to the task of the last level through only one child on each level; (2) order lines according to their relative computing times $T_{comp}^l$. (3) iterate over the lines until one of the lines does not meet the deadline $D$ and schedule the work.
 
