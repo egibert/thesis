@@ -15,6 +15,8 @@
 \usepackage{cleveref}
 \usepackage{acronym}
 \usepackage{subcaption}
+\usepackage{changepage}
+\usepackage{soul}
 
 \acrodef{QoS}{Quality of Service}
 \acrodef{VM}{Virtual Machine}
@@ -69,18 +71,12 @@
 \submissionyear{2017}
 \submissionmonth{May}
 
-\abstract{Due to the proliferation of the Internet of Things (IoT), the number of devices connected to the Internet is growing. These devices are generating unprecedented amounts of data at the edge of the infrastructure. Although the generated data provides great potential, identifying and processing relevant data points hidden in streams of unimportant data, and doing this in near real time, remains a significant challenge. Existing stream processing platforms require the data to be transported to the cloud for processing, resulting in latencies that can prevent timely decision making or may reduce the amount of data processed.
-
+\abstract{Due to the proliferation of the Internet of Things (IoT), the number of devices connected to the Internet is growing. These devices are generating unprecedented amounts of data at the edge of the infrastructure. Although the generated data provides great potential, identifying and processing relevant data points hidden in streams of unimportant data, and doing this in near real time, remains a significant challenge. The prevalent model of moving data located at the edge of the network to the datacenters to process is quickly becoming unsustainable. The resulting impact on latency, network congestion, storage cost, and privacy can limit the potential impact of IoT. These observations can be leveraged to design hybrid architectures that can effectively leverage both the edge and the cloud resources to process the data in an effective and timely manner. Although the cloud is better suited to perform heavier (resource intensive) analysis, such as processing historical events and very large datasets, edge devices can support real-time analytics that consider the temporal, spatial, and
+continuous nature of IoT data. While such edge-based data processing can benefit IoT applications, edge resources are typically constrained in their capabilities. Integrating edge computing can also add complexity to applications, especially when they need to include policies that govern what kind of data is processed and analyzed at the edge and what is sent to cloud.
 
 To address these challenges, this dissertation presents an IoT Edge Framework, called R-Pulsar, that extends cloud capabilities to local devices and provides a programming model for deciding what, when, where and how data get collected and processed. This thesis makes the following contributions: (1) A content- and location-based programming abstraction for specifying \textbf{what} data gets collected and \textbf{where} the data gets analyzed. (2) A rule-based programming abstraction for specifying \textbf{when} to trigger data-processing tasks based on data observations. (3) A programming abstraction for specifying \textbf{how} to split a given dataflow and place operators across edge and cloud resources. (4) An operator placement strategy that aims to minimize an aggregate cost which covers the end-to-end latency (time for an event to traverse the entire dataflow), the data transfer rate (amount of data transferred between the edge and the cloud) and the messaging cost (number of messages transferred between edge and the cloud). (5) Performance optimizations on the data-processing pipeline in order to achieve real-time performance on constrained devices.
 
-The applicability of this work to real-world IoT applications is validated through a series of experiments where 
-
-heterogeneous, geographically distributed services are composed based on user, resource provider, and application specifications. The results establish the potential impact of a system capable of real-time adaptability to changes in mixed resource environments, including multiple clouds, grids, clusters, supercomputers, and traditional data centers.
-
-
-
-(6) An implementation of the above capabilities as part of the R-Pulsar software stack and its evaluation using embedded devices (Raspberry Pi and Android phone)}
+The applicability of this work to real-world IoT applications is validated through a series of experiments performed using embedded devices (Raspberry Pi and Android phone).}
 
 \beforepreface
 \acknowledgements{The body of the acknowledgements}

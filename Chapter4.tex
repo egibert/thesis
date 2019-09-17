@@ -385,7 +385,7 @@ The end-to-end tuple latency corresponds to the sum of the mean times from the t
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.5\textwidth]{Results/Latency.pdf}
+  \includegraphics[width=0.8\textwidth]{Results/Latency.pdf}
   \caption{End-to-end tuple latency optimization with 3 self injected failures affecting edge and cloud nodes, while comparing it with Cloud, Random and LB approaches.}
   \label{fig:latency}
 \end{figure} 
@@ -398,7 +398,7 @@ The second experiment aims to evaluate how efficient the Cloud, Random, and LB a
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.5\textwidth]{Results/CDF_latency.pdf}
+  \includegraphics[width=0.8\textwidth]{Results/CDF_latency.pdf}
   \caption{End-to-end tuple latency optimization cumulative distribution function (CDF) comparison with Cloud, Random and LB approaches.}
   \label{fig:CDFLatency}
 \end{figure} 
@@ -412,7 +412,7 @@ The Data transfer rate consists of the sum of all message sizes that traverse a 
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{Results/CDF_bandwidth.pdf}
+  \includegraphics[width=0.8\textwidth]{Results/CDF_bandwidth.pdf}
   \caption{End-to-end data transfer rate optimization cumulative distribution function (CDF) comparison with cloud, Random and LB approaches.}
   \label{fig:bandwidth}
 \end{figure} 
@@ -424,7 +424,7 @@ This next experiment aims to evaluate the efficiency of minimizing the transfer 
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{Results/LandB.pdf}
+  \includegraphics[width=0.8\textwidth]{Results/LandB.pdf}
   \caption{Multi optimization evaluation, end-to-end tuple latency and data transfer rate comparison with cloud, Random, and LB approaches.}
   \label{fig:both}
 \end{figure} 
@@ -453,7 +453,7 @@ The second cost model is the Amazon IoT Core~\cite{AWSPricing} where messaging i
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.5\textwidth]{Results/Cost_Microsoft.pdf}
+  \includegraphics[width=0.8\textwidth]{Results/Cost_Microsoft.pdf}
   \caption{Messaging cost savings evaluation based on the Microsoft Azure IoT Hub pricing model, for four different setups.}
   \label{fig:cost-microsoft}
 \end{figure} 
@@ -464,7 +464,7 @@ Figure~\ref{fig:cost-microsoft} depicts the cost of deploying the ETL dataflow u
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=.5\textwidth]{Results/Cost_Amazon.pdf}
+  \includegraphics[width=0.8\textwidth]{Results/Cost_Amazon.pdf}
   \caption{Messaging cost savings evaluation based on the Amazon IoT pricing model, for four different setups.}
   \label{fig:cost-amazon}
 \end{figure} 
@@ -476,18 +476,18 @@ Figure~\ref{fig:cost-amazon} depicts the cost of deploying the ETL dataflow usin
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.5\textwidth]{Results/Scale.pdf}
+  \includegraphics[width=0.8\textwidth]{Results/Scale.pdf}
   \caption{Evaluation of the scalability of the operator placement problem algorithm as the number of operators to place increase over edge and cloud resources.}
 \end{figure}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.5\textwidth]{Results/Redeploy.pdf}
+  \includegraphics[width=0.8\textwidth]{Results/Redeploy.pdf}
   \caption{Evaluation of the cost of redeploying a subset of operators over edge and cloud resources.}
 \end{figure}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.5\textwidth]{Results/Time.pdf}
+  \includegraphics[width=0.8\textwidth]{Results/Time.pdf}
   \caption{Evaluation of the real-time vs the modeled time as the number of operators increases.}
 \end{figure}

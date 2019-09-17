@@ -1,18 +1,33 @@
+The proliferation of the Internet of Things (IoT) is fostering the connection of massive numbers of devices to the network. It is predicted that by 2020 there will be 50 to 100 billion devices connected to the Internet and constantly producing data[].
+
+\hl{Internet of Things (IoT) refers to a system of connected physical objects via the internet. The 'thing' in IoT can refer to a person or any device which is assigned through an IP address. A 'thing' collects and transfers data over the internet without any manual intervention with the help of embedded technology. It helps them to interact with the external environment or internal states to take the decisions.}
+
+\hl{Big data means a large set (petabytes or gigabytes) of structured, unstructured or semi-structured data and analyzing those data to get the insights of the business trend.}
+
+IoT analytics refers to the analysis of data from multiple IoT data sources, including sensors, actuators, smart devices and other internet connected objects. The collection and analysis of data streams from IoT sources is nowadays considered a key element of the IoT’s disruptive power, as well as a prerequisite to realizing IoT’s hyped market potential. Indeed, according to a recent report by McKinsey[], less than 1\% of IoT data is currently used, which is a serious set-back to maximizing IoT’s business value. For example, most IoT analytics applications are nowadays used for anomaly detection and control rather than for optimization and prediction, which are the applications that will provide the greatest business value in the coming years.
+
 \section{Challenges of IoT Applications}
-IoT data features several all the Vs of BigData:
+
+Internet of Things(IoT) and big data are closely intertwined and although they are not the same thing.
+The term big data existed long before IoT arrived. When the information demonstrates veracity, velocity, variety and volume, then it is interpreted as big data
+
+IoT data is essentially BigData since they feature several of the Vs of BigData, including
 \begin{itemize}
-    \item Volume: 
-    \item Velocity:
-    \item Variety: 
-    \item Veracity: 
+    \item Volume: IoT data is machine-generated data coming from a wide variety of sensors, where big data is mostly human-generated data.
+    \item Velocity: Refers to the speed data is being produced, collected and analyzed. IoT, data needs to ingest hundreds of thousands, or even millions, of events per second from their devices.
+    \item Variety: Since IoT encompasses a large variety of IoT devices, IoT data can be very heterogeneous both in terms of semantics and data formats.
+    \item Veracity: Several IoT streams are noisy and incomplete, which creates
+uncertainty in the scope of IoT analytics applications. Statistical and probabilistic approaches must be
+therefore employed in order to take into account the noisy nature of IoT data streams, especially in
+cases where they stem from unreliable sensors.
 \end{itemize}
 
-In addition IoT introduces a new set of challenges that big data does not have. The main challenges associated with the development and deployment of IoT analytics applications are:
+IoT data differ from big data datasets and introduces new challenges, this are some of the new characteristics that IoT introduces:
 
 \begin{itemize}
     \item Data heterogeneity:
-    \item Real-time nature:
-    \item Time and location dependencies:
+    \item Real-time nature: While in big data projects it is perfectly normal for data to rest before it is used in any kind of analysis, in any IoT projects time is of the absolute essence, for several application must be processes nearly in real-time.
+    \item Time and location dependencies: IoT data is naturally geo-distributed and generated at the edge of the network, sometimes involving fast moving sensors. Big data is mostly generated from a single location, the core of the network.
     \item Privacy and security sensitivity:
 \end{itemize}
 
@@ -32,9 +47,14 @@ Due to the proliferation of the Internet of Things (IoT) paradigm, the number of
 
 
 \section{Problem Description}
+Due to the proliferation of the Internet of Things (IoT) paradigm, the number of devices connected to the Internet is growing. These devices are generating unprecedented amounts of data at the edges of the infrastructure. Although the generated data provides great potential, identifying and processing relevant data points hidden in streams of unimportant data, and doing this in near real time, remains a significant challenge. Existing stream processing platforms require the data to be transported to the
+cloud for processing, resulting in latencies that can prevent timely decision making or may reduce the amount of data processed. However, in recent years, non-trivial computational capabilities have proliferated across the computing service landscape []. In particular, edge services are emerging close to the data sources and can provide potential data-processing capabilities [], []. Furthermore, not all the data produced is interesting or relevant, and only a part of it may need to be processed in the context of an application. These observations can be leveraged to design hybrid architectures that can
+effectively leverage both the edge and the cloud resources to process the data in an effective and timely manner [], []. Although the cloud is better suited to perform heavier (resource intensive) analysis, such as processing historical events and very large datasets, edge devices can support real-time analytics that consider the temporal, spatial, and continuous nature of IoT data. While such edge-based data processing can benefit IoT applications, edge resources are typically constrained in their capabilities. Integrating edge computing can also add complexity to applications, especially when they need to include policies that govern what kind of data is processed and analyzed at the edge and what is sent to cloud.
+
 \section{Overview of Thesis Research}
+
 \section{Contributions}
-This dissertation makes the following contributions:
+The primary contributions of the research in this thesis are a programming model for deciding what, when, where and how computations get distributed across the edge and the cloud. The detailed contributions are presented as follows.
 \begin{itemize}
   \item A content- and location-based programming abstraction for specifying \textbf{what} data gets collected and \textbf{where} the data gets analyzed.
   \item A rule-based programming abstraction for specifying \textbf{when} to trigger data-processing tasks based on data observations.
@@ -45,11 +65,4 @@ This dissertation makes the following contributions:
 \end{itemize}
 
 \section{Outline}
-The rest of this thesis is organized as follows.
-
-Chapter 2 shows the benefits of using data staging, as well as motivating and representative workflow examples. This chapter also summarizes the key parameters and components of coupled scientific workflows.
-
-Chapter 3 presents an overview of related research work.
-
-Chapter x summarizes the research work of this thesis and presents future research
-directions.
+The rest of this thesis is organized as follows. Chapter 2 shows the motivating use cases that where used to build R-Pulsar. Chapter 3 presents an extensive literature review of related work. Chapter 4 . Chapter 5 presents the concepts on what R-Pulsar was build upon. Chapter 6 presents the implementation and evaluation details of R-Pulsar. Chapter 7 introduces the operator placement problem. The dissertation concludes in Chapter 8 by outlining future research.
