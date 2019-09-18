@@ -3,269 +3,16 @@
 \section{API Examples}
 
 \section{Evaluation}
+In this section all the layers of R-Pulsar are evaluated by using three metrics: Overhead, Scalability and Performance. In addition each of those experiments are evaluated using cloud resources and Edge devices:
+
+\begin{itemize}
+\item Edge System: Using Raspberry Pi 3 with 4x ARM Cortex-A53 1.2GHz, 1GB LPDDR2 of RAM and 10/100 Ethernet.
+\item Cloud System: Chameleon Cloud~\cite{chameleon}, a configurable experimental environment for large-scale cloud research~\cite{chameleon}, with 5 instances of type m1.small (1 CPU and 2 GB RAM) and 5 instances of type m1.medium (2 CPU and 4 GB RAM) to simulate the computation capabilities of a Raspberry Pi and the hardware heterogeneity that IoT presents.
+\end{itemize}
 
 \subsection{Location-aware Overlay Network Layer}
 
-\subsection{Content-based Routing Layer}
-
-\subsection{Serverless Messaging Layer}
-
-\subsection{Memory-mapped Streaming Analytics Pipeline}
-
-\subsubsection{Data Collection Layer}
-
-\subsubsection{Data Processing Layer}
-
-\subsubsection{Data Storage and Query Layer}
-
-\subsection{Rule-based Programming Abstraction}
-
-We have deployed our Apache Storm streaming engine framework on Chameleon, an Infrastructure as a Service (IaaS) platform that allows you to create and manage virtual environments. In our experiments, each rendezvous point has a streaming engine based on Storm~\cite{storm} version 0.9.3. Our implementation of the overlay network and ARMS uses JXTA version 2.6. We have performed two sets of experiments to evaluate the proposed framework. First, we evaluated the scalability and the overhead of our framework involved in the programming abstraction that we presented of our rule engine system. Second, we emulated a real scenario of the disaster recovery workflow to compare and prove that by trading off quality for processing efficiency we are able to get our results faster than a traditional stream-processing core approach.
-
-\subsection{Scalability and Overhead Experiments}
-
-To evaluate the scalability and the overhead of our system we performed two sets of experiments in two types of virtual nodes. The first node is our "drone" with computational capabilities with 1 vCPU and 2 GB of memory, we used a low CPU machine to simulate the overheads as if we used a small IoT device with reduced computational capacity. The second node is the "minivan" with 8 vCPU and 32 GB of memory, we assume that a minivan will be able to carry higher computational resources.
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/RuleEngine}
-  \caption{Rule engine overhead for different number of rules.}
-  \label{fig:RuleEngine}
-  \vspace{-2ex}
-\end{figure}
-
-To evaluate the scalability and overhead of the rule engine system we added different rule amounts and streamed our regular workload, forcing the evaluation of each of the tuples. The plotted graph in Figure  \ref{fig:RuleEngine} shows the scalability and overhead of our rule engine for two different machines described above. We can observe that the overhead is very minimal and can be used for processing real-time stream processing, we can also observe that as we add rules the overheads do not increase exponentially making it suitable to handle hundreds of rules.
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/QoS}
-  \caption{Data quality rule-based system 20 second deadline.}
-  \label{fig:QoS}
-  \vspace{-2ex}
-\end{figure}
-
-In this second experiment we wanted to show the importance of being able to programmatically express a trade-off between data quality and computational performance. Figure \ref{fig:QoS} we demonstrate that if we do not allow the to specify QoS rules to set a deadline in this case a deadline of 20 seconds per tuple was specified, depending on the workload and the underlying computing capabilities most of the tuples will not satisfy the deadline. We can also see that our algorithm can't guarantee 100\% completion in time in small computational resources, but that is due to the fact that the CPU can't drain the storm bolt queues fast enough, so some tuples will experience some extra delay.
-
-\subsection{Performance experiments}
-In this section we have performed a set of experiments to compare the proposed split architecture (edge and core processing) with the current state of the art approach in which the stream processing is located in a fixed location at the core of the infrastructure. To perform these experiments we deployed them all in the same Chameleon cluster and we introduced artificial latency between the edge of the network and the core of the network. For the edge setup, 3 instances of type m1.small simulate computation capabilities of a drone (1 VCPUs and 2 GB of memory) and 3 other instances of type m1.medium simulate the minivan (2 VCPUs and 8 GB of memory). The core of the network is represented by 3 instances of type m1.large (4 CPUs and 8 GB of memory). To simulate that the edge infrastructure was located in a minivan or a drone we stored all the images that need to be processed locally to simulate a small latency since the minivan or the drone will be producing the data. For the traditional approach the storm topology gets the data from an external server to simulate the latencies need it to transfer between the edge and the core of the network.
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/EdgeVCore}
-  \caption{Disaster response workflow edge vs core no QoS.}
-  \label{fig:Edge_CoreVsCloud}
-  \vspace{-2ex}
-\end{figure}
-
-For the experiment in Figure \ref{fig:Edge_CoreVsCloud} we wanted to demonstrate that if we simply deployed our entire workflow at the edge of the network without any "quality" trade-off and we compared it to the traditional approach where each of the LiDAR images will be sent to the core for processing. We can see that with small workflows the edge is significantly faster than the core of the network, but  
-as the number of images that need to be processed grows (the affected area is large) the core performs better than the edge due to limited resources at the edge of the network.
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/SmallSpeed}
-  \caption{Disaster response workflow 10 images edge speed-up.}
-  \label{fig:SmallSpeed}
-  \vspace{-2ex}
-\end{figure}
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/MediumSpeed}
-  \caption{Disaster response workflow 50 images edge speed-up.}
-  \label{fig:MediumSpeed}
-  \vspace{-2ex}
-\end{figure}
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/BigSpeed}
-  \caption{Disaster response workflow 100 images edge speed-up.}
-  \label{fig:BigSpeed}
-  \vspace{-2ex}
-\end{figure}
-
-Figures \ref{fig:SmallSpeed} \ref{fig:MediumSpeed} \ref{fig:BigSpeed} showcase the speed-up that can be obtained by trading off some image "quality" for some computational complexity. Figure \ref{fig:SmallSpeed} is the graph for a workflow with 10 LiDAR images to be processed; one can observe that if we perform all the computations in the "drone" and only 10\% of those images need further processing we get a speed up of 44\% compared to sending all 10 images to the core of the network. We can observe from figures \ref{fig:MediumSpeed} \ref{fig:BigSpeed} that due to the small compute limitations, the drone gets a faster speed-up when the worflow size is small and a small percentage of tuples needs further processing, which makes it perfect for assessing affected areas where minivans can't get to due to road blocks. In the case of the minivan, it gets a higher speed-up in all three cases since it has higher computational resources and we can also observe that we can still send a large percentage of rules to the core and we still get a higher speed-up. In the best case the minivan is 71\% faster than the traditional approach where all the images are sent to the cloud.
-
-\section{Summary}
-
-
-
-
-\subsubsection{Performance of the Messaging Layer Over the Raspberry Pi System}
-\hfill\vspace{1ex}
-
-The first experiment aims to evaluate the throughput of R-Pulsar messaging layer.
-This experiment was carried out using two Raspberry Pi's one as a producer and the other as the broker. The workload sizes are chosen based on the current limitations imposed by existing IoT services, such as AWS~\cite{AWS-MQTT} and Azure~\cite{AZURE-MQTT}.
-The inner memory-mapped queue is compared to Apache Kafka and Mosquitto.
-Apache Kafka (the \textit{de facto} standard for cloud and edge data analytics)~\cite{Young2017, firework, planner}, Mosquitto (a broker that can be found on edge frameworks, such as Azure IoT or the AWS Greengrass), and the R-Pulsar memory-mapped queue, using four different message sizes.  The main difference between them is the way they store information: Apache Kafka and Mosquitto store messages on the disk while R-Pulsar stores them in the main memory and disk. 
-
-%The ability of the messaging layer to maintain steady throughput is critical for systems that are communication intensive, such as stream processing engines.  
-
-\begin{figure}[h]
-  \includegraphics[width=0.8\textwidth]{Results/ProducerBar}
-  %\caption{Single broker and producer R-Pulsar vs. Kafka \& Mosquitto throughput on a single Raspberry Pi.}
-    \caption{Single broker and producer throughput performance as message sizes grow. Comparison of R-Pulsar, Kafka, and Mosquitto systems deployed on a single Raspberry Pi.}
-  \label{fig:ProducerBar}
-\end{figure}
-
-Results in Figure~\ref{fig:ProducerBar} show that R-Pulsar's throughput scales as the message size increase. This experiment is representative of a traditional IoT scenario with small messages streamed at a high rate arrival.
-We observed that R-Pulsar pub/sub messaging system outperforms Kafka by a factor of 3x and Mosquitto by a factor of 7x. Also, Apache Kafka exhibits a high variability of throughput performance. 
-This is explained by the fact that Kafka continuously stores messages on the disk overwhelming the filesystem and producing this unpredictable throughput.
-The use of a memory-mapped queue allows R-Pulsar to obtain higher throughput, but also steadier and more predictable throughput.
-%, making R-Pulsar better suited for supporting real-time analytics on embedded devices.    
-
-\hfill\vspace{0.1ex}
-\subsubsection{Performance of the Query and Store Operations Over the Raspberry Pi System}
-\hfill\vspace{1ex}
-
-The next set of experiments explores the performance of the R-Pulsar's storage and query layer as compared to self-contained, embedded and lightweight data storage systems. We compare R-Pulsar with lightweight SQL (SQLite) and non-SQL (NitriteDB) storage systems. We choose SQLite and Nitrite DB because  both systems are designed to be deployed in constrained devices~\cite{sqlite}~\cite{nitrite}. In addition, Nitrite DB is a key-value store like R-Pulsar. 
-
-The experiments were deployed in 10 Raspberry Pis and grouped them together in the same R-Pulsar group. A client then issued requests for data to be stored and queried. As neither Nitrite DB nor SQLite supports horizontal data partitioning, the client directly queried a single DB for these systems. In the case of R-Pulsar, the content-based routing layer is responsible for determining where the data should be stored or queried.
-
-We present three different results for these experiments. Figure~\ref{fig:DBInsertBar} shows the time required for each system to store different sets of elements. R-Pulsar presents a steady performance as the number of elements grows. It also outperforms Nitrite DB (factor of 30x).
-%when storing elements. R-Pulsar has a higher performance because R-Pulsar performs queries in parallel, instead of sequentially, and because of its use of the memory-mapped system to store the data.
-
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/DBInsertBar}
-  \caption{Storage performance of R-Pulsar, SQLite and Nitrite DB as the number of elements to be stored increases over 10 Raspberry Pi.}
-  \label{fig:DBInsertBar}
-\end{figure}
-
-Figure~\ref{fig:DBExactBar} and~\ref{fig:DBWildBar} present the results for experiments using exact and wildcard queries (a profile containing wildcards, ranges or both).
-In the last two experiments, we can observe that Nitrite DB and SQLite are both faster when the number of consecutive reads is small, but R-Pulsar outperforms both when the workload increases. 
-Overall, R-Pulsar has a higher performance because it takes advantage of the distributed storage of data over multiple RPs so that queries can be performed in parallel.
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/DBExactBar}
-  \caption{Exact query performance of R-Pulsar, SQLite and Nitrite DB as the number of exact queries increases over 10 Raspberry Pi.}
-  \label{fig:DBExactBar}
-\end{figure}
-
-%The reason R-Pulsar stores and queries data faster than Nitrite DB and SQLite is due to the fact that data are stored in multiple RPs, and queries can be performed in parallel. Furthermore, R-Pulsar uses a memory-mapped system to store the data.
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/DBWildBar}
-  \caption{Wildcard query performance of R-Pulsar, SQLite and Nitrite DB as the number of wildcard queries increases over 10 Raspberry Pi.}
-  \label{fig:DBWildBar}
-\end{figure}
-
-\vspace{1ex}
-%\hfill%\vspace{0.1ex}
-\subsubsection{Performance of the Messaging Layer Over the Android System}
-\hfill\vspace{1ex}
-
-In this experiment, we want to demonstrate that R-Pulsar can be deployed on  Android Phones.  
-The experiment setup consists of an Android device as a data producer and a single Raspberry Pi as the RP.
-In Figure~\ref{fig:ProducerPhone}, the throughput comparison of R-Pulsar and Mosquitto~\cite{mosquitto} shows similar performance with larger messages. For smaller messages, R-Pulsar exhibits a better performance (factor of 10x). Also, Mosquitto presents a larger variability of performance (unpredictable throughput).
- %As of 2018, Android is the leading mobile operating system~\cite{market}, and is used with a large number of devices, including IoT systems. 
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/ProducerPhone}
-  \caption{Single broker and producer throughput performance as message sizes grow. Comparison of R-Pulsar and Mosquitto on the Android system.}
-  \label{fig:ProducerPhone}
-
-\end{figure}
-
-%are compared. On average, R-Pulsar performs better than Mosquitto by a factor of about 10x, specifically for small messages. Moreover, Mosquitto presents a larger variability in its performance. %Mosquitto also uses the disk to store messages and can stress the file system. 
-\vspace{1ex}
-\subsubsection{Routing Overhead Over the Android and Raspberry Pi Systems}
-\hfill\vspace{1ex}
-
-The routing overhead represents the time interval between an AR message is created until it is forwarded to the recipient of the message. It is important to maintain the routing overhead in the order of milliseconds to achieve real-time analytics on constrained devices.
-The routing overhead was evaluated over Android and Raspberry PIs by simulating the storage or retrieval of data, as the number of RPs on a given region grows, and also as the AR profiles complexity grows. The profile complexity is defined in terms of the number of attribute-value pairs that make up the profile. For example, a 2D profile is composed of two properties, such as data type and location.
-
-%This set of experiments evaluates the routing overhead associated with R-Pulsar when it is deployed on Android and Raspberry Pi systems. It is important to keep the routing overhead in the order of milliseconds since the end goal is to achieve near real-time analytics on constrained devices.
-
-%The evaluation was performed by 
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/Phone}
-  \caption{Evaluation of R-Pulsar space filling curve routing overhead as the number of messages and the complexity of profiles increase over the Android system.}
-  \label{fig:Phone}
-\end{figure}
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/Raspberry}
-  \caption{Evaluation of R-Pulsar space filling curve routing overhead as the number of messages and the complexity of profiles increase over the Raspberry Pi system.}
-  \label{fig:Raspberri}
-\end{figure}
-
-Figure~\ref{fig:Phone} shows that when the profile complexity increases by a factor of 6, the time required to route messages increases by 2.5. Similarly, when the system increases the number of messages sent by a factor of 100, the time required to route one message increases by a factor of 25. It shows that the routing overhead scales efficiently in both cases, as messages become increasingly complex and as the number of messages sent increases when using the Android system. 
-
-However, Figure~\ref{fig:Raspberri} shows that when the profile complexity increases by a factor of 6, the time required to route messages increases by about 1.2, when using the Raspberry Pi system. Likewise, when the system increases the number of messages sent by a factor of 100, the time required to route one message increases by about 2.5. Demonstrating that the routing overhead scales more efficiently on a Raspberry Pi system than on an Android system.
-\vspace{1ex}
-\subsubsection{Scalability of Store/Query Operations on Chameleon Cloud}
-\hfill\vspace{1ex}
-
-In addition to deploying R-Pulsar on the Raspberry Pi and Android systems, we deployed it on virtual machines using Chameleon Cloud.
-%, a configurable experimental environment for large-scale cloud research~\cite{chameleon}. 
-These experiments aimed to stress the system and evaluated the storage and query scalability of R-Pulsar using multiple workload sizes. The following workloads were used for the tests: Workload 1 (W1) stored/queried one element, Workload 2 (W2) stored/queried 10 different elements, Workload 3 (W3) stored/queried 50 different elements, and Workload 4 (W4) stored/queried 100 different elements. For this test, all RP nodes were part of the same P2P network and the same geographic region to evaluate how R-Pulsar scales as the number of RP increases in each region. 
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/ProducerLine.pdf}
-  \caption{Evaluation of R-Pulsar store query operations as the number of nodes increases on Chameleon cloud.}
-  \label{fig:ProducerLine}
-\end{figure}
-
-Figure~\ref{fig:ProducerLine} presents the scalability evaluation of the R-Pulsar store operation. The figure shows that for storing a single element (W1), the runtime increased by a factor of $\sim$4 when the system size increased by a factor of 16 (from 4 nodes to 64 nodes). As the system expands, the number of intermediary nodes involved in routing the query grows, causing an increase in the runtime. The storage of 100 different elements (W4) forces the system to store elements in multiple destinations. %Once again, the rate of increase in the message runtime is smaller than that of the system size.
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/ProducerLineEx.pdf}
-  \caption{Evaluation of R-Pulsar exact query operations as the number of nodes increases on Chameleon Cloud.}
-  \label{fig:ProducerLineEx}
-\end{figure}
-
-Figure~\ref{fig:ProducerLineEx} presents an evaluation of the exact query operations. It shows that the query of a single element (W1), the runtime increases by a factor of 2.8 when the system size increases by a factor of 16 (from 4 nodes to 64 nodes).
-
-\subsection{End To End Evaluation}
-
-The disaster response use case has been implemented using R-Pulsar to showcase the ability to express and decide what, where and when data gets collected and processed, using edge and cloud resources, and we compared it against a traditional approach of moving all the data to the cloud for analysis.
-For this experiment, the bandwidth consumption, latency, and performance are evaluated using the disaster response workflow described in Chapter~\ref{chap:applications}.
-
-%In this subsection, we evaluate R-Pulsar's ability to decide \textbf{what}, \textbf{where}, and \textbf{when} data gets collected and processed, and we compare it against a traditional approach of moving all the data to the cloud. For this test the bandwidth consumption, latency, and performance for both setups were evaluated using the disaster response workflow described in Section~\ref{sec:background}.
-
-The cloud only setup was performed using the Chameleon cloud with 5 instances of type m1.medium (2 CPU and 4 GB RAM). The R-Pulsar experiments where performed using a realistic edge and cloud setup:
-
-\begin{itemize}
-\item For the edge, we used 10 Raspberry Pis model 3 and grouped them together in the same R-Pulsar group.
-\item For the cloud, we used the Chameleon cloud with 5 instances of type m1.medium (2 CPU and 4 GB RAM).
-\end{itemize}
-
-The 10 Raspberry Pis are connected to the same LAN and use external WAN (the Internet) for connecting to the cloud.
-
-Figure~\ref{fig:EndToEnd} presents the end-to-end evaluation of the disaster recovery use case. The green and blue bars represent the total time for pre-processing and post-processing 100 images (Edge + Cloud setup). The red dashed line is the total time needed to send and process all data to the cloud (traditional approach). The key results are summarized below. 
-
-\begin{figure}[h!]
-  \includegraphics[width=0.8\textwidth]{Results/EndToEndBar.pdf}
-  \caption{Evaluation of processing time for 100 images according to the disaster recovery use case. Comparison of two setups R-Pulsar (edge and cloud) and cloud only.}
-  \label{fig:EndToEnd}
-\end{figure}
-
-%The following results are extracted from the same experiment setup: By using R-Pulsar ability to support runtime decision, we observed significant reductions in terms of bandwidth utilization and latency when compared to the cloud only setup.
-
-\noindent\textbf{Completion Time}: Experiments showed that the computations were completed faster when using edge resources as compared to using Chameleon cloud alone. When only 10 images were sent to the core, a 40\% decrease in completion time was observed. On the other hand, when 70 images were sent to the cloud for post-processing, a 20\% increase of the completion time was observed.
-\\\\
-\textbf{Bandwidth Reduction}: The bandwidth consumption between the edge and the cloud was reduced by 82\% when 10 images were sent to the cloud. The bandwidth consumption decreased by 23\% when 70 images were sent to the cloud.
-\\\\
-\textbf{Latency}: Experiments showed that tuples using R-Pulsar experienced a 28\% latency decrease when 10 images were sent to the cloud. When 70 images were sent to the cloud for post-processing, a 19\% increase in the latency was observed
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-We have deployed our edge streaming engine framework on a cluster of 32 Intel(r) Xeon(r) e5620 2.40 GHz computers with 25 GB of memory, and a 1~Gbps Ethernet interconnection. In our experiments, each rendezvous point has a multi-queue based on Kafka~\cite{kafka} version 2.10-0.9.0.0, and a streaming engine based on Storm~\cite{storm} version 0.9.3. Our implementation of the overlay network and ARMS uses JXSA~\footnote{https://jxse.kenai.com/} version 2.6.
-
-We have performed two set of experiments to evaluate the proposed framework. First, we evaluated the scalability of our framework and the overheads involved in the basic orchestration mechanisms. Second, we emulated a real scenario to compare our locality-aware approach versus a single cloud approach.
-
-\subsection{Scalability Experiments}
-
-To evaluate the scalability of the framework, we distributed RPs among the physical machines of our cluster to emulate an environment with multiple peers. These experiments were aimed at understanding the overheads involved in the basic orchestration mechanisms of our framework. We performed several experiments in which the system had a different number of RP nodes and amounts of available data.
-
-\subsubsection{Querying Operation}
+\subsubsection{Overhead Over Cloud Systems}
 
 The first set of experiments measured the overhead involved in performing a location-based query to identify relevant resources around the location of a client node. In our experiments, the location-based query used the GPS coordinates of each RP node and the client to identify the RP around the client.
 As we described in Figure~\ref{fig:example1A}, a location-based query involves sending {\it statistics} action messages to all RP with a matching location, which ask RPs to send their information to the client. In these experiments, we only measured the overhead incurred in querying the database and constructing the ``notify\_interest'' message, i.e., the notification delivery was not measured. For these experiments, we had a total of 1000 RP nodes and we varied the position of the client, resulting in a different number of RP nodes matching the location requirement. Figure~\ref{fig:matching} collects the results of these experiments.
@@ -278,6 +25,10 @@ As we described in Figure~\ref{fig:example1A}, a location-based query involves s
 
 Figure~\ref{fig:matching} shows that the overhead of performing a location-based query increases linearly with the number of matching RP nodes. Results show a maximum overhead of 10 milliseconds, which occurred when the query found 250 RP nodes being within the specified location.
 
+\subsection{Content-based Routing Layer}
+
+\subsubsection{Overhead Over Cloud Systems}
+
 The second set of experiments measured the overhead involved in the profile matching operation at an RP node. We used a {\it notify\_data} action message for these experiments. We considered different scenarios in which the system had different number of data profiles (i.e. subscriptions) and the request returned a different number of profile matches. As we described in Figure~\ref{fig:example1B}, a {\it notify\_data} request asks an RP to find matching profiles and to send a {\it notify} message to the profile owners -- e.g., requesting to start streaming data. In this experiment, we measured the overhead of performing the matching operation and constructing the ``notify'' messages.  The experiment was conducted using profiles similar to the one described in Figure~\ref{fig:profiles}, which contains sets of complex keyword tuples containing wildcards and/or ranges. Figure~\ref{fig:profileQuery} collects the results of these experiments. 
 
 \begin{figure}[htb!]
@@ -288,7 +39,51 @@ The second set of experiments measured the overhead involved in the profile matc
 
 We can observe in Figure~\ref{fig:profileQuery} that, for a moderate database size of up to $10^4$ profiles, the profile-matching operation incurs in an overhead between five and 10 milliseconds. Nonetheless, when we increase to $10^5$ profiles, the overhead increases significantly, as could have been expected given the memory and data access times required to identify and retrieve such a large number of profiles. As a consequence, we need to ensure that the number of profiles that each RP manages is within a manageable range to minimize the overheads. This can be achieved by implementing load-balancing techniques and limiting the knowledge of each RP to its closest neighbors. 
 
-\subsubsection{Propagating New Information through the System}
+
+\subsubsection{Overhead Over Edge Systems}
+
+The routing overhead represents the time interval between an AR message is created until it is forwarded to the recipient of the message. It is important to maintain the routing overhead in the order of milliseconds to achieve real-time analytics on constrained devices.
+The routing overhead was evaluated over Android and Raspberry PIs by simulating the storage or retrieval of data, as the number of RPs on a given region grows, and also as the AR profiles complexity grows. The profile complexity is defined in terms of the number of attribute-value pairs that make up the profile. For example, a 2D profile is composed of two properties, such as data type and location.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/Phone}
+  \caption{Evaluation of R-Pulsar space filling curve routing overhead as the number of messages and the complexity of profiles increase over the Android system.}
+  \label{fig:Phone}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/Raspberry}
+  \caption{Evaluation of R-Pulsar space filling curve routing overhead as the number of messages and the complexity of profiles increase over the Raspberry Pi system.}
+  \label{fig:Raspberri}
+\end{figure}
+
+Figure~\ref{fig:Phone} shows that when the profile complexity increases by a factor of 6, the time required to route messages increases by 2.5. Similarly, when the system increases the number of messages sent by a factor of 100, the time required to route one message increases by a factor of 25. It shows that the routing overhead scales efficiently in both cases, as messages become increasingly complex and as the number of messages sent increases when using the Android system. 
+
+However, Figure~\ref{fig:Raspberri} shows that when the profile complexity increases by a factor of 6, the time required to route messages increases by about 1.2, when using the Raspberry Pi system. Likewise, when the system increases the number of messages sent by a factor of 100, the time required to route one message increases by about 2.5. Demonstrating that the routing overhead scales more efficiently on a Raspberry Pi system than on an Android system.
+\vspace{1ex}
+
+\subsubsection{Performance Over Edge System}
+
+The first experiment aims to evaluate the throughput of R-Pulsar messaging layer.
+This experiment was carried out using two Raspberry Pi's one as a producer and the other as the broker. The workload sizes are chosen based on the current limitations imposed by existing IoT services, such as AWS~\cite{AWS-MQTT} and Azure~\cite{AZURE-MQTT}.
+The inner memory-mapped queue is compared to Apache Kafka and Mosquitto.
+Apache Kafka (the \textit{de facto} standard for cloud and edge data analytics)~\cite{Young2017, firework, planner}, Mosquitto (a broker that can be found on edge frameworks, such as Azure IoT or the AWS Greengrass), and the R-Pulsar memory-mapped queue, using four different message sizes.  The main difference between them is the way they store information: Apache Kafka and Mosquitto store messages on the disk while R-Pulsar stores them in the main memory and disk. 
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/ProducerBar}
+    \caption{Single broker and producer throughput performance as message sizes grow. Comparison of R-Pulsar, Kafka, and Mosquitto systems deployed on a single Raspberry Pi.}
+  \label{fig:ProducerBar}
+\end{figure}
+
+Results in Figure~\ref{fig:ProducerBar} show that R-Pulsar's throughput scales as the message size increase. This experiment is representative of a traditional IoT scenario with small messages streamed at a high rate arrival.
+We observed that R-Pulsar pub/sub messaging system outperforms Kafka by a factor of 3x and Mosquitto by a factor of 7x. Also, Apache Kafka exhibits a high variability of throughput performance. 
+This is explained by the fact that Kafka continuously stores messages on the disk overwhelming the filesystem and producing this unpredictable throughput.
+The use of a memory-mapped queue allows R-Pulsar to obtain higher throughput, but also steadier and more predictable throughput.
+
+\subsubsection{Information Propagating through the System}
 
 First we performed a set of experiments to understand the behavior of the system when multiple RP nodes request to join an existing deployment of our system. Specifically, we measured the time from when the RP nodes sent their joint message until all RP nodes existing in the system were updated. In our experiments, we varied both the number of RP nodes wanting to join and the number of existing RP nodes in the system. Figure~\ref{fig:rpDiscovery} collects the results.
 
@@ -311,17 +106,181 @@ Next, we measured the time required to propagate and store the information of a 
 
 We can observe that in Figure~\ref{fig:topology} that the time required to propagate and store the information of new topologies across all the RP nodes in the system is relatively low. In particular, it can vary from a few milliseconds to around 100 milliseconds on average when having a large system with 100 RP nodes. The main factor affecting the time required to propagate the information is the number of RP nodes as each individual message is relatively small (around 5KB). As in the case of adding RP nodes to the system, we also consider that updating the information about available topologies is eventually consistent. Moreover, in a real scenario, not every RP node will have the information of every topology, as some of them might not be relevant to all RP nodes.
 
-\subsection{Performance experiments}
+\subsection{Serverless Messaging Layer}
 
+\subsection{Memory-mapped Streaming Analytics Pipeline}
+
+\subsubsection{Performance of the Data Collection Layer Over Edge Systems}
+
+In this experiment, we want to demonstrate that R-Pulsar can be deployed on  Android Phones.  
+The experiment setup consists of an Android device as a data producer and a single Raspberry Pi as the RP.
+In Figure~\ref{fig:ProducerPhone}, the throughput comparison of R-Pulsar and Mosquitto~\cite{mosquitto} shows similar performance with larger messages. For smaller messages, R-Pulsar exhibits a better performance (factor of 10x). Also, Mosquitto presents a larger variability of performance (unpredictable throughput).
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/ProducerPhone}
+  \caption{Single broker and producer throughput performance as message sizes grow. Comparison of R-Pulsar and Mosquitto on the Android system.}
+  \label{fig:ProducerPhone}
+
+\end{figure}
+
+\subsubsection{Scalability of Store/Query Operations Over Cloud Systems}
+
+In addition to deploying R-Pulsar on the Raspberry Pi and Android systems, we deployed it on virtual machines using Chameleon Cloud.
+These experiments aimed to stress the system and evaluated the storage and query scalability of R-Pulsar using multiple workload sizes. The following workloads were used for the tests: Workload 1 (W1) stored/queried one element, Workload 2 (W2) stored/queried 10 different elements, Workload 3 (W3) stored/queried 50 different elements, and Workload 4 (W4) stored/queried 100 different elements. For this test, all RP nodes were part of the same P2P network and the same geographic region to evaluate how R-Pulsar scales as the number of RP increases in each region. 
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/ProducerLine.pdf}
+  \caption{Evaluation of R-Pulsar store query operations as the number of nodes increases on Chameleon cloud.}
+  \label{fig:ProducerLine}
+\end{figure}
+
+Figure~\ref{fig:ProducerLine} presents the scalability evaluation of the R-Pulsar store operation. The figure shows that for storing a single element (W1), the runtime increased by a factor of $\sim$4 when the system size increased by a factor of 16 (from 4 nodes to 64 nodes). As the system expands, the number of intermediary nodes involved in routing the query grows, causing an increase in the runtime. The storage of 100 different elements (W4) forces the system to store elements in multiple destinations.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/ProducerLineEx.pdf}
+  \caption{Evaluation of R-Pulsar exact query operations as the number of nodes increases on Chameleon Cloud.}
+  \label{fig:ProducerLineEx}
+\end{figure}
+
+Figure~\ref{fig:ProducerLineEx} presents an evaluation of the exact query operations. It shows that the query of a single element (W1), the runtime increases by a factor of 2.8 when the system size increases by a factor of 16 (from 4 nodes to 64 nodes).
+
+\subsubsection{Performance of the Query and Store Layer Over Edge Systems}
+
+The next set of experiments explores the performance of the R-Pulsar's storage and query layer as compared to self-contained, embedded and lightweight data storage systems. We compare R-Pulsar with lightweight SQL (SQLite) and non-SQL (NitriteDB) storage systems. We choose SQLite and Nitrite DB because  both systems are designed to be deployed in constrained devices~\cite{sqlite}~\cite{nitrite}. In addition, Nitrite DB is a key-value store like R-Pulsar. 
+
+The experiments were deployed in 10 Raspberry Pis and grouped them together in the same R-Pulsar group. A client then issued requests for data to be stored and queried. As neither Nitrite DB nor SQLite supports horizontal data partitioning, the client directly queried a single DB for these systems. In the case of R-Pulsar, the content-based routing layer is responsible for determining where the data should be stored or queried.
+
+We present three different results for these experiments. Figure~\ref{fig:DBInsertBar} shows the time required for each system to store different sets of elements. R-Pulsar presents a steady performance as the number of elements grows. It also outperforms Nitrite DB (factor of 30x).
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/DBInsertBar}
+  \caption{Storage performance of R-Pulsar, SQLite and Nitrite DB as the number of elements to be stored increases over 10 Raspberry Pi.}
+  \label{fig:DBInsertBar}
+\end{figure}
+
+Figure~\ref{fig:DBExactBar} and~\ref{fig:DBWildBar} present the results for experiments using exact and wildcard queries (a profile containing wildcards, ranges or both).
+In the last two experiments, we can observe that Nitrite DB and SQLite are both faster when the number of consecutive reads is small, but R-Pulsar outperforms both when the workload increases. 
+Overall, R-Pulsar has a higher performance because it takes advantage of the distributed storage of data over multiple RPs so that queries can be performed in parallel.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/DBExactBar}
+  \caption{Exact query performance of R-Pulsar, SQLite and Nitrite DB as the number of exact queries increases over 10 Raspberry Pi.}
+  \label{fig:DBExactBar}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/DBWildBar}
+  \caption{Wildcard query performance of R-Pulsar, SQLite and Nitrite DB as the number of wildcard queries increases over 10 Raspberry Pi.}
+  \label{fig:DBWildBar}
+\end{figure}
+
+
+\subsection{Rule-based Programming Abstraction}
+
+We have deployed our Apache Storm streaming engine framework on Chameleon, an Infrastructure as a Service (IaaS) platform that allows you to create and manage virtual environments. In our experiments, each rendezvous point has a streaming engine based on Storm~\cite{storm} version 0.9.3. Our implementation of the overlay network and ARMS uses JXTA version 2.6. We have performed two sets of experiments to evaluate the proposed framework. First, we evaluated the scalability and the overhead of our framework involved in the programming abstraction that we presented of our rule engine system. Second, we emulated a real scenario of the disaster recovery workflow to compare and prove that by trading off quality for processing efficiency we are able to get our results faster than a traditional stream-processing core approach.
+
+\subsubsection{Scalability and Overhead Over Edge and Cloud Systems}
+
+To evaluate the scalability and the overhead of our system we performed two sets of experiments in two types of virtual nodes. The first node is our "drone" with computational capabilities with 1 vCPU and 2 GB of memory, we used a low CPU machine to simulate the overheads as if we used a small IoT device with reduced computational capacity. The second node is the "minivan" with 8 vCPU and 32 GB of memory, we assume that a minivan will be able to carry higher computational resources.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/RuleEngine}
+  \caption{Rule engine overhead for different number of rules.}
+  \label{fig:RuleEngine}
+\end{figure}
+
+To evaluate the scalability and overhead of the rule engine system we added different rule amounts and streamed our regular workload, forcing the evaluation of each of the tuples. The plotted graph in Figure  \ref{fig:RuleEngine} shows the scalability and overhead of our rule engine for two different machines described above. We can observe that the overhead is very minimal and can be used for processing real-time stream processing, we can also observe that as we add rules the overheads do not increase exponentially making it suitable to handle hundreds of rules.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/QoS}
+  \caption{Data quality rule-based system 20 second deadline.}
+  \label{fig:QoS}
+\end{figure}
+
+In this second experiment we wanted to show the importance of being able to programmatically express a trade-off between data quality and computational performance. Figure \ref{fig:QoS} we demonstrate that if we do not allow the to specify QoS rules to set a deadline in this case a deadline of 20 seconds per tuple was specified, depending on the workload and the underlying computing capabilities most of the tuples will not satisfy the deadline. We can also see that our algorithm can't guarantee 100\% completion in time in small computational resources, but that is due to the fact that the CPU can't drain the storm bolt queues fast enough, so some tuples will experience some extra delay.
+
+\subsubsection{Performance Over Edge and Cloud Systems}
+In this section we have performed a set of experiments to compare the proposed split architecture (edge and core processing) with the current state of the art approach in which the stream processing is located in a fixed location at the core of the infrastructure. To perform these experiments we deployed them all in the same Chameleon cluster and we introduced artificial latency between the edge of the network and the core of the network. For the edge setup, 3 instances of type m1.small simulate computation capabilities of a drone (1 VCPUs and 2 GB of memory) and 3 other instances of type m1.medium simulate the minivan (2 VCPUs and 8 GB of memory). The core of the network is represented by 3 instances of type m1.large (4 CPUs and 8 GB of memory). To simulate that the edge infrastructure was located in a minivan or a drone we stored all the images that need to be processed locally to simulate a small latency since the minivan or the drone will be producing the data. For the traditional approach the storm topology gets the data from an external server to simulate the latencies need it to transfer between the edge and the core of the network.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/EdgeVCore}
+  \caption{Disaster response workflow edge vs core no QoS.}
+  \label{fig:Edge_CoreVsCloud}
+\end{figure}
+
+For the experiment in Figure \ref{fig:Edge_CoreVsCloud} we wanted to demonstrate that if we simply deployed our entire workflow at the edge of the network without any "quality" trade-off and we compared it to the traditional approach where each of the LiDAR images will be sent to the core for processing. We can see that with small workflows the edge is significantly faster than the core of the network, but as the number of images that need to be processed grows (the affected area is large) the core performs better than the edge due to limited resources at the edge of the network.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/SmallSpeed}
+  \caption{Disaster response workflow 10 images edge speed-up.}
+  \label{fig:SmallSpeed}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/MediumSpeed}
+  \caption{Disaster response workflow 50 images edge speed-up.}
+  \label{fig:MediumSpeed}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/BigSpeed}
+  \caption{Disaster response workflow 100 images edge speed-up.}
+  \label{fig:BigSpeed}
+\end{figure}
+
+Figures \ref{fig:SmallSpeed} \ref{fig:MediumSpeed} \ref{fig:BigSpeed} showcase the speed-up that can be obtained by trading off some image "quality" for some computational complexity. Figure \ref{fig:SmallSpeed} is the graph for a workflow with 10 LiDAR images to be processed; one can observe that if we perform all the computations in the "drone" and only 10\% of those images need further processing we get a speed up of 44\% compared to sending all 10 images to the core of the network. We can observe from figures \ref{fig:MediumSpeed} \ref{fig:BigSpeed} that due to the small compute limitations, the drone gets a faster speed-up when the worflow size is small and a small percentage of tuples needs further processing, which makes it perfect for assessing affected areas where minivans can't get to due to road blocks. In the case of the minivan, it gets a higher speed-up in all three cases since it has higher computational resources and we can also observe that we can still send a large percentage of rules to the core and we still get a higher speed-up. In the best case the minivan is 71\% faster than the traditional approach where all the images are sent to the cloud.
+
+\subsection{End To End Evaluation}
+
+\subsubsection{Disaster Response Use Case}
+The disaster response use case has been implemented using R-Pulsar to showcase the ability to express and decide what, where and when data gets collected and processed, using edge and cloud resources, and we compared it against a traditional approach of moving all the data to the cloud for analysis.
+For this experiment, the bandwidth consumption, latency, and performance are evaluated using the disaster response workflow described in Chapter~\ref{chap:applications}.
+
+The cloud only setup was performed using the Chameleon cloud with 5 instances of type m1.medium (2 CPU and 4 GB RAM). The R-Pulsar experiments where performed using a realistic edge and cloud setup:
+
+\begin{itemize}
+\item For the edge, we used 10 Raspberry Pis model 3 and grouped them together in the same R-Pulsar group.
+\item For the cloud, we used the Chameleon cloud with 5 instances of type m1.medium (2 CPU and 4 GB RAM).
+\end{itemize}
+
+The 10 Raspberry Pis are connected to the same LAN and use external WAN (the Internet) for connecting to the cloud.
+
+Figure~\ref{fig:EndToEnd} presents the end-to-end evaluation of the disaster recovery use case. The green and blue bars represent the total time for pre-processing and post-processing 100 images (Edge + Cloud setup). The red dashed line is the total time needed to send and process all data to the cloud (traditional approach). The key results are summarized below. 
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Results/EndToEndBar.pdf}
+  \caption{Evaluation of processing time for 100 images according to the disaster recovery use case. Comparison of two setups R-Pulsar (edge and cloud) and cloud only.}
+  \label{fig:EndToEnd}
+\end{figure}
+
+\noindent\textbf{Completion Time}: Experiments showed that the computations were completed faster when using edge resources as compared to using Chameleon cloud alone. When only 10 images were sent to the core, a 40\% decrease in completion time was observed. On the other hand, when 70 images were sent to the cloud for post-processing, a 20\% increase of the completion time was observed.
+\\\\
+\textbf{Bandwidth Reduction}: The bandwidth consumption between the edge and the cloud was reduced by 82\% when 10 images were sent to the cloud. The bandwidth consumption decreased by 23\% when 70 images were sent to the cloud.
+\\\\
+\textbf{Latency}: Experiments showed that tuples using R-Pulsar experienced a 28\% latency decrease when 10 images were sent to the cloud. When 70 images were sent to the cloud for post-processing, a 19\% increase in the latency was observed
+
+\subsubsection{Smart City Use Case}
 In this section we have performed a set of experiments to compare the proposed edge stream processing approach with a traditional approach in which the stream processing is located in a fixed location at the core of the infrastructure. To perform these experiments we deployed two streaming frameworks (based on Apache Kafka plus Apache Storm), one in our local cluster and another one in Amazon AWS. In both cases, Apache Kafka and Storm were deployed in a single machine to avoid any additional latency due to communication across machines of a Kafka or Storm cluster. In Amazon AWS, we used an instance of type  t2.2xlarge, which has similar characteristics to the machines in our local cluster (8 CPUs and 32 GB of memory). Note that we do not assume that the edge will be equipped with similar characteristics, we are only using this type of instance for computational comparison only. When using our approach, our framework was deployed across both infrastructures -- i.e. we had two RP nodes exposing the capabilities of each stream engine. We emulated a scenario inspired by the one described in Section~\ref{sec:usecase} in which a client performs a request to obtain navigation indications. The data-processing workflow (i.e. topology) was composed by three sequential steps (i.e. bolts in Apache Storm terms) that performed some basic data transformations that did not require significant computational time. In our experiments we evaluated the performance of both approaches using three different anonymized workloads consisting of 100, 1000, and 10000 data elements. Each data element is around 1KB of size and is generated sequentially. The client and data source were close to our local cluster. Figures~\ref{fig:perf2} and~\ref{fig:perf1} collect the results of these experiments.
 
-%select site based on location of client and data source
-\begin{figure}[h!]
+\begin{figure}[h]
   \centering
     \includegraphics[width=0.8\textwidth]{Figures/Latency.pdf}
   \caption{Delay in processing a data element.} \label{fig:perf2}
 \end{figure}
-\begin{figure}[htb!]
+\begin{figure}[h]
   \centering
   	\includegraphics[width=0.8\textwidth]{Figures/EdgeVsCloud.pdf}
   \caption{Completion time for different workloads.} \label{fig:perf1}
