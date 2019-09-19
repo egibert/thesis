@@ -18,26 +18,50 @@ R-Pulsar consists of five layers: (1) the location-aware self-organizing overlay
 
 \subsection{Location-aware Overlay Network Layer}
 
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=1\columnwidth]{Figures/quadtree.pdf}
+  \caption{}\label{fig:quadT}
+\end{figure}
+
 IoT data comes with temporal and spatial information, which is directly associated with their business value in a given context. Hence, IoT applications must process data in a timely fashion and from proper locations. R-Pulsar presents a location-aware overlay network in conjunction with point quadtrees to logically connect groups of RPs. The RPs are grouped based on the geographical location to guarantee that data gets processed with minimal latencies.
 
-During the initialization of the overlay network, the RP attempts to discover an already existing RP in the system and construct its routing table. The joining RP sends a discovery message to the group. If the message remains unanswered after a duration (in the order of seconds), the RP assumes that it is the first in the system at it becomes the master RP, creating a single overlay network (Peer-to-Peer network).  If an RP responds to the message, they communicate with the master RP, and they are added to the P2P network. Once the initial P2P network has a sufficient number of RPs to guarantee that in case of multiple failures the P2P network will not disappear, the first P2P network will be subdivided into four additional P2P rings, plus an extra ring that will allow all the master RPs of each ring to communicate. To keep track of all the P2P networks, the quadtree data structure is used. In the case of a master RPs failure, a master RP election is performed using the Hirschberg and Sinclair algorithm~\cite{Hirschberg}. 
+During the initialization of the overlay network, the RP attempts to discover an already existing RP in the system and construct its routing table. The joining RP sends a discovery message to the group. If the message remains unanswered after a duration (in the order of seconds), the RP assumes that it is the first in the system at it becomes the master RP, creating a single overlay network (Peer-to-Peer network).  If an RP responds to the message, they communicate with the master RP, and they are added to the P2P network. Once the initial P2P network has a sufficient number of RPs to guarantee that in case of multiple failures the P2P network will not disappear, the first P2P network will be subdivided into four additional P2P rings, plus an extra ring that will allow all the master RPs of each ring to communicate. To keep track of all the P2P networks, the quadtree data structure is used. In the case of a master RPs failure, a master RP election is performed using the Hirschberg and Sinclair algorithm~\cite{Hirschberg}. Figure~\ref{fig:quadT} depicts the processes.
 
 %The location-aware overlay network layer provides an abstraction to the layers above, consisting of a single operation: \textbf{lookup}(identifier, AR message). Given the location specified in the AR message, the quadtree is used for searching which group of RPs is the closest to the given location. Then the identifier is used to route it in the overlay network. 
 
 \subsection{Content-based Routing Layer}\label{sec:frameworkc}
 
+\begin{figure}
+\centering
+\begin{subfigure}[b]{0.9\textwidth}
+   \includegraphics[width=1\linewidth]{Figures/single.pdf}
+   \caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.9\textwidth}
+   \includegraphics[width=1\linewidth]{Figures/multi.pdf}
+   \caption{}
+\end{subfigure}
+\caption{R-Pulsar space filling curve routing using simple (a) and complex (b) profiles.}\label{fig:routingProfiles} 
+\end{figure}
+
 This layer builds on top of the location-aware overlay to route messages. As mentioned above, the lookup operator provided by the location-aware overlay requires an exact identifier, the AR message and the location to be routed. The content-based routing layer maps AR profiles onto single identifiers or clusters of identifiers to enable informaton discovery using partial knowledge, as described in \cite{SCHMIDT2008962}.
 
 The Hilbert Space Filling Curve (SFC)~\cite{SFC} is used to map the n-dimensional space of the AR profile to the one-dimensional space ID of the location-aware overlay network. Applying the Hilbert mapping to an AR profile consisting of exact keywords only can be mapped to a single point on the SFC. Furthermore, any AR profile containing wildcard or range keywords can be mapped to regions of points in the SFC.
 
-\textbf{Routing using simple keyword tuples:} The routing process consists of two steps. At the first step, a profile containing only exact keywords is 
-encoded into a set of ID's, each id represents an exact keyword, then the set of ID's are passed to the SFC to obtain a single ID. This ID is then  used to find the responsible RP in the P2P network. Figure~\ref{fig:profiles}a illustrates this process. \vspace{1ex} 
+\textbf{Routing using simple keyword tuples:} The routing process consists of two steps. At the first step, a profile containing only exact keywords is encoded into a set of ID's, each id represents an exact keyword, then the set of ID's are passed to the SFC to obtain a single ID. This ID is then  used to find the responsible RP in the P2P network. Figure~\ref{fig:routingProfiles}a illustrates this process. \vspace{1ex} 
 
-\textbf{Routing using complex keyword tuples:} Similarly to the first step, a profile containing wildcards, ranges, or both is encoded and a set of ID's for each keyword are obtained and passed to the SFC. The SFC outputs a collection of IDs, using those IDs, the overlay network lookup mechanism routes the message to all responsible RP nodes in the overlay. Figure~\ref{fig:profiles}b illustrates this process.
+\textbf{Routing using complex keyword tuples:} Similarly to the first step, a profile containing wildcards, ranges, or both is encoded and a set of ID's for each keyword are obtained and passed to the SFC. The SFC outputs a collection of IDs, using those IDs, the overlay network lookup mechanism routes the message to all responsible RP nodes in the overlay. Figure~\ref{fig:routingProfiles}b illustrates this process.
 
 %The content-based routing layer of the R-Pulsar stack provides an abstraction to the layer above consisting of a single operation, \textbf{deliver}(AR message), where the AR message contains the profile that is used to route the message. The routing process can be classified as simple or complex based on the AR profile. \vspace{1ex}
 
 \subsection{Serverless Messaging Layer}\label{sec:serverless}
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.9\columnwidth]{Figures/multi-old.pdf}
+  \caption{}\label{fig:Multiquad}
+\end{figure}
 
 Serverless computing is a cloud computing model that aims to abstract server management and low-level infrastructure decisions away from developers. Allowing to deploy and execute pieces of code in response to events without the need to specify IP addresses.
 
@@ -173,7 +197,7 @@ Figure~\ref{fig:qosRule} presents a brief code example of how developers will ex
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.7\textwidth]{Figures/qosRule.pdf}
-  \label{fig:qosRule}
+  \caption{}\label{fig:qosRule}
 \end{figure}
 
 %\section{Semantics of the Programming Abstraction}
