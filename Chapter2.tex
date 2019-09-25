@@ -1,20 +1,13 @@
 \section{Introduction}
-%In this chapter, we present our approach to providing a programmable and dynamic framework that can support data-driven applications by extending software-defined environment concepts to drive the process of dynamically composing infrastructure services from multiple providers. The resulting distributed software-defined environment (dSDE) autonomously evolves over the application life cycle while meeting objectives and constraints set by users, applications, and/or resource providers. In Section 3.1.1, we first discuss the requirements for a dSDE followed by a summary of our methodology in Section 3.1.2. We then present the architecture and implementation of the three layers necessary to realize a dSDE in Sections 3.2-3.4. In Section 3.5, we then demonstrate how the three layers work together to provide a dSDE using a rule-engine–based and a constraint-programming–based approaches. Finally, we provide a summary of the chapter in Section 3.6.
+In this chapter, we present our concepts in which R-Pulsar have been build upon.
 
 \section{Framework}
 
-The R-Pulsar framework has been built using the semantics defined in the previous section. The ambition of R-Pulsar is to implement a software stack that extends cloud capabilities to edge devices, allowing to collect and analyze data closer to the source of information and react autonomously to local events.
+R-Pulsar is a software stack that extends cloud capabilities to edge devices, allowing to collect and analyze data closer to the source of information and react autonomously to local events.
 
 R-Pulsar uses a distributed architecture by the means of an overlay network, where each node in the overlay network is called a Rendezvous Point (RP). RPs can be a gateway located at the edge of the network or a server located in the cloud. R-Pulsar targets applications that span the cloud and the edge of the network.
 
 R-Pulsar consists of five layers: (1) the location-aware self-organizing overlay, (2) the content-based routing layer, (3) the serverless messaging layer, (4) the memory-mapped data-processing layer, and (5) the programming abstraction layer.
-
-%Figure \ref{fig:infrastructure} shows underlying areas of research and how they are connected.
-%\begin{figure}[!htb]
-%  \centering
-%  \includegraphics[width=.75\columnwidth]{./fig/overall-architecture.pdf}
-%  \caption{An overall layered architecture of edge-based data-intensive IoT system to achieve computing in the continuum.}\label{fig:infrastructure}
-%\end{figure}
 
 \subsection{Location-aware Overlay Network Layer}
 
@@ -24,11 +17,15 @@ R-Pulsar consists of five layers: (1) the location-aware self-organizing overlay
   \caption{}\label{fig:quadT}
 \end{figure}
 
-IoT data comes with temporal and spatial information, which is directly associated with their business value in a given context. Hence, IoT applications must process data in a timely fashion and from proper locations. R-Pulsar presents a location-aware overlay network in conjunction with point quadtrees to logically connect groups of RPs. The RPs are grouped based on the geographical location to guarantee that data gets processed with minimal latencies.
+IoT data comes with temporal and spatial information, which is directly associated with their business value in a given context. Hence, IoT applications must process data in a timely fashion and from proper locations. In order to process data from the right location R-Pulsar uses a location-aware overlay network in conjunction with a point quadtree to logically groups of RPs that are physically close together. A point quadtree is a tree data structure in which each internal node has exactly four children. Each node represents a 2D bounded box covering a specific part of the space to index, using a root node to cover the entire area.
 
-During the initialization of the overlay network, the RP attempts to discover an already existing RP in the system and construct its routing table. The joining RP sends a discovery message to the group. If the message remains unanswered after a duration (in the order of seconds), the RP assumes that it is the first in the system at it becomes the master RP, creating a single overlay network (Peer-to-Peer network).  If an RP responds to the message, they communicate with the master RP, and they are added to the P2P network. Once the initial P2P network has a sufficient number of RPs to guarantee that in case of multiple failures the P2P network will not disappear, the first P2P network will be subdivided into four additional P2P rings, plus an extra ring that will allow all the master RPs of each ring to communicate. To keep track of all the P2P networks, the quadtree data structure is used. In the case of a master RPs failure, a master RP election is performed using the Hirschberg and Sinclair algorithm~\cite{Hirschberg}. Figure~\ref{fig:quadT} depicts the processes.
+%The RPs are grouped based on the geographical location to guarantee that data gets processed with minimal latencies.
 
-%The location-aware overlay network layer provides an abstraction to the layers above, consisting of a single operation: \textbf{lookup}(identifier, AR message). Given the location specified in the AR message, the quadtree is used for searching which group of RPs is the closest to the given location. Then the identifier is used to route it in the overlay network. 
+The R-Pulsar overlay network is an n-dimensional self-organizing structured overlay composed of RP nodes. Peers in the overlay can join or leave the network at any time. Every node in the overlay is assigned a unique identifier that consists of a 160bit unique identifier. Each node stores the keys that maps to the segment of the curve between itself and its predecessor node.
+
+During the initialization of the overlay network, the RP attempts to discover an already existing RP in the system and construct its routing table. The joining RP sends a discovery message to the group. If the message remains unanswered after a duration (in the order of seconds), the RP assumes that it is the first in the system at it becomes the master RP, creating a single overlay network (Peer-to-Peer network). Every time any other RP joins the overlay network and the master RP responds to the discovery message, the  RP is added to the system by using the location of the RP and determining which quadrant the RP occupies. Once the initial P2P network has a sufficient number of RPs to guarantee that in case of multiple failures the P2P network will not disappear, the quadtree subdivides the overlay network into four additional P2P rings, plus an extra ring that will allow all the master RPs of each ring to communicate. Each RP master keeps a copy of the quadtree, so in the case of an RP failure the overlay network structure will never be lost. In the case of a master RPs failure, a master RP election is performed using the Hirschberg and Sinclair algorithm~\cite{Hirschberg}. Figure~\ref{fig:quadT} is a graphical representation of the quadtree and the logical organization of the P2P network.
+
+In order to route a message the first strep is perform a quadtree query to decide in which of the P2P rings needs to be routed to. The locations in the AR message is used to perform a lookup in the tree and find the P2P ring closes to the given location. 
 
 \subsection{Content-based Routing Layer}\label{sec:frameworkc}
 
@@ -45,29 +42,37 @@ During the initialization of the overlay network, the RP attempts to discover an
 \caption{R-Pulsar space filling curve routing using simple (a) and complex (b) profiles.}\label{fig:routingProfiles} 
 \end{figure}
 
-This layer builds on top of the location-aware overlay to route messages. As mentioned above, the lookup operator provided by the location-aware overlay requires an exact identifier, the AR message and the location to be routed. The content-based routing layer maps AR profiles onto single identifiers or clusters of identifiers to enable informaton discovery using partial knowledge, as described in \cite{SCHMIDT2008962}.
+%As mentioned above, the lookup operator provided by the location-aware overlay requires an exact identifier, the AR message and the location to be routed.
 
-The Hilbert Space Filling Curve (SFC)~\cite{SFC} is used to map the n-dimensional space of the AR profile to the one-dimensional space ID of the location-aware overlay network. Applying the Hilbert mapping to an AR profile consisting of exact keywords only can be mapped to a single point on the SFC. Furthermore, any AR profile containing wildcard or range keywords can be mapped to regions of points in the SFC.
+This layer builds on top of the location-aware overlay to route messages. The content-based routing layer maps AR profiles onto single identifiers or clusters of identifiers to enable information discovery using partial knowledge, as described in \cite{SCHMIDT2008962}.
 
-\textbf{Routing using simple keyword tuples:} The routing process consists of two steps. At the first step, a profile containing only exact keywords is encoded into a set of ID's, each id represents an exact keyword, then the set of ID's are passed to the SFC to obtain a single ID. This ID is then  used to find the responsible RP in the P2P network. Figure~\ref{fig:routingProfiles}a illustrates this process. \vspace{1ex} 
+Content-based routing is achieved by performing two steps: The first step is to encode the set of attributes and/or attribute-value pairs of the AR message, into a set of unique base 10 ids. The second step is to use the set of base 10 numbers produced in the previous step and pass them to the Hilbert Space Filling Curve (SFC). The SFC~\cite{SFC} is used to map the n-dimensional space of the AR profile to the one-dimensional space ID of the location-aware overlay network. Content based routing can be performed in two ways using simple keyword profiles or complex keyword profiles, the routing process is described below.
 
-\textbf{Routing using complex keyword tuples:} Similarly to the first step, a profile containing wildcards, ranges, or both is encoded and a set of ID's for each keyword are obtained and passed to the SFC. The SFC outputs a collection of IDs, using those IDs, the overlay network lookup mechanism routes the message to all responsible RP nodes in the overlay. Figure~\ref{fig:routingProfiles}b illustrates this process.
+\textbf{Routing using simple keyword profiles:} The routing process consists of two steps. At the first step, the AR profile containing only exact attribute-value pairs is encoded into a set of based 10 ID's, each id represents an exact attribute-value pair of the AR profile, then the set of base 10 ID's are passed to the SFC to obtain a single based 10 ID. This base 10 ID corresponds to 160bit unique identifier used by the P2P overlay network. Figure~\ref{fig:routingProfiles}a illustrates this process. \vspace{1ex} 
 
-%The content-based routing layer of the R-Pulsar stack provides an abstraction to the layer above consisting of a single operation, \textbf{deliver}(AR message), where the AR message contains the profile that is used to route the message. The routing process can be classified as simple or complex based on the AR profile. \vspace{1ex}
+\textbf{Routing using complex keyword profiles:} Similarly to the first step, an AR profile this time contains wildcards, ranges, or both is encoded and a set of base 10 ID's. The wildcard gets replaced for each of the possible value in the alphabet, producing multiple base 10 encoding sets. This sets of encoding are passed to the SFC to obtain a single based 10 ID, this step is repeated for each of the base 10 encoding sets. Then we end up with muntiple base 10 IDs that corresponds to several 160bit unique identifiers of the P2P overlay network. Figure~\ref{fig:routingProfiles}b illustrates this process.
 
 \subsection{Serverless Messaging Layer}\label{sec:serverless}
 
-\begin{figure}[!h]
-  \centering
-  \includegraphics[width=0.9\columnwidth]{Figures/multi-old.pdf}
-  \caption{}\label{fig:Multiquad}
-\end{figure}
+%\begin{figure}[!h]
+%  \centering
+%  \includegraphics[width=0.9\columnwidth]{Figures/multi-old.pdf}
+%  \caption{}\label{fig:Multiquad}
+%\end{figure}
 
-Serverless computing is a cloud computing model that aims to abstract server management and low-level infrastructure decisions away from developers. Allowing to deploy and execute pieces of code in response to events without the need to specify IP addresses.
+Serverless computing is a cloud computing model that aims to abstract server management and low-level infrastructure decisions away from developers. Allowing to deploy and execute pieces of code in response to events without the need to specify IP addresses. The serverless messaging layer implements the AR interaction model described in Chapter~\ref{chap:AR} and it consists of two components: the matching engine and the profile manager. 
 
-The serverless messaging layer implements the AR interaction model described in section~\ref{sec:semantics} and it consists of two components: the matching engine and the profile manager. The matching engine component is essentially responsible for matching profiles. If the result of the match is positive, then the action field of the incoming message is executed first, followed by the evaluation of the action field in the matched profiles. The profile manager manages locally stored profiles and monitors message credentials and contexts to ensure that related constraints are satisfied.
+The matching engine component is essentially responsible for matching profiles. If the result of the match is positive, then the action field of the incoming message is executed first, followed by the evaluation of the action field in the matched profiles. 
 
-%The serverless messaging layer offers a single operation to developers, \textbf{post}(AR message), where the AR message contains the profile that is used to route the message. The AR message then is passed to the content-based routing layer and routed to the desired destination.
+The profile manager manages locally stored profiles and monitors message credentials and contexts to ensure that related constraints are satisfied.
+
+The serverless messaging layer offers a single operation, \textbf{post}(AR message), where the AR message contains the profile that is used to route the message. To route a message using the post abstraction the following steps are performed:
+
+\begin{itemize}
+    \item Step 1: The location specified in the AR message is used to the location aware layer which is responsible for performing a location query in the quadtree. The result of the query is the P2P network that will recive the message.
+    \item Step 2: Once the P2P network is selected, then content of the AR profile is used to select which RP will be responsible for the message. The content based layer is responsible for encoding the AR profile into a set of base 10 ids and performing a SFC call to go from n-dimentional space to 1-dimensional space base 10 id.
+    \item Step 3: The base 10 id is used to route the message to the right RP.
+\end{itemize}
 
 \subsection{Memory-mapped Streaming Analytics Pipeline}
 The data pipeline is responsible for consolidating data from multiple sources, processing the data, and making them available to be used. State-of-the-art data pipelines are known to be data-intensive tasks, resulting in the inability to performing real-time data analytics when deployed on constrained devices. The memory-mapped streaming analytics pipeline layer is motivated to overcome that issue.
@@ -82,10 +87,9 @@ The streaming analytics pipeline comprises the following layers:
 
 \end{enumerate}
 
-\vspace{1ex}
 \subsubsection{Data Collection Layer}
 \hfill\\
-Multiple data collection services are available, such as Apache Kafka~\cite{kafka}, Google Pub/Sub~\cite{google}, Amazon Firehose~\cite{amazon}, and Mosquitto~\cite{mosquitto}. Although some are designed to be deployed on edge devices, these services offer limited performance when deployed in constrained devices due to the limited read and write disk speeds.%low disk I/O performance.
+Multiple data collection services are available, such as Apache Kafka~\cite{kafka}, Google Pub/Sub~\cite{google}, Amazon Firehose~\cite{amazon}, and Mosquitto~\cite{mosquitto}. Although some are designed to be deployed on edge devices, these services offer limited performance when deployed in constrained devices due to the limited read and write disk speeds.
 
 We designed and implemented a custom data collection layer designed specifically for constrained devices using a memory-mapped queue. A memory mapped file is a segment of virtual memory that has been assigned a direct correlation with some portion of a file. This file is physically present on disk, which allows the operating system to ensure data access operations with better performance than standard file access. The core principle of the R-Pulsar queue system emerges from the observation that random memory read is about 3.5x faster than sequential disk read, as measured in Table~\ref{tb:table1}. 
 
@@ -104,15 +108,12 @@ Random write                             & 0.15 MB/s              & 65.88 MB/s  
 \centering
 
 \caption{Measurements of Disk I/O vs RAM memory performance on a Raspberry Pi.} \label{tb:table1}
-\vspace{-2ex}
 \end{table}
 
-\vspace{1.5ex}
 \subsubsection{Data Processing Layer}
 \hfill\\
 R-Pulsar can be used on top of any data processing engine, allowing the end user to choose his or her favorite data-processing engine. The current release of R-Pulsar was validated using Apache Edgent. 
 
-\vspace{1.5ex}
 \subsubsection{Data Storage and Query Layer}
 \hfill\\
 This layer leverages the AR programming abstraction and a key-value database to offer SQL-like query capabilities. The storage layer uses the SFC of the content-based routing layer to allow the ability to perform wildcard, range, or exact queries and allows the data to be horizontally partitioned among multiple RPs. 
@@ -122,12 +123,28 @@ For storing data, R-Pulsar relies on RocksDB~\cite{rocks}, an embedded key-value
 \subsection{Rule-based Programming Abstraction}\label{sec:programming-data}
 The rule-based programming abstraction makes it possible to build IoT applications and decide \textbf{when} data must be sent to the cloud for further postprocessing without having to manage any infrastructure.
 
-It consists of a rule engine that allows developers to specify IF-THEN rules that can trigger other data-processing tasks when a condition is satisfied. The THEN clause of the conditions sends an AR message with a custom profile to start and stop data-processing tasks on demand. The design and evaluation of the rule-based programming abstraction were illustrated in our previous paper~\cite{rules}.
+It consists of a rule engine that allows developers to specify IF-THEN rules that can trigger other data-processing tasks when a condition is satisfied. The THEN clause of the conditions sends an AR message with a custom profile to start and stop data-processing tasks on demand. %The design and evaluation of the rule-based programming abstraction were illustrated in our previous paper~\cite{rules}.
 
-We extended the Apache Storm programming framework to use a rule-based system, which contains all of the appropriate knowledge encoded into a set of If-Then rules. The system examines all the rule conditions (IF) and determines a subset, the conflict set, of the rules whose conditions are satisfied based on the data tuples. Out of this conflict set, one of those rules is triggered (fired). When a rule is fired, the action specified in its THEN clause is carried out. The loop for firing rules continues until one of two conditions are met: there are no more rules whose conditions are satisfied or a rule is fired. We allow Apache Storm programmers to specify two different types of rules, ones that let you express data quality requirements which impose time constraints on the processing of the tuples, allowing the specification of a trade-off between the data quality and computational complexity. We also offer the ability to express content-driven rules which complement the data quality requirements by triggering further stream-processing topologies either at the core or at the edge of the network if the data needs further processing due to quality of the data.
+We created a rule-based system, which contains all of the appropriate knowledge encoded into a set of If-Then rules. The system examines all the rule conditions (IF) and determines a subset, the conflict set, of the rules whose conditions are satisfied based on the data tuples. Out of this conflict set, one of those rules is triggered (fired). When a rule is fired, the action specified in its THEN clause is carried out. The loop for firing rules continues until one of two conditions are met: there are no more rules whose conditions are satisfied or a rule is fired. We allow to specify two different types of rules, ones that let you express data quality requirements which impose time constraints on the processing of the tuples, allowing the specification of a trade-off between the data quality and computational complexity. And the second one that offers the ability to express content-driven rules which complement the data quality requirements by triggering further stream-processing topologies either at the core or at the edge of the network if the data needs further processing due to quality of the data.
 
-\subsection{Content-Driven Rule-Based System}
-Our content-driven rule-based system is inspired by how OpenFlow works~\cite{openflow}. It consists of a Storm data plane bolt, a single rule table that contains a set of rule entries installed by the workflow developer (either at development time or at runtime). The rule entries contain a collection of match fields, actions, a priority field, and the statistics, which keep track of the number of tuples that have matched each of the flow-entries or rule-entries, and the time since the last tuple matched the flow-entry (to help with the removal of inactive rules). The match fields are not a fix n-tuple header like the one implemented in the OpenFlow; our match fields are defined by the topology developers and can add as many tuple-headers as they want and it will be used to match against the flow entries. Each header field can be specified as a number, string, or wildcard to allow for aggregation of rules. The data plane bolt checks each individual tuple against the rule entry match fields. The rule actions define how to handle matching tuples. Thus, by populating the single flow table with rule entries, the workflow developer defines how the tuples should be handled. In the event of having two or more rules that satisfy the tuple condition, only the one with highest priority is executed. Each flow-entry or rule-entry has a simple action associated with it; the three basic ones (that are currently supported in our AR system) are:
+\subsubsection{Content-Driven Rule-Based System}
+The content-driven rules consists of a single rule table that contains a set of rule entries installed by the developer. The rule entries contain a collection of conditions, a single action, and a single priority field.
+
+The priority field is used in the event of having two or more rules that satisfy the condition, in order to brake the tie, only the one with highest priority will be executed. The condition field consists of one ore multiple antecedents (If clause). The antecedent of a rule consists of two parts: an object and its value. The object and its value are linked by an operator. The operator identifies the object and assigns the value. The following are all the operators currently supported:
+
+\begin{enumerate}
+  \item \textbf{AND} concatenates two or more conditions.
+  \item \textbf{OR}  
+  \item \textbf{NOT} 
+  \item \textbf{$>$,$<$,$>=$,$<=$} evaluates if the object is bigger, smaller, bigger or equal, smaller or equal than the value.
+  \item \textbf{==} evaluates if the object is the same as the value.
+  \item \textbf{AVG}
+  \item \textbf{MIN}
+  \item \textbf{MAX}
+  \item \textbf{Standard Deviation}
+\end{enumerate}
+
+The rule actions define what to do when the condition is satisfied, then the rule is fired and the action its performed. Each rule-entry has a single action associated with it; the three actions that are currently supported in our AR system are:
 
 \begin{enumerate}
   \item \textbf{Store} the results of the computation at the Edge or the Cloud. This allows the topology developers to seamlessly store the results of the topology based on the content of the data across a federated set of resources and have the ability to locate where those data results have been stored when needed.
@@ -135,7 +152,6 @@ Our content-driven rule-based system is inspired by how OpenFlow works~\cite{ope
   \item \textbf{Notify} action allows to notify any node part of the overlay network and stream the results to them.
 \end{enumerate}
 
-\noindent We modified Apache Storm to support our AR messaging system, which is the underlying system behind the rule system. The actions specified in the rule system are transformed into a set of AR messaging actions, an illustrated example is shown is section \ref{sec:example}. 
 
 The following snippet of code shows how developers will express the content-driven rules to trigger a new topology in the cloud:
 
@@ -160,18 +176,47 @@ Another brief code example of how developers will express the content-driven rul
 
 
 The action of this second rule also has two parameters: the first parameter specifies where to store the results of the streaming computation, which in this case, is at one of the edge nodes that are part of the overlay network since we want to be able to get our results quickly. The second parameter specifies how to store the results either one by one (streaming fashion) or batch (several at a time).
-\\
-\\
-Since Apache Storm offers the ability to perform computation in a single tuple at a time and to a group of tuples, we developed two types of Storm data plane bolts: a simple 'IRichBolt' which checks one individual tuple at a time against the rule entries. The second bolt is a 'IWindowedBolt' which checks incoming tuples split into finite sets, or "windows", based on specified criteria such as time and computations, which will be performed on each window of events. Storm developers can now express their data content as an observation overtime (group of tuples). Figure~\ref{fig:WindowBolt} depicts how to add rules to our rule based windowed bolt.
+
+Rules programming abstraction can be used to evaluate using a single tuple at a time or using window of tuples at a time. Windows is the concept in stream processing of splitting the infinite streams into finite chunks, and then apply computations to each chunk. There are two types of windows:
+
+\begin{itemize}
+    \item \textbf{Sliding Window:} tuples are grouped within a window that slides across the data stream according to a specified interval.
+    \item \textbf{Tumbling Window:} tuples can be grouped in a single window according to a specified interval. Any tuple belongs to only one of the windows.
+\end{itemize}
+
+Windows can be specified accordingly to two different types of intervals: time and count.
+
+Time can be used for sliding and tumbling windows to group elements from a given time period using the timestamp of the tuples. 
+
+Count can be used for sliding and tumbling windows can be used to create windows with a defined size. In such a case, all windows will have the same size and the window will not be emitted if there are fewer elements than the defined size.
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.7\textwidth]{Figures/WindowBolt.pdf}
+  \includegraphics[width=0.7\textwidth]{Figures/SlidingWindow.png}
+  \caption{A time duration based sliding window with length 10 secs and sliding interval of 5 seconds.}
+  \label{fig:SlideBolt}
+\end{figure}
+
+Figure~\ref{fig:SlideBolt} depicts an example of a duration based sliding window with length 10 secs and sliding interval of 5 seconds. The window is evaluated every 10 seconds and some of the tuples in the first window overlaps with the second one. Figure~\ref{fig:WindowBolt} depicts the API to add a rule window with length 10 secs and sliding interval of 5 seconds.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{Figures/WindowBolt.png}
   \caption{Rule engine window bolt definition.}
   \label{fig:WindowBolt}
 \end{figure}
 
-\subsection{Data Quality Rule-Based System}
+Figure~\ref{fig:TumbBolt} depicts a window is evaluated every five seconds and none of the windows overlap.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{Figures/TumblingWindow.png}
+  \caption{A time duration based tumbling window with length 5 secs..}
+  \label{fig:TumbBolt}
+\end{figure}
+
+
+\subsubsection{Data Quality Rule-Based System}
 
 \begin{figure}[h!]
   \centering
@@ -180,9 +225,8 @@ Since Apache Storm offers the ability to perform computation in a single tuple a
   \label{fig:AlgoImg}
 \end{figure}
 
-From the workflow described in Section \ref{chap:applications}, if one does not gave time constraints on how fast the data insights are needed, a highest quality of   image will always be the choice. But getting the highest quality results does not guarantee demanding results. For those reasons, we implemented a QoS mechanism to allow Apache Storm developers to specify tradeoffs between quality and computational complexity.
 
-Our data quality rule-based system (QoS rule-based system) works similarly to the content-driven rule-based system. It consists of a custom Apache Storm stream grouping and a rule engine. In Apache Storm, part of defining a topology is to define how data is exchanged between components (how streams are consumed by the bolts). A Stream Grouping specifies which streams are consumed by each bolt. A stream grouping tells a topology how to send tuples between two components. The rule engine parses the given rule entries and computes all the possible paths that will satisfy the constraints specified by the rules. In order for the stream grouping to determine all the paths that will satisfy the constraints specified by the rules we developed in an offline training mode where the stream grouping collects execution information, transfers information, etc.. to determine all the paths that will satisfy the constraint. The data quality rule entries contain a tag filed and a deadline filed. The tag filed needs to be part of each of the tuples that needs to processed. The deadline filed specifies how much time each tuple with the corresponding tag has to go through the entire Storm topology. The algorithm consists of following steps: (1) breakdown the Storm topology into lines-paths from the task of the first level to the task of the last level through only one child on each level; (2) order lines according to their relative computing times $T_{comp}^l$. (3) iterate over the lines until one of the lines does not meet the deadline $D$ and schedule the work.
+The second type of rule are the data quality rules. Our data quality rule-based system (QoS rule-based system) works similarly to the content-driven rule-based system. It consists of a custom Apache Storm stream grouping and a rule engine. In Apache Storm, part of defining a topology is to define how data is exchanged between components (how streams are consumed by the bolts). A Stream Grouping specifies which streams are consumed by each bolt. A stream grouping tells a topology how to send tuples between two components. The rule engine parses the given rule entries and computes all the possible paths that will satisfy the constraints specified by the rules. In order for the stream grouping to determine all the paths that will satisfy the constraints specified by the rules we developed in an offline training mode where the stream grouping collects execution information, transfers information, etc.. to determine all the paths that will satisfy the constraint. The data quality rule entries contain a tag filed and a deadline filed. The tag filed needs to be part of each of the tuples that needs to processed. The deadline filed specifies how much time each tuple with the corresponding tag has to go through the entire Storm topology. The algorithm consists of following steps: (1) breakdown the Storm topology into lines-paths from the task of the first level to the task of the last level through only one child on each level; (2) order lines according to their relative computing times $T_{comp}^l$. (3) iterate over the lines until one of the lines does not meet the deadline $D$ and schedule the work.
 
 \begin{figure}[h!]
   \centering

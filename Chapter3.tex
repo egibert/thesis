@@ -1,6 +1,77 @@
 \section{Introduction}
 
+R-Pulsar is build uinsg Java and the open source project TomP2P. TomP2P is a P2P library and a distributed hash table (DHT) implementation which provides a decentralized key-value infrastructure for distributed applications. Each peer has a table that can be configured either to be disk-based or memory-based to store its values.
+
+%TomP2P stores key-value pairs in a distributed manner. To find the peers to store the data in the distributed hash table, TomP2P uses an iterative routing to find the closest peers. Since TomP2P uses non-blocking communication, a future object is required to keep track of future results. This key concept is used for all the communication (iterative routing and DHT operations, such as storing a value on multiple peers) in TomP2P and it is also exposed in the API. Thus, an operation such as get or put will return immediately and the user can either block the operation to wait for the completion or add a listener that gets notified when the operation completes.
+
+The overall operation of the overlay consists of two phases: bootstrap and running. During the bootstrap phase (or join phase), messages are exchanged between a joining RP and the rest of the group. During this phase, the joining RP attempts to discover RPs already existing in the system to build its routing table. The joining RP sends a discovery message to the group. If the message is unanswered after a set duration (in the order of seconds), the RP assumes that it is the first in the system. If an RP responds to the message, the joining RP and the rest of the RPs update their routing tables.
+
+The running phase consists of stabilization and user modes. In the stabilization mode, an RP responds to queries issued by other RPs in the system. The purpose of the stabilization mode is to ensure that routing tables are up to date and to verify that other RPs in the system have not failed or left the system. In the user mode, each RP interacts at the ARMS layer. The ARMS matching engine at each RP is based on ....
+
+Once the system is operating in user mode, RPs allow external entities to use the ARMS layer to communicate with each other to offer and request data and computation. These entities can include: a) users that might want to retrieve specific data or perform certain computation over data found using a query; b) IoT devices that can produce and consume data based on specific interests; and c) computational resources, such as data analytics and streaming platforms, clouds, or high performance computing clusters that offer their computational capabilities.
+
+
+
+R-Pulsar as indirect replication which is inherited from TomP2P. The indirect replication can be described as peers publishing content for others. The peer closest to a location ID is considered as the responsible peer and replicates data if necessary. Indirect replication is triggered by two events:
+
+One event is if a peer x gets to know a new peer y. Then peer x checks all its stored data for which peer x is responsible for. If peer y is the new responsible for this stored data, the content will be handed over to peer y and peer y will be the new responsible peer. If peer y leaves the system that was responsible for content and peer x becomes the new responsible peer.
+
+The second event is triggered by a timer. Peer x checks periodically all stored data for enough replicas in the network. If not enough replicas are stored on peers, peer x starts to replicate the content.
+
 \section{API Examples}
+
+The first example uses the resource actions for enabling the exchange of data, without prior knowledge between devices. In Listing~\ref{lst:sensor}, an advertising profile is specified by the drone sensor with the type of data it can produce, and requests to be notified when someone is interested in such data.
+
+\begin{lstlisting}[language=mylang, caption={Data producer resource profile sample code.}, captionpos=b, label={lst:sensor}]
+1 profile.addSingle("Drone").addSingle("LiDAR");
+2 ARMessage msg = ARMessage.newBuilder()
+  .setAction(ARMessage.NOTIFY_INTEREST)
+  .setLatitude(40.0583).setLongitude(-74.4056))
+  .setProfile(profile);
+3 producer.post(msg);
+\end{lstlisting}
+
+Respectively, a data consumer declares the type of content of its interest. Listing~\ref{lst:ed} presents a data consumer with interest for any LiDAR sensor data that match the profile ``Drone" and ``Li*", located within the specified range (40*, 70*). As this profile matches the previous profile, the sensor from Listing 1 is notified that there is a consumer interested in its data, then the sensor starts streaming.
+
+\begin{lstlisting}[language=mylang, caption={Data consumer resource profile sample code.}, captionpos=b, label={lst:ed}]
+1 profile.addSingle("Drone").addSingle("Li*")
+  .addSingle("lat:40*").addSingle("long:-74*");
+2 ARMessage msg = ARMessage.newBuilder()
+  .setProfile(profile).setAction
+  (ARMessage.NOTIFY_DATA);
+3 producer.post(msg);
+\end{lstlisting}
+
+As mentioned previously, profiles can be used in two different ways: for discovering resources or subscribing to data publishers (resource actions) and for deploying data-processing tasks across the edge and the cloud (function actions). Listing~\ref{lst:ed2} implements the deployment of a function (post\_processing\_func) in the system. This allows the developer to specify where/on which set of resources it should be deployed.
+
+\begin{lstlisting}[language=mylang, caption={Store post-processing task in the R-Pulsar overlay network.}, captionpos=b, label={lst:ed2}]
+1 profile.addSingle("post_processing_func");
+2 ARMessage msg = ARMessage.newBuilder()
+  .setProfile(profile).setLocationTag("Cloud");
+  .setAction(ARMessage.STORE_FUNCTION);
+3 producer.post(msg);
+\end{lstlisting}
+
+Consequently, a profile and a decision (the IF-THEN rule) can be created to decide \textbf{when} to trigger the data-processing function (post\_processing\_func). In Listing~\ref{lst:t-rule}, the resulting action is created and attached to the function profile from Listing~\ref{lst:t-start2}, which is sent when the rule is satisfied.
+
+In addition, Listing~\ref{lst:t-rule} defines a rule that is constantly evaluated for every data element. If the condition of this rule is met, then the function profile from Listing~\ref{lst:t-start2} is forwarded, resulting in the execution (trigger) of the data-processing task previously stored.
+
+\begin{lstlisting}[language=mylang, caption={Rule based programming abstraction for deploying the post-processing task.}, captionpos=b, label={lst:t-rule}]
+1 Action topo1 = new Reaction(T-profile);
+2 Rule rule1 = new Rule.Builder()
+  .withCondition("IF(RESULT >= 10)")
+  .withConsequence(topo1).withPriority(0);
+\end{lstlisting}
+
+\begin{lstlisting}[language=mylang, caption={Profile for deploying the post-processing task.}, captionpos=b, label={lst:t-start2}]
+1 T-profile.addSingle("post_processing_func");
+2 ARMessage msg = ARMessage.newBuilder()
+  .setAction(ARMessage.START_FUNCTION)
+  .setProfile(T-profile);
+3 producer.post(msg);
+\end{lstlisting}
+
+\section{Location-aware Overlay Network Layer Evaluation}
 
 %\section{Evaluation}
 %In this section all the layers of R-Pulsar are evaluated by using three metrics: Overhead, Scalability and Performance. In addition each of those experiments are evaluated using cloud resources and Edge devices:
@@ -9,8 +80,6 @@
 %\item Edge System: Using Raspberry Pi 3 with 4x ARM Cortex-A53 1.2GHz, 1GB LPDDR2 of RAM and 10/100 Ethernet.
 %\item Cloud System: Chameleon Cloud~\cite{chameleon}, a configurable experimental environment for large-scale cloud research~\cite{chameleon}, with 5 instances of type m1.small (1 CPU and 2 GB RAM) and 5 instances of type m1.medium (2 CPU and 4 GB RAM) to simulate the computation capabilities of a Raspberry Pi and the hardware heterogeneity that IoT presents.
 %\end{itemize}
-
-\section{Location-aware Overlay Network Layer Evaluation}
 
 In this section we evaluate the overhead and scalability of the location-aware overlay network layer of R-Pulsar. The tests are evaluated using cloud resources and Edge devices:
 
@@ -31,6 +100,19 @@ This experiment measures the overhead involved in performing a location-based qu
 \end{figure}
 
 Figure~\ref{fig:oslocation} shows that the overhead of performing a location-based query increases ... as the number of RP nodes in the system increases. Results show a maximum overhead of 10 milliseconds, which occurred when 50k RPs are in the system. 
+
+\subsection{Overhead and Scalability of the Data Replication}
+
+Next, we measured the time required to replicate the information stored across a set of RP nodes in the system. In these experiments, we considered several scenarios involving different number of RP nodes as well as different number of replication factors. Figure~\ref{fig:topology} collects the results. 
+
+\begin{figure}[htb!]
+  \centering
+    \includegraphics[width=0.8\textwidth]{Results/ReplicationOver.pdf}
+  \caption{Time neccessary to update information of all RP nodes in the system after multiple topologies are registered.} \label{fig:topology}
+    \vspace{-2ex}
+\end{figure}
+
+We can observe that in Figure~\ref{fig:topology} that the time required to replicate the information across all the RP nodes in the system is relatively low. In particular, it can vary from a few milliseconds to around 200 milliseconds on average when having a large system with 500 RP nodes. The main factor affecting the time required to propagate the information is the number of RP nodes, since the time to route a message increases. 
 
 \section{Content-based Routing Layer Evaluation}
 
@@ -94,16 +176,7 @@ This last set of experiments are performed to understand the behavior of the sys
 
 Figure~\ref{fig:rpDiscovery} shows that the time required to have a consistent view of all the new RP nodes after the requests are placed is relatively low, and that it scales properly when increasing the number of existing RP nodes. In the case of a small system with only five existing RP nodes the overhead is around 20 milliseconds on average. The overhead increases to around 70 milliseconds in the case of having a large system with 100 existing RP nodes. Additionally, we can observe that varying the number of requests does not significantly affect the time required to propagate the information in a system with up to 50 RP nodes. In the case of having 100 RP nodes, we observe that increasing the number of requests, increases the overhead as well as the dispersion around the average. Although it is important to maintain an updated view of the system to ensure that we can efficiently process clients' requests, it is not critical for the regular operations of the system. Our system has mechanisms to adapt to changes in the availability of RP nodes to improve data processing efficiency. Therefore, we consider that having an eventually consistent system is sufficient. 
 
-Next, we measured the time required to propagate and store the information of a new topology across all RP nodes in the system. In these experiments, we considered several scenarios involving different number of RP nodes as well as different number of concurrent requests to register new topologies. Figure~\ref{fig:topology} collects the results. 
 
-\begin{figure}[htb!]
-  \centering
-    \includegraphics[width=0.8\textwidth]{Figures/topologyBox.pdf}
-  \caption{Time neccessary to update information of all RP nodes in the system after multiple topologies are registered.} \label{fig:topology}
-    \vspace{-2ex}
-\end{figure}
-
-We can observe that in Figure~\ref{fig:topology} that the time required to propagate and store the information of new topologies across all the RP nodes in the system is relatively low. In particular, it can vary from a few milliseconds to around 100 milliseconds on average when having a large system with 100 RP nodes. The main factor affecting the time required to propagate the information is the number of RP nodes as each individual message is relatively small (around 5KB). As in the case of adding RP nodes to the system, we also consider that updating the information about available topologies is eventually consistent. Moreover, in a real scenario, not every RP node will have the information of every topology, as some of them might not be relevant to all RP nodes.
 
 \section{Serverless Messaging Layer Evaluation}
 

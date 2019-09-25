@@ -1,5 +1,28 @@
-\section{AR} 
-Associative Rendezvous (AR) is a paradigm for content-based decoupled interactions with programmable reactive behaviors. Rendezvous-based interactions~\cite{AR} provide a mechanism for decoupling senders and receivers. The Rendezvous Point (RP) is the node where rendezvous interactions occur, and it can be an edge node or a cloud node. Senders transmit messages to an RP without knowledge of who or where the receivers are. The associative rendezvous interaction model consists of three elements, messages, associative selection, and reactive behaviors, which are described below. The AR interaction model consists of three elements: messages, associative selection, and reactive behaviors, which are described below~\cite{meteor2008}.
+\section{Introduction}
+
+In this Chapter, we describe the semantics and mechanisms that our programming abstraction builds upon, which enable
+developers to decide \textbf{what} and \textbf{where} data are collected and analyzed. This abstraction uses the Associative Rendezvous (AR), a paradigm for content-based decoupled interactions with programmable reactive behaviors. Rendezvous-based interactions [] provide a mechanism for decoupling senders and receivers. The Rendezvous Point (RP) is the node where rendezvous interactions occur, and it can be an edge node or a cloud node. Senders transmit messages to an RP without knowledge of who or where the receivers are. The associative rendezvous interaction model consists of three elements, messages, associative selection, and reactive behaviors, which are described below. The current approach is an adaptation of existing primitives from Meteor []
+
+\section{Associative Rendezvous} 
+Associative Rendezvous is a paradigm for content-based decoupled interactions with programmable reactive behaviors. Rendezvous-based interactions~\cite{AR} provide a mechanism for decoupling senders and receivers. The Rendezvous Point (RP) is the node where rendezvous interactions occur, and it can be an edge node or a cloud node. Senders transmit messages to an RP without knowledge of who or where the receivers are. The associative rendezvous interaction model consists of three elements, messages, associative selection, and reactive behaviors, which are described below. The AR interaction model consists of three elements: messages, associative selection, and reactive behaviors, which are described below~\cite{meteor2008}.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1in]{Figures/data_profile.pdf}
+        \caption{}
+        \label{fig:data_profile}
+    \end{subfigure}%
+    ~ 
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1in]{Figures/interest_profile.pdf}
+        \caption{}
+        \label{fig:interest_profile}
+    \end{subfigure}
+    \caption{Sample profiles: (a) producer profile from a video camera sensor; (b) consumer profile interested in video camera sensors}
+\end{figure}
 
 \subsection{AR Message}
 An AR message~\cite{meteor2008} is defined as the triplet: (header, action, data). The data field may be empty or may contain the message payload. The header includes a semantic profile in addition to the credentials of the sender, a message context, and the Lifetime of the message. The profile is a set of attributes and/or attribute–value pairs, and defines the set of recipients of the message. The attributes are keywords from the application information space, such as the type of data a sensor produces (temperature or humidity) and/or its location, the type of functionality a service provides and/or its quality of service guarantees, and the capability and/or the cost of a resource, while the values field may be a keyword, partial keyword, wildcard, or range from the same space. At the RP, a profile is classified as a data profile or an interest profile depending on the action field of the message. The data profile corresponds to a message carrying data to be stored in the system. The interest profile corresponds to a query.
@@ -9,6 +32,7 @@ An AR message~\cite{meteor2008} is defined as the triplet: (header, action, data
 Profiles are represented using a hierarchical schema that can be efficiently stored and evaluated by the selection engine at runtime. Profile $p$ represents a path in the hierarchical schema, [$e_0$ $\bigtriangleup$ ... $e_k$], where $e_i$ is an element operand and $\bigtriangleup$ can be a parent-child ("/") operator (i.e. at adjacent levels) or an ancestor-descendant ("//") operator (i.e. separated by more than one level). Within a level, the profile defines a propositional expression where $\bigtriangleup$ represents propositional operators, such as $\wedge$ and $\vee$ between elements at the same level. Note that the propositional expression at a level must be evaluated as TRUE for the evaluation to continue to the next level. The elements of the profile can be an attribute, $e_i$ : ($a_i$), or an attribute-value pair $e_i$ : ($a_i$, $v_i$), where $a_i$ is a keyword and $v_i$ may be a keyword, partial keyword, wildcard, or range. The singleton attribute $a_i$ evaluates to true if and only if $p$ contains the simple attribute $a_i$. The attribute-value pair ($a_i$,$u_i$) evaluates to true with respect to a profile $p$, if and only if $p$ contains attribute $a_i$ and the corresponding value $v_i$ satisfies $u_i$. For example, the profile in Figure~\ref{fig:data_profile} will be matched by the profile in Figure~\ref{fig:interest_profile}, since (1) both have matched singleton attribute video camera; (2) for attribute location, 100 - 105, satisfies the range relation; (3) for attribute type, {\it Public} matches the wildcard *; and (4) quality$=$720p satisfies the request quality$>=$720p. 
 
 \subsection{Reactive Behaviors} 
+
 The action field of the message defines the reactive behavior of the profile when a match occurs. Every time an RP receives an AR message, the profile is stored and matched against existing profiles. If there is a match, the action of the profile is carried out. Basic reactive behaviors are store, retrieve, notify, and delete.
 
 The notify and delete actions are explicitly invoked on a data or an interest profile. The store
@@ -35,7 +59,27 @@ R-Pulsar uses a custom implementation of the original AR semantics~\cite{meteor2
 
 In the AR message is now defined as a quintuplet instead of the original triplet: (header, action, data, location, and data-processing task). The location and data processing task fields have been added in to the already existing fields.
 
-The location field has been added so the AR message can be routed based on the location and the content, where the original version of AR only routes messages based on the content. The location coordinates represent the physical location of the sensors or the physical location of where to deploy data-processing tasks and the tag helps decide where to deploy data-processing tasks, either the edge or the cloud, allowing to pick from multiple cloud or edge geographically distributed resources. 
+The location field has been added so the AR message can be routed based on the location and the content, where the original version of AR only routes messages based on the content. The location coordinates represent the physical location of the sensors or the physical location of where to deploy data-processing tasks and the tag helps decide where to deploy data-processing tasks, either the edge or the cloud, allowing to pick from multiple cloud or edge geographically distributed resources.
+
+\begin{table}[t]
+\centering
+\caption{Reactive behaviors}
+\label{table:actions}
+\begin{tabular}{ll}
+\hline
+\textbf{Actions} & \textbf{Semantics}                                                                                                                                  \\ \hline
+store            & Store data in rendezvous point queue.                                                                                                               \\ \hline
+profiles         & \begin{tabular}[c]{@{}l@{}}Notify sender all the interest\_profiles stored in that rendezvous\\ point.\end{tabular}                                 \\ \hline
+store\_topology  & Store the new topology in the RP.                                                                                                                   \\
+start\_topology  & Start the topology in the RP.                                                                                                                       \\
+stop\_topology   & Stop the topology.                                                                                                                                  \\
+delete\_topology & Delete the topology.                                                                                                                                \\ \hline
+notify\_data     & Match message profile with existing data/interest profiles.                                                                                         \\
+notify\_interest & Notify sender if there is at least one match.                                                                                                       \\ \hline
+delete\_data     & Match message profile with existing data/interest profile.                                                                                          \\
+delete\_interest & \begin{tabular}[c]{@{}l@{}}Notify sender if there is at least one match.\\ Remove all matching data/interest profiles from the system.\end{tabular} \\ \hline
+\end{tabular}
+\end{table}
 
 In the new Associative Rendezvous, the actions are classified in two two different classes: resource actions and function actions. 
 
@@ -44,23 +88,7 @@ Resource actions are designated for discovering, starting, and stopping sensors 
 Function actions are designated for storing, triggering, and stopping data-processing tasks. Basic function reactive behaviors currently defined include {\it store\_function, start\_function and stop\_function}. The {\it store\_function} action allows users to submit and store user-defined data-processing tasks in the RPs, allowing to share and discover existing data-processing tasks previously uploaded by other users. This avoids the need to rewrite the same function multiple times and facilitates the reproducibility of the experiments. The {\it start\_function} allows users to trigger data-processing tasks on demand. %It also causes the function profile to be matched against existing function profiles. 
 If there is a match between two profiles, the data-processing task is executed. The {\it stop\_function} allows users to stop data-processing tasks that are running. %When a store\_function profile and a start\_function profile match, the function stored in the RP is triggered. 
 
-\begin{figure}
-    \centering
-    \begin{subfigure}[t]{0.5\textwidth}
-        \centering
-        \includegraphics[height=1in]{Figures/data_profile.pdf}
-        \caption{}
-        \label{fig:data_profile}
-    \end{subfigure}%
-    ~ 
-    \begin{subfigure}[t]{0.5\textwidth}
-        \centering
-        \includegraphics[height=1in]{Figures/interest_profile.pdf}
-        \caption{}
-        \label{fig:interest_profile}
-    \end{subfigure}
-    \caption{Sample profiles: (a) producer profile from a video camera sensor; (b) consumer profile interested in video camera sensors}
-\end{figure}
 
+\subsection{Illustrative Example}
 
 

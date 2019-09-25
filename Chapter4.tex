@@ -57,7 +57,6 @@ Each operator of the \ac{IoT} application is a quintuple $o_i = \langle cpu_i^o,
 
 The rate at which operator $i$ produces events is denoted by $\lambda_i^{out}$ and is a product of its input event rate $\lambda_i^{in}$ and its selectivity ($\psi^o_i$). The output event rate of a source operator ($f_k=source$) depends on the number of measurements it takes from a sensor or another monitored device. Likewise, we can recursively compute the average size $\varsigma_i^{in}$ of events that arrive at a downstream operator $i$ and the size of events it emits $\varsigma_i^{out}$ by considering the upstream operators' event sizes and their respective compression/expansion factors (\textit{i.e.}, $\omega^o_i$).
 
-
 A computational resource can host one or more operators; operators within a same host communicate directly whereas inter-node communication is done via a communication service as depicted in Figure~\ref{fig:deployment}. Events are handled in a \ac{FCFS} fashion both by operators and the communication service that serialises messages to be sent to another host. Both operators and the communication service follow an M/M/1 model for their queues which allows for estimating the waiting and service times for computation and communication. The computation or service time $stime_{\langle o_i,r_k\rangle}$ of an operator $i$ placed on a resource $k$ is hence given by:
 
 \begin{equation}
@@ -475,21 +474,26 @@ Figure~\ref{fig:cost-microsoft} depicts the cost of deploying the ETL dataflow u
 
 Figure~\ref{fig:cost-amazon} depicts the cost of deploying the ETL dataflow using the Amazon cost model. Our system obtains a 50\% cost reduction when compared to the cloud and LB approaches in all four different setups (15, 200, 5000 and 10000 sensors). In addition our system obtains a 97\% savings when compared to the Random approach in all four different setups.
 
-
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.8\textwidth]{Results/Scale.pdf}
-  \caption{Evaluation of the scalability of the operator placement problem algorithm as the number of operators to place increase over edge and cloud resources.}
+  \caption{Evaluation of the scalability of the operator placement problem algorithm as the number of operators to place increase over edge and cloud resources.}\label{fig:scalefirst}
 \end{figure}
+
+Figure~\ref{fig:scalefirst} depicts the scalability and the overhead of the initial operator placement problem algorithm in both edge and cloud resources. We can observe that the algorithm scales with the number of operators to place and a valid solution can be found in less than half a minute.
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.8\textwidth]{Results/Redeploy.pdf}
-  \caption{Evaluation of the cost of redeploying a subset of operators over edge and cloud resources.}
+  \caption{Evaluation of the cost of redeploying a subset of operators over edge and cloud resources.}\label{fig:scalesecond}
 \end{figure}
+
+Figure~\ref{fig:scalefirst} depicts the redeployment scalability and overhead of the algorithm. We can observer that since we do not need to redeploy all the operators when the workflow is not meeting the constraints, we can see that the cost of redeploying a subset of operators is very low and more important decisions can be done in real time since it the redeployment calculations are small.
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.8\textwidth]{Results/Time.pdf}
-  \caption{Evaluation of the real-time vs the modeled time as the number of operators increases.}
+  \caption{Evaluation of the real-time vs the modeled time as the number of operators increases.}\label{fig:validation} 
 \end{figure}
+
+The final result we wanted to validate the model by comparing the expected results and the actual results after deploying the workflow in a real setup, Figure~\ref{fig:validation} depicts the results. We can observe that when the number of operators is small the difference between the expected and the actual results only differs by at most 10\%, when the number of operators grows to 25 the difference slightly grows up to 15\%.
