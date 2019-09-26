@@ -91,4 +91,28 @@ If there is a match between two profiles, the data-processing task is executed. 
 
 \subsection{Illustrative Example}
 
+This section illustrates two operation examples of the AR model. The first example in Figure~\ref{fig:ARExample} illustrates the exchange of messages for registering and registering ...
 
+For this example we have two different types of data producers/sensors in this case we have a temperature sensors and a CCTV camera as data producers. The first step that both sensors perform is to register themselves into the system by advertising the type of data they can produce and where they are located, in the case of the temperature sensor its described by the profile $<T1>$, x.y,y.x and $<C1>$ x.x, y.y for the CCTV camera. By doing that they are requesting to be notified if there are other clients interested in the type of data that they can produce. Both interest profiles are stored in the system, and matched against existing interest profiles. Since there is no interest profiles stored in the system nothing else happens. Both data producers/sensors publishes data in the system only if other clients need it. The second step is the data consumer/computation is interested in consuming a very specific type of data, in this case it is interested in consuming data that matches the profile $<C*>$ and it is located in x.*,y.*.,  requesting to be notified if there are data stored in the system matching the profile. The interest profile of the computation is stored in the system and matched against the other profiles in the system. Since the notify data profile matches the profile of the CCTV camera, a notification message is sent to the CCTV camera that someone is interested in its data and to start pushing the data into the system. In Figure~\ref{fig:ARExample2} the camera starts publishing data in the system, the data published by the camera matches the data profile specified by the computation,  resulting in the data being send to the computation for processing. After a few minutes the computation decide that the data the CCTV camera is producing is no longer valuable and decides the unsubscribe from it by sending a delete interest, pushing a notification to the CCTV camera to sop pushing data to the system.
+
+\begin{figure}[h]
+\centering
+\begin{subfigure}[b]{0.8\textwidth}
+   \includegraphics[width=1.1\linewidth]{Figures/AR_Exmple_1.pdf}
+   \caption{}
+\end{subfigure}
+\begin{subfigure}[b]{0.8\textwidth}
+   \includegraphics[width=1.1\linewidth]{Figures/AR_Example_2.pdf}
+   \caption{}\label{fig:ARExample2} 
+\end{subfigure}
+\caption{An example illustrating the operation of associative rendezvous.}\label{fig:ARExample} 
+\end{figure}
+
+AR can also be used to realize different interaction semantics such as one-to-many, one-to-some, one-to-all, and mobilities while appropriately setting data and interest profiles. Figure~\ref{fig:AR-Multi} illustrates a one-to-many (e.g. multicast) interaction using AR
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{Figures/AR_Example_Multi.pdf}
+  \caption{One-to-many interactions using associative rendezvous.}
+  \label{fig:AR-Multi}
+\end{figure}

@@ -131,18 +131,7 @@ We created a rule-based system, which contains all of the appropriate knowledge 
 The content-driven rules consists of a single rule table that contains a set of rule entries installed by the developer. The rule entries contain a collection of conditions, a single action, and a single priority field.
 
 The priority field is used in the event of having two or more rules that satisfy the condition, in order to brake the tie, only the one with highest priority will be executed. The condition field consists of one ore multiple antecedents (If clause). The antecedent of a rule consists of two parts: an object and its value. The object and its value are linked by an operator. The operator identifies the object and assigns the value. The following are all the operators currently supported:
-
-\begin{enumerate}
-  \item \textbf{AND} concatenates two or more conditions.
-  \item \textbf{OR}  
-  \item \textbf{NOT} 
-  \item \textbf{$>$,$<$,$>=$,$<=$} evaluates if the object is bigger, smaller, bigger or equal, smaller or equal than the value.
-  \item \textbf{==} evaluates if the object is the same as the value.
-  \item \textbf{AVG}
-  \item \textbf{MIN}
-  \item \textbf{MAX}
-  \item \textbf{Standard Deviation}
-\end{enumerate}
+\textbf{AND}, \textbf{OR}, \textbf{NOT}, \textbf{$>$,$<$,$>=$,$<=$}, \textbf{==}, \textbf{AVG}, \textbf{MIN}, \textbf{MAX}, and \textbf{Standard Deviation}
 
 The rule actions define what to do when the condition is satisfied, then the rule is fired and the action its performed. Each rule-entry has a single action associated with it; the three actions that are currently supported in our AR system are:
 
