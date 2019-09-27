@@ -23,7 +23,7 @@ IoT data comes with temporal and spatial information, which is directly associat
 
 The R-Pulsar overlay network is an n-dimensional self-organizing structured overlay composed of RP nodes. Peers in the overlay can join or leave the network at any time. Every node in the overlay is assigned a unique identifier that consists of a 160bit unique identifier. Each node stores the keys that maps to the segment of the curve between itself and its predecessor node.
 
-During the initialization of the overlay network, the RP attempts to discover an already existing RP in the system and construct its routing table. The joining RP sends a discovery message to the group. If the message remains unanswered after a duration (in the order of seconds), the RP assumes that it is the first in the system at it becomes the master RP, creating a single overlay network (Peer-to-Peer network). Every time any other RP joins the overlay network and the master RP responds to the discovery message, the  RP is added to the system by using the location of the RP and determining which quadrant the RP occupies. Once the initial P2P network has a sufficient number of RPs to guarantee that in case of multiple failures the P2P network will not disappear, the quadtree subdivides the overlay network into four additional P2P rings, plus an extra ring that will allow all the master RPs of each ring to communicate. Each RP master keeps a copy of the quadtree, so in the case of an RP failure the overlay network structure will never be lost. In the case of a master RPs failure, a master RP election is performed using the Hirschberg and Sinclair algorithm~\cite{Hirschberg}. Figure~\ref{fig:quadT} is a graphical representation of the quadtree and the logical organization of the P2P network.
+During the initialization of the overlay network, the RP attempts to discover an already existing RP in the system and construct its routing table. The joining RP sends a discovery message to the group. If the message remains unanswered after a duration (in the order of seconds), the RP assumes that it is the first in the system and it becomes the master RP, creating a single overlay network (Peer-to-Peer network). Every time any other RP joins the overlay network and the master RP responds to the discovery message, the  RP is added to the system by using the location of the RP and determining which quadrant the RP occupies. Once the initial P2P network has a sufficient number of RPs to guarantee that in case of multiple failures the P2P network will not disappear, the quadtree subdivides the overlay network into four additional P2P rings, plus an extra ring that will allow all the master RPs of each ring to communicate. Each RP master keeps a copy of the quadtree, so in the case of an RP failure the overlay network structure will never be lost. In the case of a master RPs failure, a master RP election is performed using the Hirschberg and Sinclair algorithm~\cite{Hirschberg}. Figure~\ref{fig:quadT} is a graphical representation of the quadtree and the logical organization of the P2P network.
 
 In order to route a message the first strep is perform a quadtree query to decide in which of the P2P rings needs to be routed to. The locations in the AR message is used to perform a lookup in the tree and find the P2P ring closes to the given location. 
 
@@ -66,10 +66,31 @@ The matching engine component is essentially responsible for matching profiles. 
 
 The profile manager manages locally stored profiles and monitors message credentials and contexts to ensure that related constraints are satisfied.
 
-The serverless messaging layer offers a single operation, \textbf{post}(AR message), where the AR message contains the profile that is used to route the message. To route a message using the post abstraction the following steps are performed:
+\begin{table}[h]
+\begin{tabular}{cc}
+\hline
+\textbf{Operators}                       & \textbf{Guarantees}                                                                                                                                                                                                    \\ \hline
+bool \textbf{init()}                             & \begin{tabular}[c]{@{}c@{}}Connects to the existing P2P network \\ and guarantees the discover all existing RPs\end{tabular}                                                                                           \\ \hline
+bool \textbf{post}(AR Message)                   & \begin{tabular}[c]{@{}c@{}}Routes the AR Message based on the \\  profile and the location;\\  Guarantees that all RPs responsible for that \\  content in that location will receive the \\  AR message.\end{tabular} \\ \hline
+bool \textbf{stream}(AR Message, String Peer Id) & \begin{tabular}[c]{@{}c@{}}Stream direct messages to a select RP.\\ Guarantees that the responsible RP will\\ always receive the message.\end{tabular}                                                                 \\ \hline
+AR Message \textbf{poll}()                       & \begin{tabular}[c]{@{}c@{}}Retrieve messages from a select RP point.\\ Guarantees that the consumer will always\\ receive the message.\end{tabular}                                                                    \\ \hline
+\end{tabular}
+\centering
+\caption{Available R-Pulsar operators.} \label{tb:operators}
+\end{table}
+
+The serverless messaging layer offers four different operators. Table~\ref{tb:operators} summarized all of the available operators.
+
+The \textbf{init}() operator is used to join the R-Pulsar network and it guarantees that all the available RPs will be discovered.
+
+The \textbf{post}(AR message) operator is used to route the messages without the need of specifying the recipient of the message, the recipient of the message is resolved by using the AR Message. To route a message using the post abstraction the following steps are performed:
+
+The \textbf{stream}(AR Message, String Peer Id) operator is used to stream data directly to a specific RP, this operator bypasses the location and the content based routing layers.
+
+The \textbf{poll}() operator is used to retrieve the data other RPs are sending.
 
 \begin{itemize}
-    \item Step 1: The location specified in the AR message is used to the location aware layer which is responsible for performing a location query in the quadtree. The result of the query is the P2P network that will recive the message.
+    \item Step 1: The location specified in the AR message is used to the location aware layer which is responsible for performing a location query in the quadtree. The result of the query is the P2P network that will receive the message.
     \item Step 2: Once the P2P network is selected, then content of the AR profile is used to select which RP will be responsible for the message. The content based layer is responsible for encoding the AR profile into a set of base 10 ids and performing a SFC call to go from n-dimentional space to 1-dimensional space base 10 id.
     \item Step 3: The base 10 id is used to route the message to the right RP.
 \end{itemize}
