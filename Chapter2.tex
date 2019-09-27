@@ -109,7 +109,7 @@ The streaming analytics pipeline comprises the following layers:
 \end{enumerate}
 
 \subsubsection{Data Collection Layer}
-\hfill\\
+
 Multiple data collection services are available, such as Apache Kafka~\cite{kafka}, Google Pub/Sub~\cite{google}, Amazon Firehose~\cite{amazon}, and Mosquitto~\cite{mosquitto}. Although some are designed to be deployed on edge devices, these services offer limited performance when deployed in constrained devices due to the limited read and write disk speeds.
 
 We designed and implemented a custom data collection layer designed specifically for constrained devices using a memory-mapped queue. A memory mapped file is a segment of virtual memory that has been assigned a direct correlation with some portion of a file. This file is physically present on disk, which allows the operating system to ensure data access operations with better performance than standard file access. The core principle of the R-Pulsar queue system emerges from the observation that random memory read is about 3.5x faster than sequential disk read, as measured in Table~\ref{tb:table1}. 
@@ -132,11 +132,11 @@ Random write                             & 0.15 MB/s              & 65.88 MB/s  
 \end{table}
 
 \subsubsection{Data Processing Layer}
-\hfill\\
+
 R-Pulsar can be used on top of any data processing engine, allowing the end user to choose his or her favorite data-processing engine. The current release of R-Pulsar was validated using Apache Edgent. 
 
 \subsubsection{Data Storage and Query Layer}
-\hfill\\
+
 This layer leverages the AR programming abstraction and a key-value database to offer SQL-like query capabilities. The storage layer uses the SFC of the content-based routing layer to allow the ability to perform wildcard, range, or exact queries and allows the data to be horizontally partitioned among multiple RPs. 
 
 For storing data, R-Pulsar relies on RocksDB~\cite{rocks}, an embedded key-value database optimized for fast and low-latency storage. The database keeps the most recently used data in the main memory and stores the least recently used data on disk.
@@ -151,8 +151,26 @@ We created a rule-based system, which contains all of the appropriate knowledge 
 \subsubsection{Content-Driven Rule-Based System}
 The content-driven rules consists of a single rule table that contains a set of rule entries installed by the developer. The rule entries contain a collection of conditions, a single action, and a single priority field.
 
-The priority field is used in the event of having two or more rules that satisfy the condition, in order to brake the tie, only the one with highest priority will be executed. The condition field consists of one ore multiple antecedents (If clause). The antecedent of a rule consists of two parts: an object and its value. The object and its value are linked by an operator. The operator identifies the object and assigns the value. The following are all the operators currently supported:
-\textbf{AND}, \textbf{OR}, \textbf{NOT}, \textbf{$>$,$<$,$>=$,$<=$}, \textbf{==}, \textbf{AVG}, \textbf{MIN}, \textbf{MAX}, and \textbf{Standard Deviation}
+The priority field is used in the event of having two or more rules that satisfy the condition, in order to brake the tie, only the one with highest priority will be executed. The condition field consists of one ore multiple antecedents (If clause). The antecedent of a rule consists of two parts: an object and its value. The object and its value are linked by an operator. The operator identifies the object and assigns the value. Table~\ref{tb:ruleOp} summarized all the rule operators currently supported.
+
+
+\begin{table}[h]
+\begin{tabular}{cc}
+\hline
+\textbf{Operator}                                                                                       & \textbf{Definition} \\ \hline
+AND                                                                                                     &                     \\ \hline
+OR                                                                                                      &                     \\ \hline
+NOT                                                                                                     &                     \\ \hline
+\begin{tabular}[c]{@{}c@{}}\textgreater{},\textless{},\\ \textgreater{}=,\textless{}=\\ ==\end{tabular} &                     \\ \hline
+MIN                                                                                                     &                     \\ \hline
+MAX                                                                                                     &                     \\ \hline
+AVG                                                                                                     &                     \\ \hline
+STD                                                                                                     &                     \\ \hline
+IF                                                                                                      &                     \\ \hline
+\end{tabular}
+\centering
+\caption{Available R-Pulsar rule operators.} \label{tb:ruleOp}
+\end{table}
 
 The rule actions define what to do when the condition is satisfied, then the rule is fired and the action its performed. Each rule-entry has a single action associated with it; the three actions that are currently supported in our AR system are:
 
@@ -235,8 +253,9 @@ Figure~\ref{fig:TumbBolt} depicts a window is evaluated every five seconds and n
   \label{fig:AlgoImg}
 \end{figure}
 
+The second type of rule are the data quality rules. Data quality rules are used in workflows that have multiple redundant computations, where each computations takes different amount of time and produces a different data quality. The rule system is designed so users can specify time and data quality constraints so the QoS for the application can be meet.
 
-The second type of rule are the data quality rules. Our data quality rule-based system (QoS rule-based system) works similarly to the content-driven rule-based system. It consists of a custom Apache Storm stream grouping and a rule engine. In Apache Storm, part of defining a topology is to define how data is exchanged between components (how streams are consumed by the bolts). A Stream Grouping specifies which streams are consumed by each bolt. A stream grouping tells a topology how to send tuples between two components. The rule engine parses the given rule entries and computes all the possible paths that will satisfy the constraints specified by the rules. In order for the stream grouping to determine all the paths that will satisfy the constraints specified by the rules we developed in an offline training mode where the stream grouping collects execution information, transfers information, etc.. to determine all the paths that will satisfy the constraint. The data quality rule entries contain a tag filed and a deadline filed. The tag filed needs to be part of each of the tuples that needs to processed. The deadline filed specifies how much time each tuple with the corresponding tag has to go through the entire Storm topology. The algorithm consists of following steps: (1) breakdown the Storm topology into lines-paths from the task of the first level to the task of the last level through only one child on each level; (2) order lines according to their relative computing times $T_{comp}^l$. (3) iterate over the lines until one of the lines does not meet the deadline $D$ and schedule the work.
+The data quality rules are only supported when the Apache Storm engine is used, since it was build using Apache Storm. The content based rules consist of a custom Apache Storm stream grouping and the rule engine. In Apache Storm, part of defining a topology is to define how data is exchanged between components (how streams are consumed by the bolts). A Stream Grouping specifies which streams are consumed by each bolt. A stream grouping tells a topology how to send tuples between two components. The rule engine parses the given rule entries and computes all the possible paths that will satisfy the constraints specified by the rules. In order for the stream grouping to determine all the paths that will satisfy the constraints specified by the rules we developed in an offline training mode where the stream grouping collects execution information, transfers information, etc.. to determine all the paths that will satisfy the constraint. The data quality rule entries contain a tag filed and a deadline filed. The tag filed needs to be part of each of the tuples that needs to processed. The deadline filed specifies how much time each tuple with the corresponding tag has to go through the entire Storm topology. The algorithm consists of following steps: (1) breakdown the Storm topology into lines-paths from the task of the first level to the task of the last level through only one child on each level; (2) order lines according to their relative computing times $T_{comp}^l$. (3) iterate over the lines until one of the lines does not meet the deadline $D$ and schedule the work.
 
 \begin{figure}[h!]
   \centering

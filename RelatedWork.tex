@@ -26,7 +26,7 @@ The majority of IoT platform's architecture follows the cloud-centric approach. 
 
 The other approach is the end-to-end architecture or middleware centric architecture built on the premise that edge-processing can save huge costs to clients. An Internet of Things (IoT) gateway or middleware is a physical device that serves as the connection point between the cloud and sensors and intelligent devices. All data moving to the cloud, or vice versa, goes through the gateway, which is deployed on single board computers (e.g., Raspberry Pi's), minicomputers, or smart devices (e.g., smartphones, TVs, or refrigerators) to provide management, connectivity, and data pre-processing for sensors.
 
-In this survey, we are only going to focus on the end-to-end or middleware centric architecture. In order to compare and contrast all the existing state of the art, we propose a four-layer edge-based middleware framework that each of the middlewares should consist of. Figure~\ref{fig:EdgeArch} presents the layers and components that need to be included in an edge computing solution. The architecture proposed covers all the requirements that the IoT applications. The edge-based middleware architecture consists of the following four layers: (1) resource management layer, (2) data processing layer, (3) service layer and (4) security layer. In the appendix ~\cref{tab:full_system_no_goals,tab:full_system_1,tab:full_system_2,tab:full_system_3} summarize the comparison of the available edge-based middleware systems in the market. 
+In this survey, we are only going to focus on the end-to-end or middleware centric architecture. In order to compare and contrast all the existing state of the art, we propose a four-layer edge-based middleware framework that each of the middlewares should consist of. Figure~\ref{fig:EdgeArch} presents the layers and components that need to be included in an edge computing solution. The architecture proposed covers all the requirements that the IoT applications. The edge-based middleware architecture consists of the following four layers: (1) resource management layer, (2) data processing layer, (3) service layer and (4) security layer. Tables ~\cref{tab:full_system_no_goals,tab:full_system_1,tab:full_system_2,tab:full_system_3} summarize the comparison of the available edge-based middleware systems in the market. 
 
 \begin{table}[hbt!]
 \begin{adjustwidth}{-1.6cm}{-1cm}
@@ -55,7 +55,7 @@ The resource management layer is responsible for discovering, identifying, and a
 %to discover, estimate, allocate and monitor resources are the fundamental activities of this layer.
 
 \subsubsection{Design Goals}
-\hfill\\
+
 The following are the design goals that need to be taken into consideration when developing any of the components of the resource management layer.
 \\\\
 \textbf{Low Overhead:} The algorithms and protocols of the resource management layer need to offer low runtime overhead when deployed in performance-limited hardware platforms.
@@ -130,7 +130,7 @@ Farris et al.~\cite{Farris:2017}, define two integer linear programming (ILP) op
 The data processing layer is responsible for consolidating data from multiple sources, processing the data, and making them available. State-of-the-art data processing layers are known to be data-intensive tasks, due to the constant reading and writing from an to disk resulting in the inability to performing real-time data analytics when deployed on edge constrained devices. The data processing layer consists of the following components: data ingestion, data analysis, data storage, and data query. Table~\ref{tab:processing} summarizes the design goals of each of the works focused on the data processing layer.
 
 \subsubsection{Design Goals}
-\hfill\\
+
 The following are the design goals that need to be taken into consideration when designing any of the components of the data processing layer.
 \\\\
 \textbf{Distributed:} The data processing components should support distributed information processing, distributed computing capabilities, distributed storage and query. In order to address the variable number of devices, services, and users at any given point in time.
@@ -141,7 +141,7 @@ clients. The data processing components also need to be scalable also to address
 \textbf{Real-Time:} The real-time term refers to the ability to achieve low processing latency as the number of messages increases. The data processing components need to be able to process data in real-time either in edge constrained devices such as Raspberry Pis or smartphones and the cloud. Since IoT applications are latency sensitive as we described in section~\ref{sec:usecases}. 
 
 \subsubsection{Data Ingestion}
-\hfill\\
+
 The data ingestion component gathers data from multiple sources and brings them to the pipeline for processing. The following are some of the work focused only on the data ingestion component.
 
 Apache Kafka~\cite{kafka} is one of the most popular frameworks available, it is an open source framework used for building real-time data pipelines and streaming apps. It is horizontally scalable, fault-tolerant, and runs in production in thousands of companies. Apache Kafka meets three of the four design goals, the reason Apache Kafka does not offer real-time processing at the edge of the network, because it was not designed to be deployed in constrained devices, it was designed to be deployed at the cloud. 
@@ -153,7 +153,7 @@ RabbitMQ~\cite{RabbitMQ} is lightweight and easy to deploy on-premises and in th
 ActiveMQ~\cite{HiveMQ} is the most popular open source, multi-protocol, Java-based messaging server. It supports industry-standard protocols so users get the benefits of client choices across a broad range of languages and platforms. ActiveMQ also suffers from the same problems as Mosquitto and RabbitMQ, has high message transmission latency and cannot handle more than 20.000 publishers~\cite{mqtt}.
 
 \subsubsection{Data Analysis}
-\hfill\\
+
 The data analysis is a process of inspecting, cleansing, transforming, and modeling data with the goal of discovering useful information and decision-making. The following are some of the work focused only on the data analysis component.
 
 Heron~\cite{heron} is a real-time analytics platform developed by Twitter, it's designed for speedy performance, low latency, isolation, and reliability. Heron meets all the design goals except for the real-time data analytics at the edge. Because it was designed to be deployed in large clusters at the core of the network.
@@ -171,7 +171,7 @@ Apache Edgent~\cite{edgent} is a programming model and micro-kernel style runtim
 LMC~\cite{8102173} a framework that aims at enabling cross-platform code execution on constrained IoT devices. LCM meets the real-time and the scalable design goals since it was designed to constrained devices, but it doesn't meet the distributed since there is no current support.
 
 \subsubsection{Data Storage}
-\hfill\\
+
 Due to the ever-increasing deployment of bandwidth-intensive IoT platforms (especially cameras), there is an increasing pressure on the bandwidth to transport data back and forth between the edge and the Cloud. This factor point to the need for a more efficient management of the data and the computation on the data at the edge of the network. Building a storage system on an edge computing infrastructure has its own set of peculiar challenges. The wide geo-distribution, heterogeneous and the constrained nature of this
 infrastructure requires data-partitioning and replication policies that are commensurate with the latency requirements of the applications. The following are some of the work focused only on the data storage component.
 
@@ -180,7 +180,7 @@ DataFlog~\cite{DataFog:2018} is a distributed indexing mechanism that performs d
 FogStore~\cite{Gupta:2018}~\cite{Mayer2017FogStore} is a key-value store for event-based systems, that exploits the concept of relevance to guarantee low-latency access to relevant data with strong consistency guarantees while providing tolerance from geographically correlated failures. FogStore was designed by the same authors of DataFog and it also meets all the design goals, just like DataFlog.
 
 \subsubsection{Data Query}
-\hfill\\
+
 Similarly to the data storage, once data has been stored it needs to be accessed as well. The following are some of the research work on creating edge query systems. The following are some of the work focused only on the data query component.
  
 Moon et al.~\cite{8190803} propose a data management and searching system based on blockchain which ensures security by using ECDSA digital signature and SHA-256 hash function. Moon et al. are able to meet all the goals for the data query layer except for the real-time since they are using heavy blockchain algorithms.
@@ -213,7 +213,7 @@ IOTMDB~\cite{6468294} is an Internet of Things storage management architecture b
 The Service Layer defines an application's set of available operations from the perspective of interfacing client layers. It encapsulates the application's business logic, controlling transactions and coordinating responses in the implementation of its operations. The service layer consists of the following components: rule engine, programming model, and workflow orchestrator. Table~\ref{tab:service} summarizes the design goals of each of the works focused on the service layer.
 
 \subsubsection{Design Goals}
-\hfill\\
+
 The following are the design goals that need to be taken into consideration when creating any of the components of the service layer.
 \\\\
 \textbf{Low Overhead} The service layer components need to be able to process data in real-time, i.e. providing fast analysis and data queries when deployed in performance-limited hardware platforms.
@@ -230,7 +230,7 @@ The following are the design goals that need to be taken into consideration when
 %The recent trend of emergence of heterogeneous subsystems in smart home environment often leads to interoperability problem in managing such systems. Interoperability is defined as the ability of two or more entities to exchange information and to use the information that has been exchanged [2]. In smart home environment, interoperability is concerned with message exchange between two or more subsystems and performing interoperation in a federated and satisfactory manner without the need for external intervention. 
 
 \subsubsection{Rule Engine}
-\hfill\\
+
 The Rule Engine makes it possible to build IoT applications that gather, process, analyze and act on data generated by connected devices at a global scale without having to manage any infrastructure. A rule engine applies a set of rules and facts to deduce conclusions, searching the rules until it finds one where the IF clause is known to be true. The following are some of the work focused only on the rule engine component.
 
 Chui et al.~\cite{5277977} propose a rule-based framework for the management of heterogeneous systems in a smart home environment. The proposed framework is based on an ECA rule mechanism with SOAP technology that provides interoperability among sensors and actuators systems. Chui et al rule engine satisfies all the design goals since they use an Event-Condition-Action (ECA) pattern which allows them to scale the system as the number of rules grows and achieve low overhead. 
@@ -255,7 +255,7 @@ Fabryq et al.~\cite{Etemadi2014FabryqUP} allow developers to write an embedded-g
 FogFlow~\cite{8022859} extends the dataflow programming model with declarative hints based on the widely used standard NGSI, which leads to two benefits for service developers: 1) fast and easy development of fog computing applications, this is because the proposed hints hide lots of task configuration and deployment complexity from service developers; 2) good openness and interoperability for information sharing and data source integration, this is because NGSI is a standardized open data model and API and it has been widely adopted by more than 30 cities all over the world. FogFlow satisfies both design goals since it extends the cloud-based dataflow programming model with standard-based APIs and makes it suitable for the cloud-edge environment, making it easy to learn. FogFlow also satisfies both design goals since it uses Javascript or Python as a programming language and has a high-level API, making it easy to learn.
 
 \subsubsection{Workflow Orchestrator}
-\hfill\\
+
 The Workflow Orchestrator consists of defining how to accommodate the application components (i.e., operators) on the available resources of the network topology to optimize one or more performance metrics. A key challenge is to automatically decide how to partition such operations among edge and cloud compute resources, in order to minimize the overall completion time of the entire graph of operations. The workflow placement has been proved to be at least NP-Hard~\cite{Benoit:2013}. The following are some of the work focused only on the workflow orchestrator component.
 
 Eidenbenz et al.~\cite{Eidenbenz:2016} evaluated Series-Parallel-Decomposable Graphs (SPDG) from its parallelism degree to decompose the application graph and by an approximation algorithm to determine the placement. Eidenbenz et al. only satisfy the real-time design goals since its only a theoretical approach.
@@ -289,7 +289,7 @@ Kothmayr et al.~\cite{6424088}  & \checkmark &                           \\ \hli
 Internet of Things (IoT) consists of thousands of devices that generate, process, and exchange vast amounts of security and safety-critical data as well as privacy-sensitive information, and hence keeping that information private and secure is a big and important challenge that needs to be taken into consideration. The following are some of the work focused only on the end-to-end security component. Table~\ref{tab:security} summarizes the work focused on the security layer.
 
 \subsubsection{Data privacy}
-\hfill\\
+
 Since the IoT makes large volumes of information easily available through remote access mechanisms, privacy protection in IoT is challenging. The following are some of the work focused only on the data privacy component.
 
 Endler et al.~\cite{8241993} present ContextNet a middleware which consists of scalable software infrastructure for enabling cloud-based communication with mobile devices (SDDL), and parallel data stream processing facilities in the cloud/cluster. The Scalable Data Distribution Layer (SDDL) is a communication infrastructure that connects mobile nodes to stationary nodes (i.e. the SDDL Core), executing in a cloud or a cluster. The stationary nodes may be application specific servers, gateways for connection with the mobile nodes, or monitoring and control nodes for displaying the mobile nodes current position on maps, managing and communicating with groups of mobiles, and sending message to individual mobile nodes. 
@@ -299,7 +299,7 @@ Lu et al.~\cite{7869305} present a lightweight privacy-preserving data aggregati
 Shi et al.~\cite{shi} describes a Private Stream Aggregation (PSA) algorithms which allow users to upload a stream of encrypted data to an untrusted aggregator, and allow the aggregator to decrypt (approximate) aggregate statistics for each time interval with an appropriate capability.
 
 \subsubsection{End-to-End Security}
-\hfill\\
+
 To preserve user security and privacy it is critical that the communication link among the IoT devices and the remote hosts or servers that are interested in accessing the critical data is secured, in order not to leak personal data. It is very important to understand which protocols are able to provide the right level of security without burdening the limited resources of the constrained edge devices. The limited computational capacity, the low amount of memory, and the constraints on energy consumption make the design of these protocols particularly hard and complicated. 
 
 Behrens et al.~\cite{7899405} present a single end-to-end Application Security Layer (ASL). The ASL caters for reliable and confidential communications within a constrained Internet of Things (IoT) environment. To provide a secure key exchange and to set up a secure data connection, the TLS protocol is used. This paper studies the use of TLS over JSON via a CoAP RESTful service. This method provides a way for end-to-end communication flexibility and potentially retain identity information for repudiation. 

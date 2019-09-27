@@ -21,7 +21,7 @@ Associative Rendezvous is a paradigm for content-based decoupled interactions wi
         \caption{}
         \label{fig:interest_profile}
     \end{subfigure}
-    \caption{Sample profiles: (a) producer profile from a video camera sensor; (b) consumer profile interested in video camera sensors}
+    \caption{Sample profiles: (a) producer profile from a video camera sensor; (b) consumer profile interested in video camera sensors}\label{fig:samples_profiles}
 \end{figure}
 
 \subsection{AR Message}
@@ -35,24 +35,13 @@ Profiles are represented using a hierarchical schema that can be efficiently sto
 
 The action field of the message defines the reactive behavior of the profile when a match occurs. Every time an RP receives an AR message, the profile is stored and matched against existing profiles. If there is a match, the action of the profile is carried out. Basic reactive behaviors are store, retrieve, notify, and delete.
 
-The notify and delete actions are explicitly invoked on a data or an interest profile. The store
-action stores the data and data profile at the RP. It also causes the message profile to be matched
-against existing interest profiles with notify data action, and the data to be sent to the data consumers
-that requested it in case of a positive match.
+The notify and delete actions are explicitly invoked on a data or an interest profile. The store action stores the data and data profile at the RP. It also causes the message profile to be matched against existing interest profiles with notify data action, and the data to be sent to the data consumers that requested it in case of a positive match.
 
-The retrieve action retrieves data corresponding to each matching data profile. The notify action
-matches the message profile against existing interest/data profile, and notifies the sender if there
-is at least one positive match. 
+The retrieve action retrieves data corresponding to each matching data profile. The notify action matches the message profile against existing interest/data profile, and notifies the sender if there is at least one positive match. 
 
-The notify action comes in two flavors: notify data and notify interest.
-Notify data is used by data consumers, who want to be notified when data matching their interest
-profile are stored in the system. Notify interest can be used by data producers, who want to be notified
-when there is interest in the data they produce, so that they can start sending data into the system.
+The notify action comes in two flavors: notify data and notify interest. Notify data is used by data consumers, who want to be notified when data matching their interest profile are stored in the system. Notify interest can be used by data producers, who want to be notified when there is interest in the data they produce, so that they can start sending data into the system.
 
-Finally, the delete action deletes all matching interest/data profiles. Note that the actions will
-only be executed if the message header contains an appropriate credential. Also note that each
-message is stored at the rendezvous for a period corresponding to the Lifetime defined in its header.
-In case of multiple matches, the profiles matching are processed in random order.
+Finally, the delete action deletes all matching interest/data profiles. Note that the actions will only be executed if the message header contains an appropriate credential. Also note that each message is stored at the rendezvous for a period corresponding to the Lifetime defined in its header. In case of multiple matches, the profiles matching are processed in random order.
 
 \subsection{Associative Rendezvous 2.0}\label{sec:semantics}
 R-Pulsar uses a custom implementation of the original AR semantics~\cite{meteor2008}. In our new implementation of the AR model, we modified to elements: the AR Message and the Reactive Behaviors.
