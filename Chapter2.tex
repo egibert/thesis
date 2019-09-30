@@ -83,11 +83,11 @@ The serverless messaging layer offers four different operators. Table~\ref{tb:op
 
 The \textbf{init}() operator is used to join the R-Pulsar network and it guarantees that all the available RPs will be discovered.
 
-The \textbf{post}(AR message) operator is used to route the messages without the need of specifying the recipient of the message, the recipient of the message is resolved by using the AR Message. To route a message using the post abstraction the following steps are performed:
-
 The \textbf{stream}(AR Message, String Peer Id) operator is used to stream data directly to a specific RP, this operator bypasses the location and the content based routing layers.
 
 The \textbf{poll}() operator is used to retrieve the data other RPs are sending.
+
+The \textbf{post}(AR message) operator is used to route the messages without the need of specifying the recipient of the message, the recipient of the message is resolved by using the AR Message. To route a message using the post abstraction the following steps are performed:
 
 \begin{itemize}
     \item Step 1: The location specified in the AR message is used to the location aware layer which is responsible for performing a location query in the quadtree. The result of the query is the P2P network that will receive the message.
@@ -127,7 +127,6 @@ Random read                              & 0.78 MB/s              & 65.96 MB/s  
 Random write                             & 0.15 MB/s              & 65.88 MB/s              \\ \hline
 \end{tabular}}
 \centering
-
 \caption{Measurements of Disk I/O vs RAM memory performance on a Raspberry Pi.} \label{tb:table1}
 \end{table}
 
