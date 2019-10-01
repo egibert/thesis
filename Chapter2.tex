@@ -67,6 +67,8 @@ The matching engine component is essentially responsible for matching profiles. 
 The profile manager manages locally stored profiles and monitors message credentials and contexts to ensure that related constraints are satisfied.
 
 \begin{table}[h]
+\caption{Available R-Pulsar operators.} \label{tb:operators}
+\begin{adjustwidth}{-0.5cm}{-1cm}
 \begin{tabular}{cc}
 \hline
 \textbf{Operators}                       & \textbf{Guarantees}                                                                                                                                                                                                    \\ \hline
@@ -75,8 +77,7 @@ bool \textbf{post}(AR Message)                   & \begin{tabular}[c]{@{}c@{}}Ro
 bool \textbf{stream}(AR Message, String Peer Id) & \begin{tabular}[c]{@{}c@{}}Stream direct messages to a select RP.\\ Guarantees that the responsible RP will\\ always receive the message.\end{tabular}                                                                 \\ \hline
 AR Message \textbf{poll}()                       & \begin{tabular}[c]{@{}c@{}}Retrieve messages from a select RP point.\\ Guarantees that the consumer will always\\ receive the message.\end{tabular}                                                                    \\ \hline
 \end{tabular}
-\centering
-\caption{Available R-Pulsar operators.} \label{tb:operators}
+\end{adjustwidth}
 \end{table}
 
 The serverless messaging layer offers four different operators. Table~\ref{tb:operators} summarized all of the available operators.
@@ -114,9 +115,11 @@ Multiple data collection services are available, such as Apache Kafka~\cite{kafk
 
 We designed and implemented a custom data collection layer designed specifically for constrained devices using a memory-mapped queue. A memory mapped file is a segment of virtual memory that has been assigned a direct correlation with some portion of a file. This file is physically present on disk, which allows the operating system to ensure data access operations with better performance than standard file access. The core principle of the R-Pulsar queue system emerges from the observation that random memory read is about 3.5x faster than sequential disk read, as measured in Table~\ref{tb:table1}. 
 
-The trade-off of using a memory mapped data collection system is that operating systems decides when to copy data from the main memory to disk. %Our approach is based on the assumption that the MQTT protocol assumes that the client and the server are generally available~\cite{IBM-MQTT}. 
-
+The trade-off of using a memory mapped data collection system is that operating systems decides when to copy data from the main memory to disk.  
+\\
 \begin{table}[h!]
+\centering
+\caption{Measurements of Disk I/O vs RAM memory performance on a Raspberry Pi.} \label{tb:table1}
 \scalebox{1.2}{
 \begin{tabular}{|l|c|c|}
 \hline
@@ -126,8 +129,6 @@ Sequential write                         & 7.12 MB/s              & 573.65 MB/s 
 Random read                              & 0.78 MB/s              & 65.96 MB/s              \\ \hline
 Random write                             & 0.15 MB/s              & 65.88 MB/s              \\ \hline
 \end{tabular}}
-\centering
-\caption{Measurements of Disk I/O vs RAM memory performance on a Raspberry Pi.} \label{tb:table1}
 \end{table}
 
 \subsubsection{Data Processing Layer}
@@ -154,21 +155,22 @@ The priority field is used in the event of having two or more rules that satisfy
 
 
 \begin{table}[h]
+\caption{Available R-Pulsar rule operators.}\label{tb:ruleOp}
+\begin{adjustwidth}{-1cm}{-1cm}
 \begin{tabular}{cc}
 \hline
-\textbf{Operator}                                                                                       & \textbf{Definition} \\ \hline
-AND                                                                                                     &                     \\ \hline
-OR                                                                                                      &                     \\ \hline
-NOT                                                                                                     &                     \\ \hline
-\begin{tabular}[c]{@{}c@{}}\textgreater{},\textless{},\\ \textgreater{}=,\textless{}=\\ ==\end{tabular} &                     \\ \hline
-MIN                                                                                                     &                     \\ \hline
-MAX                                                                                                     &                     \\ \hline
-AVG                                                                                                     &                     \\ \hline
-STD                                                                                                     &                     \\ \hline
-IF                                                                                                      &                     \\ \hline
+\textbf{Operator}                                                                                       & \textbf{Definition}                                                                                                                                                                                                                                                                                                                                                 \\ \hline
+AND                                                                                                     & Evaluates if two values or expressions are both true.                                                                                                                                                                                                                                                                                                               \\ \hline
+OR                                                                                                      & Evaluates if at least one of multiple values or expressions is true.                                                                                                                                                                                                                                                                                                \\ \hline
+NOT                                                                                                     & Returns false for true and true for false.                                                                                                                                                                                                                                                                                                                          \\ \hline
+\begin{tabular}[c]{@{}c@{}}\textgreater{},\textless{},\\ \textgreater{}=,\textless{}=\\ ==\end{tabular} & \begin{tabular}[c]{@{}c@{}}Evaluates if a value is less than the value that follows this symbol.\\ Evaluates if a value is greater than the value that follows this symbol.\\ Evaluates if a value is less than or equal to the value that follows this symbol.\\ Evaluates if a value is greater than or equal to the value that follows this symbol.\end{tabular} \\ \hline
+MIN                                                                                                     & Returns true if the given number is the lowest number from a list of numbers.                                                                                                                                                                                                                                                                                       \\ \hline
+MAX                                                                                                     & Returns true if the given number is the highest number from a list of numbers.                                                                                                                                                                                                                                                                                      \\ \hline
+AVG                                                                                                     & Returns true if the given number is the avg number from a list of numbers.                                                                                                                                                                                                                                                                                          \\ \hline
+STD                                                                                                     & Returns true if the given number is the std number from a list of numbers.                                                                                                                                                                                                                                                                                          \\ \hline
+IF                                                                                                      & \begin{tabular}[c]{@{}c@{}}Determines if expressions are true or false. \\ Returns a given value if true and another value if false.\end{tabular}                                                                                                                                                                                                                   \\ \hline
 \end{tabular}
-\centering
-\caption{Available R-Pulsar rule operators.} \label{tb:ruleOp}
+\end{adjustwidth}
 \end{table}
 
 The rule actions define what to do when the condition is satisfied, then the rule is fired and the action its performed. Each rule-entry has a single action associated with it; the three actions that are currently supported in our AR system are:
