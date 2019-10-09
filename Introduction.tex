@@ -40,7 +40,7 @@
 %\item \textbf{Data Storage and Query:} reads and writes data to the main memory and disk.
 %\end{enumerate}
 
-The Internet of Things (IoT) is an emerging concept that is fostering the connection of massive numbers of objects, sensors, and devices to the network. As per Cisco systems\footnote{Cisco, Internet of Things At-a-Glance, 2016 }, 500 billion devices are expected to be connected the Internet by 2030, and nearly half of the worldwide data will come from sensors~\cite{McAuley}. 
+The Internet of Things (IoT) is an emerging concept that is fostering the connection of massive numbers of objects, sensors, and devices to the network. As per Cisco systems\footnote{Cisco, Internet of Things At-a-Glance, 2016 }, 500 billion devices are expected to be connected to the Internet by 2030, and nearly half of the worldwide data will come from sensors~\cite{McAuley}. 
 %
 IoT devices produce important and timely data that can lead to new and transformative applications that are important to science and society, such as:
 %
@@ -52,26 +52,47 @@ IoT devices produce important and timely data that can lead to new and transform
 
 Making such applications a reality requires collecting data from sensors and instruments, processing this data individually or collectively in a timely manner, and making decisions based on the results. 
 
-Stream processing frameworks (SPFs) have proven to be very effective at processing large amounts of data at near-real time, especially when combined with the elasticity and scalability of the cloud. Nonetheless, existing solutions were developed keeping in mind Big Data streams generated at the core of the infrastructure, such as those associated with web analytics. As a result, applying these solutions to IoT data stream requires transferring data from the edges to a data center located at the core of the infrastructure for processing. The prevalent model of moving data located at the edge of the network to the core of the network to process is quickly becoming unsustainable~\cite{intro}. The resulting impact on latency, network congestion, storage cost, and privacy can limit the potential impact of IoT.
+Stream processing frameworks (SPFs) have proven to be very effective at processing large amounts of data at near-real-time, especially when combined with the elasticity and scalability of the cloud. Nonetheless, existing solutions were developed keeping in mind Big Data streams generated at the core of the infrastructure, such as those associated with web analytics. As a result, applying these solutions to IoT data stream requires transferring data from the edges to a data center located at the core of the infrastructure for processing. The prevalent model of moving data located at the edge of the network to the core of the network to process is quickly becoming unsustainable~\cite{intro}. The resulting impact on latency, network congestion, storage cost, and privacy can limit the potential impact of IoT.
 
-However, in recent years, non-trivial computational capabilities have proliferated across the computing service landscape~\cite{continuum}. In particular, edge services are emerging close to the data sources and can provide potential data-processing capabilities\cite{dastjerdi2016fog,bonomi2014fog}. Furthermore, not all the data produced is interesting or relevant, and only a part of it may need to be processed in the context of an application. These observations can be leveraged to design hybrid architectures that can effectively leverage both the edge and the cloud resources to process the data in an effective and timely manner\cite{ahmed2017role, satyanarayanan2015edge}.
+However, in recent years, non-trivial computational capabilities have proliferated across the computing service landscape~\cite{continuum}. In particular, edge services are emerging close to the data sources and can provide potential data-processing capabilities\cite{dastjerdi2016fog,bonomi2014fog}. 
 
-Although the cloud is better suited to perform heavier (resource intensive) analysis, such as processing historical events and very large datasets, edge devices can support real-time analytics that consider the temporal, spatial, and continuous nature of IoT data. 
+Edge computing extends the conventional centralized cloud infrastructures with an
+additional storage and processing layer that enables execution of application logic close to end-user. Edge computing foresees the deployment of edge nodes, which may range from IoT embedded devices featuring limited storage, memory, and processing capacity to whole data centers (i.e. "local clouds") which are deployed close to end-users and physical infrastructures. Overall, the edge computing paradigm extends the cloud paradigm to the edge of the network. In this way, users can benefit from computing, storage and communication resources at their vicinity, instead of interfacing to a centralized back-end cloud. The proximity of resources helps to overcome the high-latency that is associated with the provision of cloud services to mobile users.
 
-While such edge-based data processing can benefit IoT applications, edge resources are typically constrained in their capabilities. Therefore, the edge resources can be leveraged to complement the computing capabilities of the cloud-centric approach and reduce the overall latency and bandwidth requirements. The use of the edge and cloud architecture poses the following challenges: 
+The IoT faces the same 3 Vs challenges that Big Data. However, IoT data feature certain characteristics, which distinguish them radically from Big Data. As a result, Big Data techniques and tools are applicable to IoT Analytics, including tools and models for data mining and machine learning, as well as streaming engines and databases. Nevertheless, adaptations of these tools to the nature and special characteristics of IoT data (such as their dynamic and streaming nature) and to support embedded devices are needed. The special characteristics and related challenges for IoT data processing applications can be listed as follows:
+
+\begin{itemize}
+
+\item{\textbf{Dynamic:}} The platform needs to include features to support dynamic data-driven workflows, to dynamically manage the platform functions, components, and applications at runtime. The developers should be capable to express decisions, and dynamic deployment of data analytics functions based on the underlying data.
+
+\item{\textbf{Geographically Distributed:}} The platform needs to support geographically distributed computing. Since ....
+
+\item{\textbf{Time and location dependencies:}} IoT data come with temporal and spatial information, which is directly associated with their business value in a given application context. Hence, IoT analytics applications must in several cases process data in a timely fashion and from the proper location.
+
+\item{\textbf{Real-Time nature:}} IoT streams feature high velocities and applications require the data to be processed in near real-time. 
+
+\item{\textbf{Secure:}} The platform must include security and privacy, data needs to be secure at all times.
+
+\item{\textbf{Mobility:}} Applications involving moving sensors (e.g., connected vehicles, autonomous cars) require the connection to local resources (computing, storage) residing in their vicinity. 
+
+\end{itemize}
+
+While edge computing can help achieve all the new requirements that IoT applications need, edge resources are typically constrained in their capabilities. Therefore, edge computing can be leveraged to complement the computing capabilities of the cloud-centric approach. The use of edge and cloud architecture poses several challenges: 
 
 \begin{itemize}
 \item Deciding how to split such IoT applications among the edge and cloud resources;
 
-\item Exploring heterogeneous infrastructure for deploying dataflow applications has proved to be NP-hard \cite{Benoit:2013}.
+\item Exploring heterogeneous infrastructure for deploying data flow applications has proved to be NP-hard~\cite{Benoit:2013}.
  
 \item Moving operators from cloud to edge devices is challenging due to the devices' limitations with respect to memory, CPU, and often network bandwidth \cite{dias:2018:survey}.
 \end{itemize}
 
-Solving the challenges presented above in a correct manner will allow for faster completion time, a reduction in edge to cloud data transfers, and ensure an efficient use of the edge and cloud resources. Doing them incorrectly can be detrimental to throughput and exacerbate the time for handling data events.
+Solving the challenges presented above in a correct manner will allow for faster completion time, a reduction in edge to cloud data transfers, and ensure efficient use of the edge and cloud resources. Doing them incorrectly can be detrimental to throughput and exacerbate the time for handling data events.
  
-Such flexibility is not currently offered in state-of-the-art IoT systems or stream processing engines. Major systems, such as Azure IoT~\cite{azure}, AWS Greengrass~\cite{amazon}, and IBM Watson IoT~\cite{IBM}, do not offer programming support for orchestrating the execution of data-processing tasks between the cloud and the edge. Therefore, the developers' ability to specify ``What data needs to be processed?,'' ``Where to deploy the computations?,'' and ``When to deploy the computations?,'' is limited. Moreover, existing IoT stacks tend to perform poorly when deployed on constrained devices, making it nearly impossible to support real-time data analytics on these devices.
+Such flexibility is not currently offered in state-of-the-art IoT systems or stream processing engines. Major systems, such as Azure IoT~\cite{azure}, AWS Greengrass~\cite{amazon}, and IBM Watson IoT~\cite{IBM}, do not offer programming support for orchestrating the execution of data-processing tasks between the cloud and the edge. Therefore, the developers' ability to specify ``What data needs to be processed?,'' ``Where to deploy the computations?,'' and ``When to deploy the computations?'' is limited. Moreover, existing IoT stacks tend to perform poorly when deployed on constrained devices, making it nearly impossible to support real-time data analytics on these devices.
 
+%Furthermore, not all the data produced is interesting or relevant, and only a part of it may need to be processed in the context of an application. These observations can be leveraged to design hybrid architectures that can effectively leverage both the edge and the cloud resources to process the data in an effective and timely manner\cite{ahmed2017role, satyanarayanan2015edge}.
+%Although the cloud is better suited to perform heavier (resource intensive) analysis, such as processing historical events and very large datasets, edge devices can support real-time analytics that consider the temporal, spatial, and continuous nature of IoT data. 
 
 \section{Motivation}
 
@@ -109,12 +130,12 @@ The primary contributions of the research in this thesis are a programming model
 The core chapters of the thesis are structured as shown in Figure~\ref{fig:Outline} and are deviated from articles and journals published during the PhD. The remaining of the thesis is organized as follows: 
 
 \begin{itemize}
-    \item Chapter 2 shows the motivating use cases that where used to build R-Pulsar. 
-    \item Chapter 3 presents an extensive literature review of related work. 
-    \item Chapter 4 presents the programming abstraction that R-Pulsar builds upon.
-    \item Chapter 5 presents the system concepts on what R-Pulsar was build upon. 
-    \item Chapter 6 presents the implementation and evaluation details of R-Pulsar. 
-    \item Chapter 7 introduces the operator placement problem. 
+    \item Chapter 2 shows some of the IoT application that where used in order to motivate and validate the build of R-Pulsar.  
+    \item Chapter 3 presents an extensive literature review of all the commercial and academic edge-based middleware currently available. 
+    \item Chapter 4 presents the Associative Rendezvous programming abstraction that R-Pulsar builds upon.
+    \item Chapter 5 presents the system concepts and all the layers on what R-Pulsar was build upon. 
+    \item Chapter 6 presents the implementation and evaluation details of all the layers that R-Pulsar consists. 
+    \item Chapter 7 introduces the operator placement problem, to solve the how to split IoT applications dynamically across the edge and the cloud. 
     \item Chapter 8 concludes the dissertation by outlining future research work.
 \end{itemize}
 

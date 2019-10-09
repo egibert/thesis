@@ -62,7 +62,7 @@ The notify action comes in two flavors: notify data and notify interest. Notify 
 
 Finally, the delete action deletes all matching interest/data profiles. Note that the actions will only be executed if the message header contains an appropriate credential. Also note that each message is stored at the rendezvous for a period corresponding to the Lifetime defined in its header. In case of multiple matches, the profiles matching are processed in random order.
 
-\subsection{R-Pulsar Associative Rendezvous}\label{sec:semantics}
+\section{R-Pulsar Associative Rendezvous}\label{sec:semantics}
 R-Pulsar uses a custom implementation of the original AR semantics~\cite{meteor2008}. In our new implementation of the AR model, we modified to elements: the AR Message and the Reactive Behaviors.
 
 The AR message is now defined as a quintuplet instead of the original triplet: (header, action, data, location, and data-processing task). The location and data processing task fields have been added in to the already existing fields. The location field has been added so the AR message can be routed based on the location and the content, where the original version of AR only routes messages based on the content. The location coordinates represent the physical location of the sensors or the physical location of where to deploy data-processing tasks and the tag helps decide where to deploy data-processing tasks, either the edge or the cloud, allowing to pick from multiple cloud or edge geographically distributed resources.
@@ -122,4 +122,3 @@ For this example we have two different types of data producers/sensors in this c
 \end{figure}
 
 AR can also be used to realize different interaction semantics such as one-to-many, one-to-some and one-to-all. Figure~\ref{fig:AR-Multi} illustrates a one-to-many (e.g. multicast) interaction using AR. The example assumes that the temperature sensor has already been registered in the system with the notify interest profile $<T1>$. In step (1) the two data consumers register in the system requesting to be notified if there are data stored in the system matching the profile. In step (2) the interest profile of the computation is stored in the system and matched against the other profiles in the system. Since the notify data profile matches the profile of the temperature sensor, a notification message is sent to the temperature sensor that someone is interested in its data and to start pushing the data into the system. In step (3) the temperature sensor published data into the system. In step (4) the data published by the sensor matches the notify data profile of the two consumers so both consumers are notified with the data.
-

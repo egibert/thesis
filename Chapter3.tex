@@ -1,6 +1,6 @@
 \section{Introduction}
 
-The current implementation of R-Pulsar build upon the open source project TomP2P. TomP2P is a P2P library and a distributed hash table (DHT) implementation which provides a decentralized key-value infrastructure for distributed applications. Each peer has a table that can be configured either to be disk-based or memory-based to store its values. TomP2P stores key-value pairs in a distributed manner. To find the peers to store the data in the distributed hash table, TomP2P uses an iterative routing to find the closest peers. 
+The current implementation of R-Pulsar build upon the open source project TomP2P. TomP2P is a P2P library and a distributed hash table (DHT) implementation which provides a decentralized key-value infrastructure for distributed applications. %Each peer has a table that can be configured either to be disk-based or memory-based to store its values. TomP2P stores key-value pairs in a distributed manner. To find the peers to store the data in the distributed hash table, TomP2P uses an iterative routing to find the closest peers. 
 
 The overall operation of the R-Pulsar overlay network consists of two phases: bootstrap and running. During the bootstrap phase (or join phase), messages are exchanged between a joining RP and the rest of the group. During this phase, the joining RP attempts to discover RPs already existing in the system to build its routing table. The joining RP sends a discovery message to the group. If the message is unanswered after a set duration (in the order of seconds), the RP assumes that it is the first in the system and it becomes the master RP, creating a single overlay network (Peer-to-Peer network). Every time any other RP joins the overlay network and the master RP responds to the discovery message, the  RP is added to the system by using the location of the RP and determining which quadrant the RP occupies. Once the initial P2P network has a sufficient number of RPs to guarantee that in case of multiple failures the P2P network will not disappear, the quadtree subdivides the overlay network into four additional P2P rings, plus an extra ring that will allow all the master RPs of each ring to communicate. Each RP master keeps a copy of the quadtree, so in the case of an RP failure the overlay network structure will never be lost. In the case of a master RPs failure, a master RP election is performed using the Hirschberg and Sinclair algorithm~\cite{Hirschberg}.
 
@@ -9,6 +9,7 @@ The running phase consists of stabilization and user mode. In the stabilization 
 In addition the user mode is also responsible for replicating the data. R-Pulsar uses an indirect replication method which is inherited from TomP2P. The indirect replication can be described as peers publishing content for others. The peer closest to a location ID is considered as the responsible peer and replicates data if necessary. Doing so allows data to never be lost, data will only be lost in the unlucky event that all the RPs fail at the same time or not RPs are up.
 
 \section{API Examples}
+In this section, we present two sets of API examples based on the disaster recovery use case presented in Chapter~\ref{chap:applications}. They illustrate the use of R-Pulsar’s API for basic use of resource actions for sensor registration and discovery (Listing 1-2) and the use of function actions for storing and triggering data-processing tasks (Listing 3-5)
 
 The first example uses the resource actions for enabling the exchange of data, without prior knowledge between devices. In Listing~\ref{lst:sensor}, an advertising profile is specified by the drone sensor with the type of data it can produce, and requests to be notified when someone is interested in such data.
 
@@ -63,25 +64,17 @@ In addition, Listing~\ref{lst:t-rule} defines a rule that is constantly evaluate
 
 \section{Location-aware Overlay Network Layer Evaluation}
 
-%\section{Evaluation}
-%In this section all the layers of R-Pulsar are evaluated by using three metrics: Overhead, Scalability and Performance. In addition each of those experiments are evaluated using cloud resources and Edge devices:
-
-%\begin{itemize}
-%\item Edge System: Using Raspberry Pi 3 with 4x ARM Cortex-A53 1.2GHz, 1GB LPDDR2 of RAM and 10/100 Ethernet.
-%\item Cloud System: Chameleon Cloud~\cite{chameleon}, a configurable experimental environment for large-scale cloud research~\cite{chameleon}, with 5 instances of type m1.small (1 CPU and 2 GB RAM) and 5 instances of type m1.medium (2 CPU and 4 GB RAM) to simulate the computation capabilities of a Raspberry Pi and the hardware heterogeneity that IoT presents.
-%\end{itemize}
-
-In this section we evaluate the overhead and scalability of the location-aware overlay network layer of R-Pulsar. The tests are evaluated using cloud resources and Edge devices:
+In this section we evaluate the overhead and scalability of the location-aware overlay network layer of R-Pulsar. The tests are evaluated using cloud and edge resources:
 
 \begin{itemize}
-\item Edge System: Using Raspberry Pi 3 with 4x ARM Cortex-A53 1.2GHz, 1GB LPDDR2 of RAM and 10/100 Ethernet.
-\item Cloud System: Chameleon Cloud~\cite{chameleon}, a configurable experimental environment for large-scale cloud research~\cite{chameleon}, with one RP deployed in a type m1.medium (2 CPU and 4 GB RAM) instance.
+\item Edge System:  Chameleon Cloud~\cite{chameleon}, a configurable experimental environment for large-scale cloud research~\cite{chameleon} with 100 instances of type m1.small (1 CPU and 2 GB RAM) to simulate the computation capabilities of a Raspberry Pi.
+
+\item Cloud System: Using Chameleon Cloud~\cite{chameleon} with 100 instances of type m1.medium (2 CPU and 4 GB RAM).
 \end{itemize}
 
 \subsection{Overhead and Scalability Over Cloud And Edge Systems}
 
-This experiment measures the overhead involved in performing a location-based query to identify relevant resources around the location of a client node. In our experiments, the location-based query used the GPS coordinates of each RP node and the client to identify the RP around the client.
-%As we described in Figure~\ref{fig:example1A}, a location-based query involves sending {\it statistics} action messages to all RP with a matching location, which ask RPs to send their information to the client. In these experiments, we only measured the overhead incurred in querying the database and constructing the ``notify\_interest'' message, i.e., the notification delivery was not measured. For these experiments, we had a total of 1000 RP nodes and we varied the position of the client, resulting in a different number of RP nodes matching the location requirement. Figure~\ref{fig:matching} collects the results of these experiments.
+This experiment measures the overhead involved in performing a location-based query to identify relevant resources around the location of a client node. In our experiments, the location-based query used the GPS coordinates of each RP node and the client to identify the RP around the client. Not that for this experiment we did not deploy 500k RPs, we only used the location of 50k RPs to perform the queries.
 
 \begin{figure}[htb!]
   \centering
@@ -89,11 +82,11 @@ This experiment measures the overhead involved in performing a location-based qu
   \caption{Location-based query overhead for different number of matches per query.} \label{fig:oslocation}
 \end{figure}
 
-Figure~\ref{fig:oslocation} shows that the overhead of performing a location-based query increases ... as the number of RP nodes in the system increases. Results show a maximum overhead of 10 milliseconds, which occurred when 50k RPs are in the system. 
+Figure~\ref{fig:oslocation} shows that the overhead of performing a location-based query increases as the number of RP nodes in the system increases. Results show a maximum overhead of 10 milliseconds, which occurred when 50k RPs are in the system. 
 
 \subsection{Overhead and Scalability of the Data Replication}
 
-Next, we measured the time required to replicate the information stored across a set of RP nodes in the system. In these experiments, we considered several scenarios involving different number of RP nodes as well as different number of replication factors. Figure~\ref{fig:topology} collects the results. 
+Next, we measured the time required to replicate the information stored across a set of RP nodes in the system. In these experiments, we considered several scenarios involving different number of RP nodes as well as different number of replication factors. For this experiment we did deploy 25, 100 and 500 RPs, for the 5 RPs where deployed in the same instance in order to achieve 500 RP instances. Figure~\ref{fig:topology} collects the results. 
 
 \begin{figure}[htb!]
   \centering
@@ -106,7 +99,13 @@ We can observe that in Figure~\ref{fig:topology} that the time required to repli
 
 \section{Content-based Routing Layer Evaluation}
 
-In the content-based routing layer we evaluate three aspects: The first aspect is the overhead of matching profiles, The second aspect we evaluate is the overhead and scalability of the routing, and finally we evaluate the propagation of ....  The tests are evaluated using the same cloud and edge resources as described in the previous section.
+In the content-based routing layer we evaluate three aspects: The first aspect is the overhead of matching profiles, The second aspect we evaluate is the overhead and scalability of the routing, and finally we evaluate the time it takes to propagate information through the system when a new RP joins the system. The tests are evaluated using the same cloud resources as described in the previous section. For the edge resources of this set of experiments we used two different setups:
+
+\begin{itemize}
+\item Raspberry Pi System: Using 2 Raspberry Pi's 3 with 4x ARM Cortex-A53 1.2GHz, 1GB LPDDR2 of RAM and 10/100 Ethernet.
+
+\item Android System: Using 1 Motorola Moto G5 Plus with a Qualcomm Snapdragon 625 processor with 2.0 GHz octa-core CPU, 3GB of RAM
+\end{itemize}
 
 \subsection{Profile Matching Overhead Over Cloud Systems}
 
@@ -119,8 +118,7 @@ The experiment was conducted using profiles that contained complex keyword tuple
   \caption{Profile matching overhead. Results are grouped based on the matching ratio expressed as a percentage of the total number of stored profiles.} \label{fig:profileQuery}
 \end{figure}
 
-We can observe in Figure~\ref{fig:profileQuery} that, for a moderate database size of up to $10^4$ profiles, the profile-matching operation incurs in an overhead between five and 10 milliseconds. Nonetheless, when we increase to $10^5$ profiles, the overhead increases significantly, as could have been expected given the memory and data access times required to identify and retrieve such a large number of profiles. As a consequence, we need to ensure that the number of profiles that each RP manages is within a manageable range to minimize the overheads. This can be achieved by implementing load-balancing techniques and limiting the knowledge of each RP to its closest neighbors. 
-
+We can observe in Figure~\ref{fig:profileQuery} that, for a moderate database size of up to $10^4$ profiles, the profile-matching operation incurs in an overhead between five and 10 milliseconds. Nonetheless, when we increase to $10^5$ profiles, the overhead increases significantly, as could have been expected given the memory and data access times required to identify and retrieve such a large number of profiles.
 
 \subsection{Routing Overhead and Scalability Over Edge Systems}
 
@@ -143,21 +141,10 @@ This second set of experiments measure the routing overhead, which represents th
 Figure~\ref{fig:Phone} shows that when the profile complexity increases by a factor of 6, the time required to route messages increases by 2.5. Similarly, when the system increases the number of messages sent by a factor of 100, the time required to route one message increases by a factor of 25. It shows that the routing overhead scales efficiently in both cases, as messages become increasingly complex and as the number of messages sent increases when using the Android system. 
 
 However, Figure~\ref{fig:Raspberri} shows that when the profile complexity increases by a factor of 6, the time required to route messages increases by about 1.2, when using the Raspberry Pi system. Likewise, when the system increases the number of messages sent by a factor of 100, the time required to route one message increases by about 2.5. Demonstrating that the routing overhead scales more efficiently on a Raspberry Pi system than on an Android system.
-\vspace{1ex}
-
-%\subsection{Routing Overhead and Scalability Over Cloud Systems}
-
-%\begin{figure}[h!]
-%  \centering
-%  \includegraphics[width=0.8\textwidth]{Results/Cloud.pdf}
-%  \caption{Evaluation of R-Pulsar space filling curve routing overhead and scalability as the number of messages and the complexity of profiles increase over a Cloud system.}
-%  \label{fig:Raspberri}
-%\end{figure}
-
 
 \subsection{Information Propagating through the System}
 
-This last set of experiments are performed to understand the behavior of the system when multiple RP nodes request to join an existing deployment of our system. Specifically, we measured the time from when the RP nodes sent their joint message until all RP nodes existing in the system were updated. In our experiments, we varied both the number of RP nodes wanting to join and the number of existing RP nodes in the system. Figure~\ref{fig:rpDiscovery} collects the results.
+This experiment is performed to understand the behavior of the system when multiple RP nodes request to join an existing deployment of our system. Specifically, we measured the time from when the RP nodes sent their joint message until all RP nodes existing in the system were updated. In our experiments, we varied both the number of RP nodes wanting to join and the number of existing RP nodes in the system. Figure~\ref{fig:rpDiscovery} collects the results.
 
 \begin{figure}[htb!]
   \centering
@@ -167,13 +154,11 @@ This last set of experiments are performed to understand the behavior of the sys
 
 Figure~\ref{fig:rpDiscovery} shows that the time required to have a consistent view of all the new RP nodes after the requests are placed is relatively low, and that it scales properly when increasing the number of existing RP nodes. In the case of a small system with only five existing RP nodes the overhead is around 20 milliseconds on average. The overhead increases to around 70 milliseconds in the case of having a large system with 100 existing RP nodes. Additionally, we can observe that varying the number of requests does not significantly affect the time required to propagate the information in a system with up to 50 RP nodes. In the case of having 100 RP nodes, we observe that increasing the number of requests, increases the overhead as well as the dispersion around the average. Although it is important to maintain an updated view of the system to ensure that we can efficiently process clients' requests, it is not critical for the regular operations of the system. Our system has mechanisms to adapt to changes in the availability of RP nodes to improve data processing efficiency. Therefore, we consider that having an eventually consistent system is sufficient. 
 
-
-
 \section{Serverless Messaging Layer Evaluation}
 
 \section{Memory-mapped Streaming Analytics Pipeline Evaluation}
 
-In this section we evaluate two of the pieces that memory-mapped streaming analytics pipeline consists, the Data collection and the storage and query layers. The tests are evaluated using the same cloud and edge resources as described in the previous section.
+In this section we evaluate two of the layers that the memory-mapped streaming analytics pipeline consists, the Data collection and the storage and query layers. The tests are evaluated using the same cloud resources as in the location-aware overlay network layer evaluation section. For the edge resources this set of experiments use the same as the content-based routing layer evaluation section. 
 
 \subsection{Performance of the Data Collection Layer Over Edge Systems}
 
@@ -187,13 +172,10 @@ The first experiment aims to evaluate the throughput of R-Pulsar messaging layer
 \end{figure}
 
 Results in Figure~\ref{fig:ProducerBar} show that R-Pulsar's throughput scales as the message size increase. This experiment is representative of a traditional IoT scenario with small messages streamed at a high rate arrival.
-We observed that R-Pulsar pub/sub messaging system outperforms Kafka by a factor of 3x and Mosquitto by a factor of 7x. Also, Apache Kafka exhibits a high variability of throughput performance. 
-This is explained by the fact that Kafka continuously stores messages on the disk overwhelming the filesystem and producing this unpredictable throughput.
+We observed that R-Pulsar pub/sub messaging system outperforms Kafka by a factor of 3x and Mosquitto by a factor of 7x. Also, Apache Kafka exhibits a high variability of throughput performance. This is explained by the fact that Kafka continuously stores messages on the disk overwhelming the filesystem and producing this unpredictable throughput.
 The use of a memory-mapped queue allows R-Pulsar to obtain higher throughput, but also steadier and more predictable throughput.
 
-In this second experiment, we want to demonstrate that R-Pulsar can be deployed on  Android Phones.  
-The experiment setup consists of an Android device as a data producer and a single Raspberry Pi as the RP.
-In Figure~\ref{fig:ProducerPhone}, the throughput comparison of R-Pulsar and Mosquitto~\cite{mosquitto} shows similar performance with larger messages. For smaller messages, R-Pulsar exhibits a better performance (factor of 10x). Also, Mosquitto presents a larger variability of performance (unpredictable throughput).
+In this second experiment, we want to demonstrate that R-Pulsar can be deployed on  Android Phones. The experiment setup consists of an Android device as a data producer and a single Raspberry Pi as the RP. In Figure~\ref{fig:ProducerPhone}, the throughput comparison of R-Pulsar and Mosquitto~\cite{mosquitto} shows similar performance with larger messages. For smaller messages, R-Pulsar exhibits a better performance (factor of 10x). Also, Mosquitto presents a larger variability of performance (unpredictable throughput).
 
 \begin{figure}[h!]
   \centering
@@ -241,8 +223,7 @@ We present three different results for these experiments. Figure~\ref{fig:DBInse
 \end{figure}
 
 Figure~\ref{fig:DBExactBar} and~\ref{fig:DBWildBar} present the results for experiments using exact and wildcard queries (a profile containing wildcards, ranges or both).
-In the last two experiments, we can observe that Nitrite DB and SQLite are both faster when the number of consecutive reads is small, but R-Pulsar outperforms both when the workload increases. 
-Overall, R-Pulsar has a higher performance because it takes advantage of the distributed storage of data over multiple RPs so that queries can be performed in parallel.
+In the last two experiments, we can observe that Nitrite DB and SQLite are both faster when the number of consecutive reads is small, but R-Pulsar outperforms both when the workload increases. Overall, R-Pulsar has a higher performance because it takes advantage of the distributed storage of data over multiple RPs so that queries can be performed in parallel.
 
 \begin{figure}[h!]
   \centering
@@ -261,11 +242,11 @@ Overall, R-Pulsar has a higher performance because it takes advantage of the dis
 
 \section{Rule-based Programming Abstraction Evaluation}
 
-In this section ....
+In this section we performed two sets of experiments to evaluate the rule-based programming abstraction. The tests are evaluated using two types of virtual nodes. The first node is our "drone" with computational capabilities with 1 vCPU and 2 GB of memory, we used a low CPU machine to simulate the overheads as if we used a small IoT device with reduced computational capacity. The second node is the "minivan" with 8 vCPU and 32 GB of memory.
 
 \subsection{Scalability and Overhead Over Edge and Cloud Systems}
 
-To evaluate the scalability and the overhead of our system we performed two sets of experiments in two types of virtual nodes. The first node is our "drone" with computational capabilities with 1 vCPU and 2 GB of memory, we used a low CPU machine to simulate the overheads as if we used a small IoT device with reduced computational capacity. The second node is the "minivan" with 8 vCPU and 32 GB of memory, we assume that a minivan will be able to carry higher computational resources.
+To evaluate the scalability and overhead of the rule engine system we added different rule amounts and streamed our regular workload, forcing the evaluation of each of the tuples. The plotted graph in Figure  \ref{fig:RuleEngine} shows the scalability and overhead of our rule engine for two different machines described above. We can observe that the overhead is very minimal and can be used for processing real-time stream processing, we can also observe that as we add rules the overheads do not increase exponentially making it suitable to handle hundreds of rules.
 
 \begin{figure}[h!]
   \centering
@@ -274,7 +255,7 @@ To evaluate the scalability and the overhead of our system we performed two sets
   \label{fig:RuleEngine}
 \end{figure}
 
-To evaluate the scalability and overhead of the rule engine system we added different rule amounts and streamed our regular workload, forcing the evaluation of each of the tuples. The plotted graph in Figure  \ref{fig:RuleEngine} shows the scalability and overhead of our rule engine for two different machines described above. We can observe that the overhead is very minimal and can be used for processing real-time stream processing, we can also observe that as we add rules the overheads do not increase exponentially making it suitable to handle hundreds of rules.
+In this experiment we wanted to show the importance of being able to programmatically express a trade-off between data quality and computational performance. Figure \ref{fig:QoS} we demonstrate that if we do not allow the to specify QoS rules to set a deadline in this case a deadline of 20 seconds per tuple was specified, depending on the workload and the underlying computing capabilities most of the tuples will not satisfy the deadline. We can also see that our algorithm can't guarantee 100\% completion in time in small computational resources, but that is due to the fact that the CPU can't drain the storm bolt queues fast enough, so some tuples will experience some extra delay.
 
 \begin{figure}[h!]
   \centering
@@ -282,8 +263,6 @@ To evaluate the scalability and overhead of the rule engine system we added diff
   \caption{Data quality rule-based system 20 second deadline.}
   \label{fig:QoS}
 \end{figure}
-
-In this experiment we wanted to show the importance of being able to programmatically express a trade-off between data quality and computational performance. Figure \ref{fig:QoS} we demonstrate that if we do not allow the to specify QoS rules to set a deadline in this case a deadline of 20 seconds per tuple was specified, depending on the workload and the underlying computing capabilities most of the tuples will not satisfy the deadline. We can also see that our algorithm can't guarantee 100\% completion in time in small computational resources, but that is due to the fact that the CPU can't drain the storm bolt queues fast enough, so some tuples will experience some extra delay.
 
 \section{End To End Evaluation}
 In this section we implement two of the five uses cases using R-Pulsar to showcase the ability to express and decide what, where and when data gets collected and processed, using edge and cloud resources, and we compared it against a traditional approach of moving all the data to the cloud for analysis.
@@ -301,21 +280,21 @@ For the disaster response use case we performed a set of experiments to compare 
 
 For the experiment in Figure \ref{fig:Edge_CoreVsCloud} we wanted to demonstrate that if we simply deployed our entire workflow at the edge of the network without any "quality" trade-off and we compared it to the traditional approach where each of the LiDAR images will be sent to the core for processing. We can see that with small workflows the edge is significantly faster than the core of the network, but as the number of images that need to be processed grows (the affected area is large) the core performs better than the edge due to limited resources at the edge of the network.
 
-\begin{figure}[h]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.8\textwidth]{Results/SmallSpeed}
   \caption{Disaster response workflow 10 images edge speed-up.}
   \label{fig:SmallSpeed}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.8\textwidth]{Results/MediumSpeed}
   \caption{Disaster response workflow 50 images edge speed-up.}
   \label{fig:MediumSpeed}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=0.8\textwidth]{Results/BigSpeed}
   \caption{Disaster response workflow 100 images edge speed-up.}

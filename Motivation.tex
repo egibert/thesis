@@ -1,22 +1,26 @@
 \section{Emergence, Benefits and Limitations of Using Edge Computing}
-Edge computing complements the cloud in IoT by filling in the gap between the cloud and the things providing computing in the continuum. In this section we describe the advantages and disadvantages of Edge computing and later on propose some IoT applications that will benefit from edge computing.
+Edge computing complements the cloud in IoT by filling in the gap between the cloud and the internet of things by providing computing in the continuum. In this section we describe the advantages and disadvantages of Edge computing and later propose some IoT applications that will benefit from using edge computing.
 
 \subsection{Advantages}
 
-Data Explosion and Network Traffic: The Internet of Things (IoT) paradigm fosters the integration of large numbers of connected devices, typically located at the edge of the network, to enable online data-driven monitoring, management, and control. It is predicted that by 2030, there will be 500 billion of such devices connected to the Internet []. 
+Minimize Data Explosion and Network Traffic: The Internet of Things (IoT) is an emerging concept that is fostering the connection of massive numbers of objects, sensors, and devices to the network. As per Cisco systems [] , 500 billion devices are expected to be connected the Internet by 2030, and nearly half of the worldwide data will come from sensors [1]. Consequently, the volume of data that will be generated will also increase. Another concern with increasing data generation is the volume of network traffic to a central server or cloud thereby reducing the response time of edge devices.
 
-Another concern with increasing data generation is the volume of network traffic to a central server or cloud thereby reducing the response time of edge devices.
+Low Latency: Emerging IoT scenarios involve gathering and processing large volumes of streaming data using complex workflows in a timely manner to support decision making. Traditionally, data processing has been done at large data centers in the core of the network, however, as the data volumes and rates grow, and the application scenario becomes increasingly time sensitive, such an approach is quickly becoming infeasible, and it is becoming essential to also leverage resources closer to the edge. By applying edge computing applications are capable of supporting time-sensitive applications.
 
-Low Latency: Emerging IoT scenarios involve gathering and processing large volumes of streaming data using complex workflows in a timely manner to support decision making. Traditionally, data processing has been done at large datacenters in the core of the network, however, as the data volumes and rates grow, and the application scenario becomes increasingly time sensitive, such an approach is quickly becoming infeasible, and it is becoming essential to also leverage resources closer to the edge. By applying edge computing applications are capable of supporting time-sensitive applications.
+Real-Time Computations: Edge computing enhances the efficiency in terms of improving performance and reducing the unnecessary costs of outgoing communication bandwidth. Since the process happens near the data source, the system can generate the result much faster.
 
-Computation Efficiency: Edge computing enhances the efficiency in terms of improving performance and reducing the unnecessary costs of outgoing communication bandwidth. Since the process happens near the data source, the system can generate the result much faster.
+Security: IoT Edge Computing has made the transfer of data between the cloud and devices redundant. It is now possible to filter sensitive data locally and transmit only the aggregate data over to the cloud.
 
 \subsection{Disadvantages}
-General Purpose Computing: While leveraging edge resources can alleviate costs associated with data transfers, they tend to be constrained in their capabilities. One challenge is to develop solutions that are portable across the edege and cloud environments.
+Constrained devices: While leveraging edge resources can alleviate costs associated with cloud data transfers, edge resources tend to be constrained in their capabilities. In addition state-of-the-art data analytics pipelines are known to be computationally intensive tasks, resulting in the inability to performing real-time data analytics when deployed on constrained devices.
 
-Added complexity: Integrating edge computing adds complexity to applications, especially when they need to include policies that govern what kind of data is processed and analyzed at the edge and what is sent to cloud. Exploring heterogeneous infrastructures such as edge and cloud for deploying dataflow applications has proved to be NP-hard[].
+Added complexity: Integrating edge computing adds complexity to applications, especially when they need to include policies that govern what kind of data is processed and analyzed at the edge and what is sent to cloud. Exploring heterogeneous infrastructures such as edge and cloud for deploying dataflow applications has proved to be NP-hard~\cite{Benoit:2013}.
 
-Security:
+Programmability: In cloud computing, users program their code and deploy them on the cloud. The cloud provider is in charge to decide where the computing is conducted in a cloud. Users have zero or partial knowledge of how the application runs. This is one of the benefits of cloud computing that the infrastructure is transparent to the user. Usually, the program is written in one programming language and compiled for a certain target platform, since the program only runs in the cloud. However, in the edge computing, computation is offloaded from the cloud, and the edge nodes are most likely heterogeneous platforms. In this case, the runtime of these nodes differ from each other, and the programmer faces huge difficulties to write an application that may be deployed in the edge computing paradigm.
+
+Data Abstraction: Edge computing, is fostering the connection of massive numbers of devices connected to the network. This connected devices are generating unprecent amounts of data, but sometimes data is not relevant or need it. There is a need to create a data abstraction that 
+
+For example, the thermometer could report the temperature every minute, but this data will most likely only be consumed by the real user several times a day. Another example could be a security camera in the home which might keep recording and sending the video to the gateway, but the data will just be stored in the database for a certain time with nobody actually consuming it, and then be flushed by the latest video.
 
 \begin{table*}[ht]
 \begin{adjustwidth}{-2.7cm}{-1cm}
@@ -120,7 +124,6 @@ The following are the actual post-processing stages that we implemented and are 
 \\
 \\
 \noindent To simulate this workflow we used real LiDAR images that were taken right after Hurricane Sandy struck back in 2012 in the NY and Long Island area, with a total of 741 images and 3.7 GB in size, with the biggest image size of 33.8 MB, and the smallest of 1.8 KB. For the historical data in stage 2 we used a bigger data set of pre-Hurricane Sandy. Supporting workflows that generate such large amounts of information at the edge of the network and having to transfer data back and forth between the edge and the core can prevent an effective reaction to an emergency situation and/or target application objectives.
-
 
 \subsection{Scientific Observatory}
 
