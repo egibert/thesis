@@ -1,12 +1,22 @@
-\section{Framework}
+%\section{Framework}
+In this chapter, we present our concepts in which R-Pulsar have been build upon. R-Pulsar is a software stack that extends cloud capabilities to edge devices, allowing to collect and analyze data closer to the source of information and react autonomously to local events. R-Pulsar consists of four layers: (1) the infrastructure layer, (2) the federation layer, (3) the streaming layer, and (4) the application layer. Each of the layers consists of multiple components.
 
-In this chapter, we present our concepts in which R-Pulsar have been build upon. R-Pulsar is a software stack that extends cloud capabilities to edge devices, allowing to collect and analyze data closer to the source of information and react autonomously to local events.
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.7\columnwidth]{Figures/R-PulsarArch.pdf}
+  \caption{Schematic overview of the R-Pulsar Architecture}\label{fig:R-PulsarArch}
+\end{figure}
 
-R-Pulsar uses a distributed architecture by the means of an overlay network, where each node in the overlay network is called a Rendezvous Point (RP). RPs can be a gateway located at the edge of the network or a server located in the cloud. R-Pulsar targets applications that span the cloud and the edge of the network.
 
-R-Pulsar consists of five layers: (1) the location-aware self-organizing overlay, (2) the content-based routing layer, (3) the serverless messaging layer, (4) the memory-mapped data-processing layer, and (5) the programming abstraction layer.
+\section{Infrastructure Layer}
+The infrastructure layer is composed of data producers and computational resources. The data producers are the various streaming sources that can generate data, including IoT devices (e.g., cameras, smart watch, and smart infrastructures, etc). The computational resources are a group of computers responsible for running the applications the user deploys. The resources are heterogeneous and distributed through the infrastructure, from the core to the edge of the network. 
 
-\subsection{Location-aware Overlay Network Layer}
+R-Pulsar uses a distributed architecture by the means of an overlay network, where each resource/node in the overlay network is called a Rendezvous Point (RP). RPs can be part of a public or private gateways located at the edge of the network or public or private server located in the cloud. 
+
+\section{Federation Layer}
+The federation layer is responsible for orchestrating the geographically distributed resources composing the infrastructure. This layer is built using two main components: the location aware overlay component and the content based routing component.
+
+\subsubsection{Location-aware Overlay Network Component}
 
 \begin{figure}[!h]
   \centering
@@ -24,7 +34,7 @@ During the initialization of the overlay network, the RP attempts to discover an
 
 In order to route a message the first strep is perform a quadtree query to decide in which of the P2P rings needs to be routed to. The locations in the AR message is used to perform a lookup in the tree and find the P2P ring closes to the given location. 
 
-\subsection{Content-based Routing Layer}\label{sec:frameworkc}
+\subsubsection{Content-based Routing Component}\label{sec:frameworkc}
 
 \begin{figure}
 \centering
@@ -41,7 +51,7 @@ In order to route a message the first strep is perform a quadtree query to decid
 
 %As mentioned above, the lookup operator provided by the location-aware overlay requires an exact identifier, the AR message and the location to be routed.
 
-This layer builds on top of the location-aware overlay to route messages. The content-based routing layer maps AR profiles onto single identifiers or clusters of identifiers to enable information discovery using partial knowledge, as described in \cite{SCHMIDT2008962}.
+This component builds on top of the location-aware overlay to route messages. The content-based routing component maps AR profiles onto single identifiers or clusters of identifiers to enable information discovery using partial knowledge, as described in \cite{SCHMIDT2008962}.
 
 Content-based routing is achieved by performing two steps: The first step is to encode the set of attributes and/or attribute-value pairs of the AR message, into a set of unique base 10 ids. The second step is to use the set of base 10 numbers produced in the previous step and pass them to the Hilbert Space Filling Curve (SFC). The SFC~\cite{SFC} is used to map the n-dimensional space of the AR profile to the one-dimensional space ID of the location-aware overlay network. Content based routing can be performed in two ways using simple keyword profiles or complex keyword profiles, the routing process is described below.
 
@@ -49,7 +59,12 @@ Content-based routing is achieved by performing two steps: The first step is to 
 
 \textbf{Routing using complex keyword profiles:} Similarly to the first step, an AR profile this time contains wildcards, ranges, or both is encoded and a set of base 10 ID's. The wildcard gets replaced for each of the possible value in the alphabet, producing multiple base 10 encoding sets. This sets of encoding are passed to the SFC to obtain a single based 10 ID, this step is repeated for each of the base 10 encoding sets. Then we end up with muntiple base 10 IDs that corresponds to several 160bit unique identifiers of the P2P overlay network. Figure~\ref{fig:routingProfiles}b illustrates this process.
 
-\subsection{Serverless Messaging Layer}\label{sec:serverless}
+
+\section{Streaming Layer}
+
+The streaming layer provides users and applications with efficient data-driven access to federated resources. This layer is composed of the serverless API, memory-mapped streaming analytics, and the rule-based programming components:
+
+\subsection{Serverless API Component}\label{sec:serverless}
 
 %\begin{figure}[!h]
 %  \centering
@@ -77,24 +92,18 @@ AR Message \textbf{poll}()                       & \begin{tabular}[c]{@{}c@{}}Re
 \end{adjustwidth}
 \end{table}
 
-The serverless messaging layer offers four different operators. Table~\ref{tb:operators} summarized all of the available operators.
+The serverless messaging component offers four different operators. Table~\ref{tb:operators} summarized all of the available operators.
 
 The \textbf{init}() operator is used to join the R-Pulsar network and it guarantees that all the available RPs will be discovered.
 
-The \textbf{stream}(AR Message, String Peer Id) operator is used to stream data directly to a specific RP, this operator bypasses the location and the content based routing layers.
+The \textbf{stream}(AR Message, String Peer Id) operator is used to stream data directly to a specific RP, this operator bypasses the location and the content based routing component.
 
 The \textbf{poll}() operator is used to retrieve the data other RPs are sending.
 
 The \textbf{post}(AR message) operator is used to route the messages without the need of specifying the recipient of the message, the recipient of the message is resolved by using the AR Message. To route a message using the post abstraction the following steps are performed:
 
-\begin{itemize}
-    \item Step 1: The location specified in the AR message is used to the location aware layer which is responsible for performing a location query in the quadtree. The result of the query is the P2P network that will receive the message.
-    \item Step 2: Once the P2P network is selected, then content of the AR profile is used to select which RP will be responsible for the message. The content based layer is responsible for encoding the AR profile into a set of base 10 ids and performing a SFC call to go from n-dimentional space to 1-dimensional space base 10 id.
-    \item Step 3: The base 10 id is used to route the message to the right RP.
-\end{itemize}
-
-\subsection{Memory-mapped Streaming Analytics Pipeline}
-The data pipeline is responsible for consolidating data from multiple sources, processing the data, and making them available to be used. State-of-the-art data pipelines are known to be data-intensive tasks, resulting in the inability to performing real-time data analytics when deployed on constrained devices. The memory-mapped streaming analytics pipeline layer is motivated to overcome that issue.
+\subsection{Memory-mapped Streaming Analytics Component}
+The data pipeline is responsible for consolidating data from multiple sources, processing the data, and making them available to be used. State-of-the-art data pipelines are known to be data-intensive tasks, resulting in the inability to performing real-time data analytics when deployed on constrained devices. The memory-mapped streaming analytics pipeline component is motivated to overcome that issue.
 
 The streaming analytics pipeline comprises the following layers: 
 
@@ -145,7 +154,7 @@ It consists of a rule engine that allows developers to specify IF-THEN rules tha
 
 We created a rule-based system, which contains all of the appropriate knowledge encoded into a set of If-Then rules. The system examines all the rule conditions (IF) and determines a subset, the conflict set, of the rules whose conditions are satisfied based on the data tuples. Out of this conflict set, one of those rules is triggered (fired). When a rule is fired, the action specified in its THEN clause is carried out. The loop for firing rules continues until one of two conditions are met: there are no more rules whose conditions are satisfied or a rule is fired. We allow to specify two different types of rules, ones that let you express data quality requirements which impose time constraints on the processing of the tuples, allowing the specification of a trade-off between the data quality and computational complexity. And the second one that offers the ability to express content-driven rules which complement the data quality requirements by triggering further stream-processing topologies either at the core or at the edge of the network if the data needs further processing due to quality of the data.
 
-\subsubsection{Content-Driven Rule-Based System}
+\subsubsection{Content-Driven Rules}
 The content-driven rules consists of a single rule table that contains a set of rule entries installed by the developer. The rule entries contain a collection of conditions, a single action, and a single priority field.
 
 The priority field is used in the event of having two or more rules that satisfy the condition, in order to brake the tie, only the one with highest priority will be executed. The condition field consists of one ore multiple antecedents (If clause). The antecedent of a rule consists of two parts: an object and its value. The object and its value are linked by an operator. The operator identifies the object and assigns the value. Table~\ref{tb:ruleOp} summarized all the rule operators currently supported.
@@ -242,7 +251,7 @@ Figure~\ref{fig:TumbBolt} depicts a window is evaluated every five seconds and n
 \end{figure}
 
 
-\subsubsection{Data Quality Rule-Based System}
+\subsubsection{Data Quality Rules}
 
 \begin{figure}[h!]
   \centering
@@ -271,10 +280,6 @@ Figure~\ref{fig:qosRule} presents a brief code example of how developers will ex
   \caption{}\label{fig:qosRule}
 \end{figure}
 
-%\section{Semantics of the Programming Abstraction}
-%\section{Realizing Data-Drive Edge Stream Processing}
-%\subsection{Basic Functionality}
-%\section{Experimental Evaluation}
-%\subsection{Scalability and Overhead Experiments}
-%\subsection{Performance experiments}
-%\section{Summary}
+\section{Application Layer}
+
+The application layer is composed of data consumers. Data consumers are the IoT applications described in Chapter~\ref{chap:applications}. Data consumers process these the incoming data from the sensors/data producers and aggregate incoming data, send automatic alerts in real-time, or produce new streams of data that can be processed by other consumers.

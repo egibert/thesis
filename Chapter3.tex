@@ -1,5 +1,21 @@
 \section{Introduction}
 
+\begin{figure}[htb!]
+  \centering
+  \hspace*{-2cm}   
+    \includegraphics[width=1.2\textwidth]{Figures/Diagram.pdf}
+  \caption{Sequence diagram of R-Pulsar, when a sensor wants to register itself in the R-Pulsar network.} \label{fig:diagram}
+\end{figure}
+
+
+
+\begin{itemize}
+    \item Step 1: The location specified in the AR message is used to the location aware component which is responsible for performing a location query in the quadtree. The result of the query is the P2P network that will receive the message.
+    \item Step 2: Once the P2P network is selected, then content of the AR profile is used to select which RP will be responsible for the message. The content based component is responsible for encoding the AR profile into a set of base 10 ids and performing a SFC call to go from n-dimentional space to 1-dimensional space base 10 id.
+    \item Step 3: The base 10 id is used to route the message to the right RP.
+\end{itemize}
+
+
 The current implementation of R-Pulsar build upon the open source project TomP2P. TomP2P is a P2P library and a distributed hash table (DHT) implementation which provides a decentralized key-value infrastructure for distributed applications. %Each peer has a table that can be configured either to be disk-based or memory-based to store its values. TomP2P stores key-value pairs in a distributed manner. To find the peers to store the data in the distributed hash table, TomP2P uses an iterative routing to find the closest peers. 
 
 The overall operation of the R-Pulsar overlay network consists of two phases: bootstrap and running. During the bootstrap phase (or join phase), messages are exchanged between a joining RP and the rest of the group. During this phase, the joining RP attempts to discover RPs already existing in the system to build its routing table. The joining RP sends a discovery message to the group. If the message is unanswered after a set duration (in the order of seconds), the RP assumes that it is the first in the system and it becomes the master RP, creating a single overlay network (Peer-to-Peer network). Every time any other RP joins the overlay network and the master RP responds to the discovery message, the  RP is added to the system by using the location of the RP and determining which quadrant the RP occupies. Once the initial P2P network has a sufficient number of RPs to guarantee that in case of multiple failures the P2P network will not disappear, the quadtree subdivides the overlay network into four additional P2P rings, plus an extra ring that will allow all the master RPs of each ring to communicate. Each RP master keeps a copy of the quadtree, so in the case of an RP failure the overlay network structure will never be lost. In the case of a master RPs failure, a master RP election is performed using the Hirschberg and Sinclair algorithm~\cite{Hirschberg}.
