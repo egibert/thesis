@@ -1,45 +1,3 @@
-%\hl{Internet of Things (IoT) refers to a system of connected physical objects via the internet. The 'thing' in IoT can refer to a person or any device which is assigned through an IP address. A 'thing' collects and transfers data over the internet without any manual intervention with the help of embedded technology. It helps them to interact with the external environment or internal states to take the decisions.}
-
-%The proliferation of the Internet of Things (IoT) is fostering the connection of massive numbers of devices to the network. It is predicted that by 2020 there will be 50 to 100 billion devices connected to the Internet and constantly producing data[].
-
-%IoT analytics refers to the analysis of data from multiple IoT data sources, including sensors, actuators, smart devices and other internet connected objects. The collection and analysis of data streams from IoT sources is nowadays considered a key element of the IoT’s disruptive power, as well as a prerequisite to realizing IoT’s hyped market potential. Indeed, according to a recent report by McKinsey[], less than 1\% of IoT data is currently used, which is a serious set-back to maximizing IoT’s business value. For example, most IoT analytics applications are nowadays used for anomaly detection and control rather than for optimization and prediction, which are the applications that will provide the greatest business value in the coming years.
-
-%\section{IoT Data and BigData}
-
-%\hl{Big data means a large set (petabytes or gigabytes) of structured, unstructured or semi-structured data and analyzing those data to get the insights of the business trend.}
-
-
-%\section{Challenges of IoT Applications}
-
-%Internet of Things(IoT) and big data are closely intertwined and although they are not the same thing.
-%The term big data existed long before IoT arrived. When the information demonstrates veracity, velocity, variety and volume, then it is interpreted as big data
-
-%IoT data is essentially BigData since they feature several of the Vs of BigData, including
-%\begin{itemize}
-%    \item Volume: IoT data is machine-generated data coming from a wide variety of sensors, where big data is mostly human-generated data.
-%    \item Velocity: Refers to the speed data is being produced, collected and analyzed. IoT, data needs to ingest hundreds of thousands, or even millions, of events per second from their devices.
-%    \item Variety: Since IoT encompasses a large variety of IoT devices, IoT data can be very heterogeneous both in terms of semantics and data formats.
-%    \item Veracity: Several IoT streams are noisy and incomplete, which creates uncertainty in the scope of IoT analytics applications. Statistical and probabilistic approaches must be therefore employed in order to take into account the noisy nature of IoT data streams, especially in cases where they stem from unreliable sensors.
-%\end{itemize}
-
-%IoT data differ from big data datasets and introduces new challenges, this are some of the new characteristics that IoT introduces:
-
-%\begin{itemize}
-%    \item Data heterogeneity:
-%    \item Real-time nature: While in big data projects it is perfectly normal for data to rest before it is used in any kind of analysis, in any IoT projects time is of the absolute essence, for several application must be processes nearly in real-time.
-%    \item Time and location dependencies: IoT data is naturally geo-distributed and generated at the edge of the network, sometimes involving fast moving sensors. Big data is mostly generated from a single location, the core of the network.
-%    \item Privacy and security sensitivity:
-%\end{itemize}
-
-%\section{IoT Application Lifecycle}
-%The IoT application lifecycle comprises of the following three phases: Data Collection, Data Analysis and Data Storage and Query.
-
-%\begin{enumerate}
-%\item \textbf{Data collection:} gathers data from multiple sources and brings them to the pipeline.
-%\item \textbf{Data Analysis:} processes the data and performs computations on the collected data.   
-%\item \textbf{Data Storage and Query:} reads and writes data to the main memory and disk.
-%\end{enumerate}
-
 The Internet of Things (IoT) is an emerging concept that is fostering the connection of massive numbers of objects, sensors, and devices to the network. As per Cisco systems\footnote{Cisco, Internet of Things At-a-Glance, 2016 }, 500 billion devices are expected to be connected to the Internet by 2030, and nearly half of the worldwide data will come from sensors~\cite{McAuley}. 
 %
 IoT devices produce important and timely data that can lead to new and transformative applications that are important to science and society, such as:
@@ -56,16 +14,14 @@ Stream processing frameworks (SPFs) have proven to be very effective at processi
 
 However, in recent years, non-trivial computational capabilities have proliferated across the computing service landscape~\cite{continuum}. In particular, edge services are emerging close to the data sources and can provide potential data-processing capabilities\cite{dastjerdi2016fog,bonomi2014fog}. 
 
-Edge computing extends the conventional centralized cloud infrastructures with an
-additional storage and processing layer that enables execution of application logic close to end-user. Edge computing foresees the deployment of edge nodes, which may range from IoT embedded devices featuring limited storage, memory, and processing capacity to whole data centers (i.e. "local clouds") which are deployed close to end-users and physical infrastructures. Overall, the edge computing paradigm extends the cloud paradigm to the edge of the network. In this way, users can benefit from computing, storage and communication resources at their vicinity, instead of interfacing to a centralized back-end cloud. The proximity of resources helps to overcome the high-latency that is associated with the provision of cloud services to mobile users.
+Edge computing extends the conventional centralized cloud infrastructures with an additional storage and processing layer that enables execution of application logic close to end-user. Edge computing foresees the deployment of edge nodes, which may range from IoT embedded devices featuring limited storage, memory, and processing capacity to whole data centers (i.e. "local clouds") which are deployed close to end-users and physical infrastructures. Overall, the edge computing paradigm extends the cloud paradigm to the edge of the network. In this way, users can benefit from computing, storage and communication resources at their vicinity, instead of interfacing to a centralized back-end cloud. The proximity of resources helps to overcome the high-latency that is associated with the provision of cloud services to mobile users.
 
-The IoT faces the same 3 Vs challenges that Big Data. However, IoT data feature certain characteristics, which distinguish them radically from Big Data. As a result, Big Data techniques and tools are applicable to IoT Analytics, including tools and models for data mining and machine learning, as well as streaming engines and databases. Nevertheless, adaptations of these tools to the nature and special characteristics of IoT data (such as their dynamic and streaming nature) and to support embedded devices are needed. The special characteristics and related challenges for IoT data processing applications can be listed as follows:
+IoT data feature certain characteristics, which distinguish them radically from other types of data sources and respective applications. The special characteristics and related challenges for IoT data processing applications can be listed as follows:
 
 \begin{itemize}
 
-\item{\textbf{Dynamic:}} The platform needs to include features to support dynamic data-driven workflows, to dynamically manage the platform functions, components, and applications at runtime. The developers should be capable to express decisions, and dynamic deployment of data analytics functions based on the underlying data.
-
-\item{\textbf{Geographically Distributed:}} The platform needs to support geographically distributed computing. Since ....
+\item{\textbf{Geographically Distributed:}} The platform needs to support geographically distributed computing, since 
+IoT sensors are geographically distributed, in addition IoT applications have some latency and bandwidth requirement that forces the use of geo-distributed architecture in order to processes the huge volume of data streams.
 
 \item{\textbf{Time and location dependencies:}} IoT data come with temporal and spatial information, which is directly associated with their business value in a given application context. Hence, IoT analytics applications must in several cases process data in a timely fashion and from the proper location.
 
@@ -80,32 +36,42 @@ The IoT faces the same 3 Vs challenges that Big Data. However, IoT data feature 
 While edge computing can help achieve all the new requirements that IoT applications need, edge resources are typically constrained in their capabilities. Therefore, edge computing can be leveraged to complement the computing capabilities of the cloud-centric approach. The use of edge and cloud architecture poses several challenges: 
 
 \begin{itemize}
-\item Deciding how to split such IoT applications among the edge and cloud resources;
+\item Deciding how to split IoT applications among the edge and cloud resources, in order to meet the requirement of the application; Where an IoT application is a sequence of operators from a source to a sink. 
 
-\item Exploring heterogeneous infrastructure for deploying data flow applications has proved to be NP-hard~\cite{Benoit:2013}.
+\item Exploring heterogeneous infrastructure for deploying data flow applications has proved to be NP-hard~\cite{Benoit:2013}. Due to the fact that there are so many possible combinations (many edge devices and many operators to place). 
  
 \item Moving operators from cloud to edge devices is challenging due to the devices' limitations with respect to memory, CPU, and often network bandwidth \cite{dias:2018:survey}.
 \end{itemize}
 
 Solving the challenges presented above in a correct manner will allow for faster completion time, a reduction in edge to cloud data transfers, and ensure efficient use of the edge and cloud resources. Doing them incorrectly can be detrimental to throughput and exacerbate the time for handling data events.
  
-Such flexibility is not currently offered in state-of-the-art IoT systems or stream processing engines. Major systems, such as Azure IoT~\cite{azure}, AWS Greengrass~\cite{amazon}, and IBM Watson IoT~\cite{IBM}, do not offer programming support for orchestrating the execution of data-processing tasks between the cloud and the edge. Therefore, the developers' ability to specify ``What data needs to be processed?,'' ``Where to deploy the computations?,'' and ``When to deploy the computations?'' is limited. Moreover, existing IoT stacks tend to perform poorly when deployed on constrained devices, making it nearly impossible to support real-time data analytics on these devices.
-
-%Furthermore, not all the data produced is interesting or relevant, and only a part of it may need to be processed in the context of an application. These observations can be leveraged to design hybrid architectures that can effectively leverage both the edge and the cloud resources to process the data in an effective and timely manner\cite{ahmed2017role, satyanarayanan2015edge}.
-%Although the cloud is better suited to perform heavier (resource intensive) analysis, such as processing historical events and very large datasets, edge devices can support real-time analytics that consider the temporal, spatial, and continuous nature of IoT data. 
+Such flexibility is not currently offered in state-of-the-art IoT systems or stream processing engines. Major systems, such as Azure IoT~\cite{azure}, AWS Greengrass~\cite{amazon}, and IBM Watson IoT~\cite{IBM}.
 
 \section{Motivation}
 
-Due to the proliferation of the Internet of Things (IoT) paradigm, the number of devices connected to the Internet is growing. These devices are generating unprecedented amounts of data at the edges of the infrastructure. As per Cisco systems\footnote{Cisco, Internet of Things At-a-Glance, 2016 }, 500 billion devices are expected to be connected the Internet by 2030. Consequently, the volume of data generated by this devices will increase, along with the volume of network traffic to the cloud thereby resulting in latencies that can prevent timely decision making or may reduce the amount of data processed.
-
-
 The popularity and proliferation of the Internet of Things (IoT) paradigm is resulting in a growing number of devices connected to the Internet. These devices are generating and consuming unprecedented amounts of data at the edges of the infrastructure, and are enabling new classes of applications, however, current approaches typically rely on cloud
-platforms located at the core of the infrastructure to process data. As the number of devices and the amount of data they generate and consume increases, such core-centric approaches are becoming increasingly inefficient as they need to transfer data back and forth between the edge and the core. Furthermore, the latencies associated with such data transfer may not be able to support applications involving time-critical data-driven decision making.
-
+platforms located at the core of the infrastructure to process data. As the number of devices and the amount of data they generate and consume increases, such core-centric approaches are becoming increasingly inefficient as they need to transfer data back and forth between the edge and the core. Furthermore, not all the data produced is interesting or relevant, and only a part of it may need to be processed in the context of an application. These observations can be leveraged to design hybrid architectures that can effectively leverage both the edge and the cloud resources to process the data in an effective and timely manner\cite{ahmed2017role, satyanarayanan2015edge}.
 
 To address these limitations, we propose R-Pulsar, a software stack with a content- and location-based programming abstraction to perform and orchestrate data analytics between the edge and the cloud. The programming abstraction enables developers to address the \textbf{what}, \textbf{where}, and \textbf{when} data needs to be processed by specifying content and action descriptors. We also propose a programming model to provide developers with the ability to define \textbf{how} to automatically split the dataflow across the edge and the cloud by specifying a set of dataflow constraints. In addition we present an optimized data-processing pipeline for achieving real-time data analytics on constrained devices.
 
 \section{Problem Description}
+
+With the increasing number of connected IoT devices, providing efficient and effective streaming analytics across the edge and the cloud for IoT applications is non-trivial due to the ....
+
+What data to consume: Due to the large number of IoT devices/sensors that are currently online , Similar to all computer systems, the naming scheme in edge computing is very important for programming, addressing, things identification, and data communication.
+
+The naming scheme for edge computing needs to handle the mobility of things, highly dynamic network topology, privacy and security protection, as well as the scalability targeting the tremendously large amount of unreliable things
+
+Where to perform the computations: time and location dependent nature of IoT data resources.
+
+When to perform computations:
+
+The platform should include intelligent and autonomic features in order to dynamically manage the platform functions, components and applications. The platform should also be capable to make proactive decisions, dynamic deployment, and intelligent decisions based on the understanding of the IoT, Cloud and BigData Integration for IoT Analytics context of the environments, users and applications requirements. The platform provides dynamic resources management for IoT, considering performance targets and constraints. This includes offloading workload from clients/hosts to the Cloud and dynamic resources and service migration, as presented in Section 2
+
+
+How to split IoT applications across the edge and the cloud: The platform needs to be distributed in order to support the requirements of the IoT applications. And in order to be scalable in order to address the needs of a variable
+number of the devices, services and users.
+
 
 \section{Contributions}
 The primary contributions of the research in this thesis are a programming model for deciding \textbf{what}, \textbf{when}, \textbf{where} data needs to be processed by specifying content and action descriptors and \textbf{how} computations get distributed across the edge and the cloud. The detailed contributions are presented as follows.

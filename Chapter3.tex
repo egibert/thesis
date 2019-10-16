@@ -1,4 +1,9 @@
-\section{Introduction}
+%\section{Introduction}
+%In this Chapter, we present the implementation, API examples of R-Pulsar and the evaluation of each of the layers and components of R-Pulsar. 
+
+\section{Implementation}
+
+In this section we describe the implementation of R-Pulsar, Figure~\ref{fig:diagram} depicts the interations that R-Pulsar performs when a the Post primitive is used:
 
 \begin{figure}[htb!]
   \centering
@@ -7,16 +12,24 @@
   \caption{Sequence diagram of R-Pulsar, when a sensor wants to register itself in the R-Pulsar network.} \label{fig:diagram}
 \end{figure}
 
-
-
 \begin{itemize}
-    \item Step 1: The location specified in the AR message is used to the location aware component which is responsible for performing a location query in the quadtree. The result of the query is the P2P network that will receive the message.
-    \item Step 2: Once the P2P network is selected, then content of the AR profile is used to select which RP will be responsible for the message. The content based component is responsible for encoding the AR profile into a set of base 10 ids and performing a SFC call to go from n-dimentional space to 1-dimensional space base 10 id.
-    \item Step 3: The base 10 id is used to route the message to the right RP.
+    \item \textbf{Step 1:} The application layer defines an AR profile by specifying the type of sensor it is, and where is it located.
+    
+    \item \textbf{Step 2:} The application layer calls the post primitive with the profile specified in step 1.
+    
+    \item \textbf{Step 3:} The serverless API splits the profile passed by the post primitive in two separate calls: one for the content, and one of the location.
+    
+    \item \textbf{Step 4.1.1:} The location specified in the AR message is used for performing a location query in the quadtree. The result of the query is the closest P2P network given that point.
+    
+    \item \textbf{Step 4.2.1:} The content of the AR profile is used to select which RP will be responsible for the message. The content of the AR profile is encoded into a set of base 10 ids.
+    
+    \item \textbf{Step 4.2.2:} The set of base 10 ids are passed to the space filling curve (SFC) to go from n-dimensional space to 1-dimensional space id.
+    
+    \item \textbf{Step 5:} The base id of the SFC is used to route the message in to the P2P network obtained in step 4.1.1, and the message is forwarded to the right RP.
 \end{itemize}
 
 
-The current implementation of R-Pulsar build upon the open source project TomP2P. TomP2P is a P2P library and a distributed hash table (DHT) implementation which provides a decentralized key-value infrastructure for distributed applications. %Each peer has a table that can be configured either to be disk-based or memory-based to store its values. TomP2P stores key-value pairs in a distributed manner. To find the peers to store the data in the distributed hash table, TomP2P uses an iterative routing to find the closest peers. 
+The current implementation of R-Pulsar build upon the open source project TomP2P. TomP2P is a P2P library and a distributed hash table (DHT) implementation which provides a decentralized key-value infrastructure for distributed applications.
 
 The overall operation of the R-Pulsar overlay network consists of two phases: bootstrap and running. During the bootstrap phase (or join phase), messages are exchanged between a joining RP and the rest of the group. During this phase, the joining RP attempts to discover RPs already existing in the system to build its routing table. The joining RP sends a discovery message to the group. If the message is unanswered after a set duration (in the order of seconds), the RP assumes that it is the first in the system and it becomes the master RP, creating a single overlay network (Peer-to-Peer network). Every time any other RP joins the overlay network and the master RP responds to the discovery message, the  RP is added to the system by using the location of the RP and determining which quadrant the RP occupies. Once the initial P2P network has a sufficient number of RPs to guarantee that in case of multiple failures the P2P network will not disappear, the quadtree subdivides the overlay network into four additional P2P rings, plus an extra ring that will allow all the master RPs of each ring to communicate. Each RP master keeps a copy of the quadtree, so in the case of an RP failure the overlay network structure will never be lost. In the case of a master RPs failure, a master RP election is performed using the Hirschberg and Sinclair algorithm~\cite{Hirschberg}.
 
@@ -25,9 +38,9 @@ The running phase consists of stabilization and user mode. In the stabilization 
 In addition the user mode is also responsible for replicating the data. R-Pulsar uses an indirect replication method which is inherited from TomP2P. The indirect replication can be described as peers publishing content for others. The peer closest to a location ID is considered as the responsible peer and replicates data if necessary. Doing so allows data to never be lost, data will only be lost in the unlucky event that all the RPs fail at the same time or not RPs are up.
 
 \section{API Examples}
-In this section, we present two sets of API examples based on the disaster recovery use case presented in Chapter~\ref{chap:applications}. They illustrate the use of R-Pulsar’s API for basic use of resource actions for sensor registration and discovery (Listing 1-2) and the use of function actions for storing and triggering data-processing tasks (Listing 3-5)
+In this section, we present two sets of API examples, they are based on the disaster recovery use case presented in Chapter~\ref{chap:applications}. The first set of API examples showcase the use of resource actions for sensor registration and discovery and the use of function actions for storing and triggering data-processing tasks. The second set of examples showcase the rule based programming abstraction.
 
-The first example uses the resource actions for enabling the exchange of data, without prior knowledge between devices. In Listing~\ref{lst:sensor}, an advertising profile is specified by the drone sensor with the type of data it can produce, and requests to be notified when someone is interested in such data.
+The first set of examples uses the resource actions for enabling the exchange of data, without prior knowledge between devices. In Listing~\ref{lst:sensor}, an advertising profile is specified by the drone sensor with the type of data it can produce, and requests to be notified when someone is interested in such data.
 
 \begin{lstlisting}[language=mylang, caption={Data producer resource profile sample code.}, captionpos=b, label={lst:sensor}]
 1 profile.addSingle("Drone").addSingle("LiDAR");
@@ -49,7 +62,9 @@ Respectively, a data consumer declares the type of content of its interest. List
 3 producer.post(msg);
 \end{lstlisting}
 
-As mentioned previously, profiles can be used in two different ways: for discovering resources or subscribing to data publishers (resource actions) and for deploying data-processing tasks across the edge and the cloud (function actions). Listing~\ref{lst:ed2} implements the deployment of a function (post\_processing\_func) in the system. This allows the developer to specify where/on which set of resources it should be deployed.
+As mentioned previously, profiles can be used in two different ways: for discovering resources or subscribing to
+data publishers (resource actions) and for deploying data-processing tasks across the edge and the cloud (function
+actions). Listing~\ref{lst:ed2} showcases the deployment of a function (post\_processing\_func) in the system. This allows the developer to specify where/on which set of resources it should be deployed.
 
 \begin{lstlisting}[language=mylang, caption={Store post-processing task in the R-Pulsar overlay network.}, captionpos=b, label={lst:ed2}]
 1 profile.addSingle("post_processing_func");
@@ -78,9 +93,52 @@ In addition, Listing~\ref{lst:t-rule} defines a rule that is constantly evaluate
 3 producer.post(msg);
 \end{lstlisting}
 
-\section{Location-aware Overlay Network Layer Evaluation}
+The second set of examples showcase the rule based programming abstraction. The following snippet of code shows how developers will express the content-driven rules to trigger a new topology in the cloud:
 
-In this section we evaluate the overhead and scalability of the location-aware overlay network layer of R-Pulsar. The tests are evaluated using cloud and edge resources:
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{Figures/RuleTopology.pdf}
+  \caption{Trigger topology reaction rule definition.}
+  \label{fig:RuleTopology}
+\end{figure}
+
+The 'withCondition' is the IF rule expression that has to be satisfied and the 'withConsequence' is the action that will be triggered when the rule is satisfied. The action has two parameters: the first one specifies the name of the topology that needs to triggered if it is the first time executing the action or route to that topology if its already running. The second parameter specifies where it needs to be triggered. In this case it will be triggered on the cloud nodes that are part of the overlay network since its really computationally intensive. 
+
+Another brief code example of how developers will express the content-driven rules to store the matching results at the edge of the network:
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{Figures/StoreReaction.pdf}
+  \caption{Store reaction rule definition.}
+  \label{fig:StoreReaction}
+\end{figure}
+
+
+The action of this second rule also has two parameters: the first parameter specifies where to store the results of the streaming computation, which in this case, is at one of the edge nodes that are part of the overlay network since we want to be able to get our results quickly. The second parameter specifies how to store the results either one by one (streaming fashion) or batch (several at a time).
+
+
+Figure~\ref{fig:WindowBolt} depicts the API to add a rule window with length 10 secs and sliding interval of 5 seconds.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{Figures/WindowBolt.png}
+  \caption{Rule engine window bolt definition.}
+  \label{fig:WindowBolt}
+\end{figure}
+
+
+Figure~\ref{fig:qosRule} presents a brief code example of how developers will express the data quality rules:
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{Figures/qosRule.pdf}
+  \caption{}\label{fig:qosRule}
+\end{figure}
+
+
+\section{Location-aware Overlay Network Component Evaluation}
+
+In this section we evaluate the overhead and scalability of the location-aware overlay network component of R-Pulsar. The tests are evaluated using cloud and edge resources:
 
 \begin{itemize}
 \item Edge System:  Chameleon Cloud~\cite{chameleon}, a configurable experimental environment for large-scale cloud research~\cite{chameleon} with 100 instances of type m1.small (1 CPU and 2 GB RAM) to simulate the computation capabilities of a Raspberry Pi.
@@ -113,9 +171,9 @@ Next, we measured the time required to replicate the information stored across a
 
 We can observe that in Figure~\ref{fig:topology} that the time required to replicate the information across all the RP nodes in the system is relatively low. In particular, it can vary from a few milliseconds to around 200 milliseconds on average when having a large system with 500 RP nodes. The main factor affecting the time required to propagate the information is the number of RP nodes, since the time to route a message increases. 
 
-\section{Content-based Routing Layer Evaluation}
+\section{Content-based Routing Component Evaluation}
 
-In the content-based routing layer we evaluate three aspects: The first aspect is the overhead of matching profiles, The second aspect we evaluate is the overhead and scalability of the routing, and finally we evaluate the time it takes to propagate information through the system when a new RP joins the system. The tests are evaluated using the same cloud resources as described in the previous section. For the edge resources of this set of experiments we used two different setups:
+In the content-based routing component we evaluate three aspects: The first aspect is the overhead of matching profiles, The second aspect we evaluate is the overhead and scalability of the routing, and finally we evaluate the time it takes to propagate information through the system when a new RP joins the system. The tests are evaluated using the same cloud resources as described in the previous section. For the edge resources of this set of experiments we used two different setups:
 
 \begin{itemize}
 \item Raspberry Pi System: Using 2 Raspberry Pi's 3 with 4x ARM Cortex-A53 1.2GHz, 1GB LPDDR2 of RAM and 10/100 Ethernet.
@@ -170,7 +228,7 @@ This experiment is performed to understand the behavior of the system when multi
 
 Figure~\ref{fig:rpDiscovery} shows that the time required to have a consistent view of all the new RP nodes after the requests are placed is relatively low, and that it scales properly when increasing the number of existing RP nodes. In the case of a small system with only five existing RP nodes the overhead is around 20 milliseconds on average. The overhead increases to around 70 milliseconds in the case of having a large system with 100 existing RP nodes. Additionally, we can observe that varying the number of requests does not significantly affect the time required to propagate the information in a system with up to 50 RP nodes. In the case of having 100 RP nodes, we observe that increasing the number of requests, increases the overhead as well as the dispersion around the average. Although it is important to maintain an updated view of the system to ensure that we can efficiently process clients' requests, it is not critical for the regular operations of the system. Our system has mechanisms to adapt to changes in the availability of RP nodes to improve data processing efficiency. Therefore, we consider that having an eventually consistent system is sufficient. 
 
-\section{Serverless Messaging Layer Evaluation}
+\section{Serverless Messaging Component Evaluation}
 
 \section{Memory-mapped Streaming Analytics Pipeline Evaluation}
 

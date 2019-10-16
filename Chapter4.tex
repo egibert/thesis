@@ -1,7 +1,8 @@
 \section{Introduction}
 
-The number of Internet of Things applications is forecast to exponentially grow within the coming decade. Owners of such applications strive to make predictions from large streams
-of complex input in near real time. Cloud-based architectures often centralize storage and processing, generating high data movement overheads that penalize real-time applications. Edge and Cloud architecture pushes computation closer to where the data is generated, reducing the cost of data movements and improving the application response time. The heterogeneity among the edge devices and cloud servers introduces an important challenge for deciding how to split and orchestrate the IoT applications across the edge and the cloud. In this chapter, we propose a solution on how to split IoT applications dynamically across the edge and the cloud, allowing us to improve performance metrics such as end-to-end latency (response time), bandwidth consumption, and edge-to-cloud and cloud-to-edge messaging cost. 
+The number of Internet of Things applications is forecast to exponentially grow within the coming decade. Owners of such applications strive to make predictions from large streams of complex input in near real time. The heterogeneity among the edge devices and cloud servers introduces an important challenge for deciding how to split and orchestrate the IoT applications across the edge and the cloud. In this chapter, we propose a solution on how to split IoT applications dynamically across the edge and the cloud, allowing us to improve performance metrics such as end-to-end latency (response time), bandwidth consumption, and edge-to-cloud and cloud-to-edge messaging cost. 
+
+%Cloud-based architectures often centralize storage and processing, generating high data movement overheads that penalize real-time applications. Edge and Cloud architecture pushes computation closer to where the data is generated, reducing the cost of data movements and improving the application response time. 
 
 \section{Problem Description}
 We focus on three performance metrics for placing \ac{IoT} applications across edge and cloud resources, \textit{i.e.}, the end-to-end application latency~\cite{daSilvaVeith:2018}, the WAN traffic, and the messaging cost (messages exchanged between the edge and the cloud). The \ac{IoT} operator placement problem consists of defining how to accommodate the application components (\textit{i.e.}, operators) on the available resources of the network topology to optimize one or more performance metrics. 
@@ -189,17 +190,12 @@ mo_{\langle o,r\rangle} \times mem_{\langle o,r\rangle} \le mem_{r} \quad\quad \
 
 Constraint \ref{eq:comp_staturation} guarantees that a resource can provide the service rate required by its hosted operators whereas Constraint \ref{eq:comm_staturation} ensures that the links are not saturated. The CPU and memory requirements of operators on each host are ensured by Constraints~\ref{eq:comp_av} and \ref{eq:mem_av} respectively. Constraint~\ref{eq:comm_av} guarantees the data requirements of streams placed on links. Constraints \ref{eq:vertex_map} and \ref{eq:edge_map} ensure that an operator is not placed on more than a resource and that a stream is not placed on more than a network link respectively.
 
-\section{R-Pulsar Framework Extension}\label{sec:framework}
-R-Pulsar is a data analytics software stack for collecting, processing, and analyzing data at the edge and/or at the cloud. R-Pulsar has been extended to allow developers the ability to decide \textbf{how} to split the application operators between the edge and the cloud, by specifying a set of constraints. 
+\section{R-Pulsar Framework Extension}\label{sec:framework}s
+R-Pulsar has been extended with the following three components in order to automatically split and orchestrate dataflows between the edge and the cloud. 
 
-R-Pulsar consists of the associative rendezvous programming model (AR), an abstraction for content-based decoupled interactions (interactions defined in terms of semantic profiles instead of names) and rendezvous points~\cite{Renart2018EdgeBD}. The rendezvous point (RP) is a node where the dataflow computations occur, and it can be a gateway located at the edge of the network or a server in the cloud. R-Pulsar uses a peer-to-peer (P2P) network to connect and communicate with all the RP nodes. 
+\textbf{R-Pulsar Infrastructure Controller:} Designed to act similarly to software-defined networking (SDN) controllers, this component keeps track of the network resources available in real time. Some of the basic tasks include inventorying devices within the R-Pulsar P2P network, their capabilities, locations, and network statistics.
 
-\subsection{R-Pulsar Layers}
-R-Pulsar has been extended with the following three layers in order to automatically split and orchestrate dataflows between the edge and the cloud. 
-
-\textbf{R-Pulsar Infrastructure Controller:} Designed to act similarly to software-defined networking (SDN) controllers, this layer keeps track of the network resources available in real time. Some of the basic tasks include inventorying devices within the R-Pulsar P2P network, their capabilities, locations, and network statistics.
-
-\textbf{R-Pulsar Plan Finder:} This layer computes the most optimized operator placement plan. It uses a three-step approach for calculating the optimal operator placement plan for deploying dataflows between the edge and the cloud. Section~\ref{sec:strategies} presents the three-step operator placement strategy developed for R-Pulsar.
+\textbf{R-Pulsar Plan Finder:} This component computes the most optimized operator placement plan. It uses a three-step approach for calculating the optimal operator placement plan for deploying dataflows between the edge and the cloud. Section~\ref{sec:strategies} presents the three-step operator placement strategy developed for R-Pulsar.
 
 \textbf{R-Pulsar Executor/Monitor:} The primary responsibility is to monitor dataflows running on the R-Pulsar P2P network, including dataflow deployment, task assignment, and task reassignment in case of failure.
 
@@ -210,7 +206,7 @@ Each rendezvous point (RP) in the R-Pulsar P2P network can be elected as a maste
 \textbf{Master RP:}
 The master RP's primary responsibility is to manage, coordinate, and monitor a dataflow running on the R-Pulsar P2P network, including dataflow deployment, task assignment, and task reassignment in the event of a failure. Each time a new dataflow is deployed in the P2P network a new master RP for that dataflow is elected.
 
-Deploying a topology to the R-Pulsar P2P network involves submitting the pre-packaged dataflow file along with topology configuration. Then the information will be routed to the responsible RP using the content-based interactions~\cite{Renart2018EdgeBD}. The content-based interactions allow users to route dataflows to unknown RPs; the RP who receives the message will be automatically elected as the master RP for that dataflow. Once the master RP has been elected, it then uses the infrastructure controller layer to collect the network information of all the worker RPs. That information is then passed to the operator placement algorithm to generate a placement strategy. Once the operator placement algorithm has an efficient operator placement plan, then the master RP distributes the tasks to the worker RPs.
+Deploying a topology to the R-Pulsar P2P network involves submitting the pre-packaged dataflow file along with topology configuration. Then the information will be routed to the responsible RP using the content-based interactions~\cite{Renart2018EdgeBD}. The content-based interactions allow users to route dataflows to unknown RPs; the RP who receives the message will be automatically elected as the master RP for that dataflow. Once the master RP has been elected, it then uses the infrastructure controller component to collect the network information of all the worker RPs. That information is then passed to the operator placement algorithm to generate a placement strategy. Once the operator placement algorithm has an efficient operator placement plan, then the master RP distributes the tasks to the worker RPs.
 
 The master RP tracks the status of all worker nodes and the tasks assigned to each one. If the master RP detects that a specific worker node has failed to heartbeat or has become unavailable, it will reassign that worker RP tasks to other worker RP nodes in the federation.
 
@@ -223,7 +219,7 @@ The strategy for operator placement on R-Pulsar applies statistics collected by 
 The operator placement strategy comprises three phases: (i) application profiling; (ii) candidate placement and (iii) final placement. 
 
 \textbf{Phase 1 -- Application Profiling:}. 
-In the first phase the worker RPs and the master RPs using the infrastructure controller layer continuously collect statistics~\cite{kaur:2017} from the running dataflow. The collected data includes the following information about the operators:
+In the first phase the worker RPs and the master RPs using the infrastructure controller component to continuously collect statistics~\cite{kaur:2017} from the running dataflow. The collected data includes the following information about the operators:
 \begin{itemize}
   \item The arrival rate of events.
   \item Processing time per event.
