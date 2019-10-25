@@ -361,8 +361,7 @@ Our experiments are performed using the following edge and cloud setup:
 
 \item We used an experimental edge testbed developed by the authors, inspired by Hu \textit{et. al.}~\cite{Hu2016QuantifyingTI} that consists of 13 Raspberry Pis; 5 Raspberry Pis model 3 (4x ARM Cortex-A53 1.2GHz, 1GB of RAM and 10/100 Ethernet), and 8 Raspberry Pis model 2 (4x ARM Cortex-A7 900MHz, 1GB of RAM and 100 Ethernet). 
 
-\item For the cloud we used the Chameleon cloud~\cite{chameleon} with 5
-instances of type m1.medium (2 CPU and 4 GB RAM).
+\item For the cloud we used the Chameleon cloud~\cite{chameleon} with 5 instances of type m1.medium (2 CPU and 4 GB RAM).
 
 \end{itemize}
 
@@ -433,7 +432,7 @@ Figure~\ref{fig:both} shows that the R-Pulsar operator placement approach can al
 
 \subsection{Messaging Cost Evaluation}
 
-The last two experiments aim to calculate the messaging cost of running the dataflow for a month using the cost models of two major actors, AWS and Microsoft, in a real life edge and cloud scenario. For this reason, we setup Equation~\ref{eq:placement} with $w_c$ equal to 1, and $w_l$ and $w_l$ equal to 0. The goal of this optimization is to reduce the number of messages that reach the cloud servers.
+This two experiments aim to calculate the messaging cost of running the dataflow for a month using the cost models of two major actors, AWS and Microsoft, in a real life edge and cloud scenario. For this reason, we setup Equation~\ref{eq:placement} with $w_c$ equal to 1, and $w_l$ and $w_l$ equal to 0. The goal of this optimization is to reduce the number of messages that reach the cloud servers.
 
 \begin{table}[h]
 \caption{Azure IoT Hub and Amazon IoT Core messaging pricing.} \label{tb:table}
@@ -473,13 +472,17 @@ Figure~\ref{fig:cost-microsoft} depicts the cost of deploying the ETL dataflow u
 
 Figure~\ref{fig:cost-amazon} depicts the cost of deploying the ETL dataflow using the Amazon cost model. Our system obtains a 50\% cost reduction when compared to the cloud and LB approaches in all four different setups (15, 200, 5000 and 10000 sensors). In addition our system obtains a 97\% savings when compared to the Random approach in all four different setups.
 
+\subsection{Model Evaluation}
+
+This last three experiments aim to evaluate the scalability, overhead and validate the operator placement algorithm.
+
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.8\textwidth]{Results/Scale.pdf}
   \caption{Evaluation of the scalability of the operator placement problem algorithm as the number of operators to place increase over edge and cloud resources.}\label{fig:scalefirst}
 \end{figure}
 
-Figure~\ref{fig:scalefirst} depicts the scalability and the overhead of the initial operator placement problem algorithm in both edge and cloud resources. We can observe that the algorithm scales with the number of operators to place and a valid solution can be found in less than half a minute.
+Figure~\ref{fig:scalefirst} depicts the scalability and the overhead of the initial operator placement problem algorithm in both edge and cloud resources. We can observe that the algorithm scales with the number of operators to place and a valid solution can be found in less than half a minute. Not that this step is only performed when the entire workflow needs to be placed, once the operators are placed, only a portion of the operators are moved.
 
 \begin{figure}[h]
   \centering

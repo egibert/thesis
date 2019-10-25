@@ -3,29 +3,25 @@ Edge computing complements the cloud in IoT by filling in the gap between the cl
 
 \subsection{Advantages}
 
-Minimize Data Explosion and Network Traffic: The Internet of Things (IoT) is an emerging concept that is fostering the connection of massive numbers of objects, sensors, and devices to the network. As per Cisco systems [] , 500 billion devices are expected to be connected the Internet by 2030, and nearly half of the worldwide data will come from sensors [1]. Consequently, the volume of data that will be generated will also increase. Another concern with increasing data generation is the volume of network traffic to a central server or cloud thereby reducing the response time of edge devices.
+Minimize Data Explosion and Network Traffic: Due to the large number of connected devices the volume of data that they will generate will increase exponentially. Another concern with increasing data generation is the volume of network traffic to a central server or cloud thereby reducing the response time of edge devices. By using edge computing data can stay local and only send the important data to the cloud, reducing the volume and network bandwidth.
 
 Low Latency: Emerging IoT scenarios involve gathering and processing large volumes of streaming data using complex workflows in a timely manner to support decision making. Traditionally, data processing has been done at large data centers in the core of the network, however, as the data volumes and rates grow, and the application scenario becomes increasingly time sensitive, such an approach is quickly becoming infeasible, and it is becoming essential to also leverage resources closer to the edge. By applying edge computing applications are capable of supporting time-sensitive applications.
 
-Real-Time Computations: Edge computing enhances the efficiency in terms of improving performance and reducing the unnecessary costs of outgoing communication bandwidth. Since the process happens near the data source, the system can generate the result much faster.
+Real-Time Computations: Edge computing improves the overall performance by offloading computations near the data source and reducing the unnecessary costs of moving the data to the cloud.
 
-Security: IoT Edge Computing has made the transfer of data between the cloud and devices redundant. It is now possible to filter sensitive data locally and transmit only the aggregate data over to the cloud.
+Security: Edge computing allows to process and filter sensitive data locally and transmit only the aggregate data over to the cloud.
 
 \subsection{Disadvantages}
-Constrained devices: While leveraging edge resources can alleviate costs associated with cloud data transfers, edge resources tend to be constrained in their capabilities. In addition state-of-the-art data analytics pipelines are known to be computationally intensive tasks, resulting in the inability to performing real-time data analytics when deployed on constrained devices.
+Limited Resources: While leveraging edge resources can alleviate costs associated with cloud data transfers, edge resources tend to be constrained in their capabilities. In addition state-of-the-art data analytics pipelines are known to be computationally intensive tasks, resulting in the inability to performing real-time data analytics when deployed on constrained devices.
 
 Added complexity: Integrating edge computing adds complexity to applications, especially when they need to include policies that govern what kind of data is processed and analyzed at the edge and what is sent to cloud. In addition exploring heterogeneous infrastructures such as edge and cloud for deploying dataflow applications has proved to be NP-hard~\cite{Benoit:2013}.
 
 Programmability: In cloud computing, users program their code and deploy them on the cloud. The cloud provider is in charge to decide where the computing is conducted in a cloud. Users have zero or partial knowledge of where the applications are running. However, in the edge computing, computation is offloaded from the cloud, and the edge nodes are most likely heterogeneous platforms. In this case, the runtime of these nodes differ from each other, and the programmer faces huge difficulties to write an application that may be deployed in the edge computing paradigm.
 
-Data Abstraction: Edge computing, is fostering the connection of massive numbers of devices connected to the network. This connected devices are generating unprecent amounts of data, but sometimes data is not relevant or need it. There is a need to create a data abstraction that .....
-
-For example, the thermometer could report the temperature every minute, but this data will most likely only be consumed by the real user several times a day. Another example could be a security camera in the home which might keep recording and sending the video to the gateway, but the data will just be stored in the database for a certain time with nobody actually consuming it, and then be flushed by the latest video.
-
 \begin{table*}[ht]
-\begin{adjustwidth}{-2.7cm}{-1cm}
 \caption{Edge Computing use cases, current limitations, and imperatives}
 \label{tab:use_case}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{|c|c|c|c|}
 \hline
 Applications                                                                                    & Example Use Case                                                                                                                                                                              & Limitations                                                                                                                                                      & Requirements                                                                                                                                         \\ \hline
@@ -35,7 +31,7 @@ Smart City                                                                      
 \begin{tabular}[c]{@{}c@{}}Video \\ Analaytics\end{tabular}                                     & \begin{tabular}[c]{@{}c@{}}Video analytics for safety \\ and security from public \\ video cameras.\end{tabular}                                                                              & \begin{tabular}[c]{@{}c@{}}Hard to perform real-time \\ analytics due to the need to \\ send large volumes of data to \\ the cloud.\end{tabular}                 & \begin{tabular}[c]{@{}c@{}}Low Latency, Security,\\ Geographically \\ Distributed,\\ Scalability\end{tabular}                                        \\ \hline
 \multicolumn{1}{|l|}{\begin{tabular}[c]{@{}l@{}}Observe Orient \\ Decide Act Loop\end{tabular}} & \begin{tabular}[c]{@{}c@{}}Refers to the decision-making \\ cycle ofobserve, orient, decide, \\ and act, developed by military \\ strategists and the United \\ States Air Force\end{tabular} & \begin{tabular}[c]{@{}c@{}}Hard to deliver near \\ real-time data to the end user \\ due to the need to send large \\ volumes of data to the cloud.\end{tabular} & \begin{tabular}[c]{@{}c@{}}Low Latency, Security,\\ Geographically \\ Distributed\end{tabular}                                                       \\ \hline
 \end{tabular}
-\end{adjustwidth}
+}
 \end{table*}
 
 

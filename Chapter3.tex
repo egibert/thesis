@@ -8,7 +8,7 @@ In this section we describe the implementation of R-Pulsar, Figure~\ref{fig:diag
 \begin{figure}[htb!]
   \centering
   \hspace*{-2cm}   
-    \includegraphics[width=1.2\textwidth]{Figures/Diagram.pdf}
+    \includegraphics[width=1\textwidth]{Figures/Diagram.pdf}
   \caption{Sequence diagram of R-Pulsar, when a sensor wants to register itself in the R-Pulsar network.} \label{fig:diagram}
 \end{figure}
 
@@ -227,8 +227,6 @@ This experiment is performed to understand the behavior of the system when multi
 \end{figure}
 
 Figure~\ref{fig:rpDiscovery} shows that the time required to have a consistent view of all the new RP nodes after the requests are placed is relatively low, and that it scales properly when increasing the number of existing RP nodes. In the case of a small system with only five existing RP nodes the overhead is around 20 milliseconds on average. The overhead increases to around 70 milliseconds in the case of having a large system with 100 existing RP nodes. Additionally, we can observe that varying the number of requests does not significantly affect the time required to propagate the information in a system with up to 50 RP nodes. In the case of having 100 RP nodes, we observe that increasing the number of requests, increases the overhead as well as the dispersion around the average. Although it is important to maintain an updated view of the system to ensure that we can efficiently process clients' requests, it is not critical for the regular operations of the system. Our system has mechanisms to adapt to changes in the availability of RP nodes to improve data processing efficiency. Therefore, we consider that having an eventually consistent system is sufficient. 
-
-\section{Serverless Messaging Component Evaluation}
 
 \section{Memory-mapped Streaming Analytics Pipeline Evaluation}
 

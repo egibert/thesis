@@ -6,7 +6,7 @@ Publish/subscribe (pub/sub) systems are widely used in IoT applications such as 
 
 Rendezvous-based interactions~\cite{AR} provide a mechanism for decoupling senders and receivers. The Rendezvous Point (RP) is the node where rendezvous interactions occur, and it can be an edge node or a cloud node. Senders transmit messages to an RP without knowledge of who or where the receivers are. The associative rendezvous interaction model consists of three elements, messages, associative selection, and reactive behaviors, which are described below. In the following sections we will first describe the semantics and primitives of AR and then we present the adaptation of AR semantics and primitives to fit our model. The R-Pulsar AR approach is an adaptation of existing primitives from Meteor~\cite{meteor2008}.
 
-\section{Associative Rendezvous} 
+\section{Original Associative Rendezvous} 
 Associative Rendezvous is a paradigm for content-based decoupled interactions with programmable reactive behaviors. Rendezvous-based interactions~\cite{AR} provide a mechanism for decoupling senders and receivers. The Rendezvous Point (RP) is the node where rendezvous interactions occur, and it can be an edge node or a cloud node. Senders transmit messages to an RP without knowledge of who or where the receivers are. The associative rendezvous interaction model consists of three elements, messages, associative selection, and reactive behaviors, which are described below. The AR interaction model consists of three elements: messages, associative selection, and reactive behaviors, which are described below~\cite{meteor2008}.
 
 \begin{figure}
@@ -39,8 +39,7 @@ Profiles are represented using a hierarchical schema that can be efficiently sto
 \begin{table}[h]
 \caption{AR Reactive behaviors}
 \label{table:OldActions}
-\begin{adjustwidth}{-1cm}{-1cm}
-
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{ll}
 \hline
 \textbf{Actions} & \textbf{Semantics}                                                                                                                                                                                                                 \\ \hline
@@ -51,7 +50,7 @@ notify\_interest & Notify sender if there is at least one match.                
 delete\_data     & Match message profile with existing data/interest profile.                                                                                                                                                                         \\
 delete\_interest & \begin{tabular}[c]{@{}l@{}}Notify sender if there is at least one match.\\ Remove all matching data/interest profiles from the system.\end{tabular}                                                                                \\ \hline
 \end{tabular}
-\end{adjustwidth}
+}
 \end{table}
 
 \subsection{Reactive Behaviors} 
@@ -69,6 +68,7 @@ Finally, the delete action deletes all matching interest/data profiles. Note tha
 \section{R-Pulsar Associative Rendezvous}\label{sec:semantics}
 R-Pulsar uses a custom implementation of the original AR semantics~\cite{meteor2008}. In our new implementation of the AR model, we modified to elements: the AR Message and the Reactive Behaviors.
 
+\subsection{AR Message}
 The AR message is now defined as a quintuplet instead of the original triplet: (header, action, data, location, and data-processing task). The location and data processing task fields have been added in to the already existing fields. The location field has been added so the AR message can be routed based on the location and the content, where the original version of AR only routes messages based on the content. The location coordinates represent the physical location of the sensors or the physical location of where to deploy data-processing tasks and the tag helps decide where to deploy data-processing tasks, either the edge or the cloud, allowing to pick from multiple cloud or edge geographically distributed resources.
 
 \begin{table}[t]
@@ -92,6 +92,8 @@ delete\_interest & \begin{tabular}[c]{@{}l@{}}Notify sender if there is at least
 \end{tabular}
 \end{adjustwidth}
 \end{table}
+
+\subsection{Reactive Behaviors} 
 
 For the reactive behaviors are now classified in two two different classes: resource actions and function actions. Where in the original implementation of AR there where only one type of actions. Table~\ref{table:actions} summarizes the available actions.
 

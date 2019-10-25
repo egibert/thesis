@@ -29,9 +29,9 @@ The other approach is the end-to-end architecture or middleware centric architec
 In this survey, we are only going to focus on the end-to-end or middleware centric architecture. In order to compare and contrast all the existing state of the art, we propose a four-layer edge-based middleware framework that each of the middlewares should consist of. Figure~\ref{fig:EdgeArch} presents the layers and components that need to be included in an edge computing solution. The architecture proposed covers all the requirements that the IoT applications. The edge-based middleware architecture consists of the following four layers: (1) resource management layer, (2) data processing layer, (3) service layer and (4) security layer. Tables ~\cref{tab:full_system_no_goals,tab:full_system_1,tab:full_system_2,tab:full_system_3} summarize the comparison of the available edge-based middleware systems in the market. 
 
 \begin{table}[hbt!]
-\begin{adjustwidth}{-1.6cm}{-1cm}
 \caption{Design goals of the resource management layer components of the cited papers in this survey.}
 \label{tab:resource}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{c|c|c|c|c|c|c|}
 \cline{2-7}
                                           & \multicolumn{2}{c|}{Resource Discovery}               & \multicolumn{2}{c|}{Resource Monitoring}              & \multicolumn{2}{c|}{Resource Mobility}                \\ \hline
@@ -47,7 +47,7 @@ In this survey, we are only going to focus on the end-to-end or middleware centr
 \multicolumn{1}{|c|}{Chaufournier et al.~\cite{Chaufournier:2017}} &                           &                           &                           &                           & \checkmark & \checkmark \\ \hline
 \multicolumn{1}{|c|}{Farris et al.~\cite{Farris:2017}}        &                           &                           &                           &                           & \checkmark & \checkmark \\ \hline
 \end{tabular}
-\end{adjustwidth}
+}
 \end{table}
 
 \subsection{Resource Management Layer}
@@ -189,8 +189,8 @@ IOTMDB~\cite{6468294} is an Internet of Things storage management architecture b
 
 \begin{table}[h!]
 \caption{Design goals of the service layer components of the cited papers in this survey.}
-\begin{adjustwidth}{-1.9cm}{-1cm}
 \label{tab:service}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{c|c|c|c|c|c|c|c|}
 \cline{2-8}
                                        & \multicolumn{2}{c|}{Rule Engine}                      & \multicolumn{2}{c|}{Programming Model}                & \multicolumn{3}{c|}{Workflow Orchestrator}                                        \\ \hline
@@ -206,7 +206,7 @@ IOTMDB~\cite{6468294} is an Internet of Things storage management architecture b
 \multicolumn{1}{|c|}{DROPLET~\cite{8457776}}          &                           &                           &                           &                           & \checkmark & \checkmark & \checkmark \\ \hline
 \multicolumn{1}{|c|}{Ghosh et al.~\cite{Ghosh:2018}}     &                           &                           &                           &                           & \checkmark &                           &                           \\ \hline
 \end{tabular}
-\end{adjustwidth}
+}
 \end{table}
 
 \subsection{Service Layer}

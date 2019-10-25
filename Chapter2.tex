@@ -7,7 +7,6 @@ In this chapter, we present our concepts in which R-Pulsar have been build upon.
   \caption{Schematic overview of the R-Pulsar Architecture}\label{fig:R-PulsarArch}
 \end{figure}
 
-
 \section{Infrastructure Layer}
 The infrastructure layer is composed of data producers and computational resources. The data producers are the various streaming sources that can generate data, including IoT devices (e.g., cameras, smart watch, and smart infrastructures, etc). The computational resources are a group of computers responsible for running the applications the user deploys. The resources are heterogeneous and distributed through the infrastructure, from the core to the edge of the network. 
 
@@ -80,7 +79,7 @@ The profile manager manages locally stored profiles and monitors message credent
 
 \begin{table}[h]
 \caption{Available R-Pulsar operators.} \label{tb:operators}
-\begin{adjustwidth}{-0.5cm}{-1cm}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{cc}
 \hline
 \textbf{Operators}                       & \textbf{Guarantees}                                                                                                                                                                                                    \\ \hline
@@ -89,7 +88,7 @@ bool \textbf{post}(AR Message)                   & \begin{tabular}[c]{@{}c@{}}Ro
 bool \textbf{stream}(AR Message, String Peer Id) & \begin{tabular}[c]{@{}c@{}}Stream direct messages to a select RP.\\ Guarantees that the responsible RP will\\ always receive the message.\end{tabular}                                                                 \\ \hline
 AR Message \textbf{poll}()                       & \begin{tabular}[c]{@{}c@{}}Retrieve messages from a select RP point.\\ Guarantees that the consumer will always\\ receive the message.\end{tabular}                                                                    \\ \hline
 \end{tabular}
-\end{adjustwidth}
+}
 \end{table}
 
 The serverless messaging component offers four different operators. Table~\ref{tb:operators} summarized all of the available operators.
@@ -103,9 +102,7 @@ The \textbf{poll}() operator is used to retrieve the data other RPs are sending.
 The \textbf{post}(AR message) operator is used to route the messages without the need of specifying the recipient of the message, the recipient of the message is resolved by using the AR Message. To route a message using the post abstraction the following steps are performed:
 
 \subsection{Memory-mapped Streaming Analytics Component}
-The data pipeline is responsible for consolidating data from multiple sources, processing the data, and making them available to be used. State-of-the-art data pipelines are known to be data-intensive tasks, resulting in the inability to performing real-time data analytics when deployed on constrained devices. The memory-mapped streaming analytics pipeline component is motivated to overcome that issue.
-
-The streaming analytics pipeline comprises the following layers: 
+The data pipeline is responsible for consolidating data from multiple sources, processing the data, and making them available to be used. State-of-the-art data pipelines are known to be data-intensive tasks, resulting in the inability to performing real-time data analytics when deployed on constrained devices. The memory-mapped streaming analytics pipeline component is motivated to overcome that issue. The streaming analytics pipeline comprises the following sub-components: 
 
 \begin{enumerate}
 
@@ -115,11 +112,11 @@ The streaming analytics pipeline comprises the following layers:
 
 \end{enumerate}
 
-\subsubsection{Data Collection Layer}
+\subsubsection{Data Collection}
 
 Multiple data collection services are available, such as Apache Kafka~\cite{kafka}, Google Pub/Sub~\cite{google}, Amazon Firehose~\cite{amazon}, and Mosquitto~\cite{mosquitto}. Although some are designed to be deployed on edge devices, these services offer limited performance when deployed in constrained devices due to the limited read and write disk speeds.
 
-We designed and implemented a custom data collection layer designed specifically for constrained devices using a memory-mapped queue. A memory mapped file is a segment of virtual memory that has been assigned a direct correlation with some portion of a file. This file is physically present on disk, which allows the operating system to ensure data access operations with better performance than standard file access. The core principle of the R-Pulsar queue system emerges from the observation that random memory read is about 3.5x faster than sequential disk read, as measured in Table~\ref{tb:table1}. 
+We designed and implemented a custom data collection sub-component designed specifically for constrained devices using a memory-mapped queue. A memory mapped file is a segment of virtual memory that has been assigned a direct correlation with some portion of a file. This file is physically present on disk, which allows the operating system to ensure data access operations with better performance than standard file access. The core principle of the R-Pulsar queue system emerges from the observation that random memory read is about 3.5x faster than sequential disk read, as measured in Table~\ref{tb:table1}. 
 
 The trade-off of using a memory mapped data collection system is that operating systems decides when to copy data from the main memory to disk.  
 \\
@@ -137,13 +134,13 @@ Random write                             & 0.15 MB/s              & 65.88 MB/s  
 \end{tabular}}
 \end{table}
 
-\subsubsection{Data Processing Layer}
+\subsubsection{Data Processing }
 
 R-Pulsar can be used on top of any data processing engine, allowing the end user to choose his or her favorite data-processing engine. The current release of R-Pulsar was validated using Apache Edgent. 
 
-\subsubsection{Data Storage and Query Layer}
+\subsubsection{Data Storage and Query}
 
-This layer leverages the AR programming abstraction and a key-value database to offer SQL-like query capabilities. The storage layer uses the SFC of the content-based routing layer to allow the ability to perform wildcard, range, or exact queries and allows the data to be horizontally partitioned among multiple RPs. 
+This sub-component leverages the AR programming abstraction and a key-value database to offer SQL-like query capabilities. The storage sub-component uses the SFC of the content-based routing component to allow the ability to perform wildcard, range, or exact queries and allows the data to be horizontally partitioned among multiple RPs. 
 
 For storing data, R-Pulsar relies on RocksDB~\cite{rocks}, an embedded key-value database optimized for fast and low-latency storage. The database keeps the most recently used data in the main memory and stores the least recently used data on disk.
 
@@ -162,7 +159,7 @@ The priority field is used in the event of having two or more rules that satisfy
 
 \begin{table}[h]
 \caption{Available R-Pulsar rule operators.}\label{tb:ruleOp}
-\begin{adjustwidth}{-1cm}{-1cm}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{cc}
 \hline
 \textbf{Operator}                                                                                       & \textbf{Definition}                                                                                                                                                                                                                                                                                                                                                 \\ \hline
@@ -176,7 +173,7 @@ AVG                                                                             
 STD                                                                                                     & Returns true if the given number is the std number from a list of numbers.                                                                                                                                                                                                                                                                                          \\ \hline
 IF                                                                                                      & \begin{tabular}[c]{@{}c@{}}Determines if expressions are true or false. \\ Returns a given value if true and another value if false.\end{tabular}                                                                                                                                                                                                                   \\ \hline
 \end{tabular}
-\end{adjustwidth}
+}
 \end{table}
 
 The rule actions define what to do when the condition is satisfied, then the rule is fired and the action its performed. Each rule-entry has a single action associated with it; the three actions that are currently supported in our AR system are:
