@@ -25,8 +25,6 @@ The federation layer is responsible for orchestrating the geographically distrib
 
 IoT data comes with temporal and spatial information, which is directly associated with their business value in a given context. Hence, IoT applications must process data in a timely fashion and from proper locations. In order to process data from the right location R-Pulsar uses a location-aware overlay network in conjunction with a point quadtree to logically groups of RPs that are physically close together. A point quadtree is a tree data structure in which each internal node has exactly four children. Each node represents a 2D bounded box covering a specific part of the space to index, using a root node to cover the entire area.
 
-%The RPs are grouped based on the geographical location to guarantee that data gets processed with minimal latencies.
-
 The R-Pulsar overlay network is an n-dimensional self-organizing structured overlay composed of RP nodes. Peers in the overlay can join or leave the network at any time. Every node in the overlay is assigned a unique identifier that consists of a 160bit unique identifier. Each node stores the keys that maps to the segment of the curve between itself and its predecessor node.
 
 During the initialization of the overlay network, the RP attempts to discover an already existing RP in the system and construct its routing table. The joining RP sends a discovery message to the group. If the message remains unanswered after a duration (in the order of seconds), the RP assumes that it is the first in the system and it becomes the master RP, creating a single overlay network (Peer-to-Peer network). Every time any other RP joins the overlay network and the master RP responds to the discovery message, the  RP is added to the system by using the location of the RP and determining which quadrant the RP occupies. Once the initial P2P network has a sufficient number of RPs to guarantee that in case of multiple failures the P2P network will not disappear, the quadtree subdivides the overlay network into four additional P2P rings, plus an extra ring that will allow all the master RPs of each ring to communicate. Each RP master keeps a copy of the quadtree, so in the case of an RP failure the overlay network structure will never be lost. In the case of a master RPs failure, a master RP election is performed using the Hirschberg and Sinclair algorithm~\cite{Hirschberg}. Figure~\ref{fig:quadT} is a graphical representation of the quadtree and the logical organization of the P2P network.
@@ -48,8 +46,6 @@ In order to route a message the first strep is perform a quadtree query to decid
 \caption{R-Pulsar space filling curve routing using simple (a) and complex (b) profiles.}\label{fig:routingProfiles} 
 \end{figure}
 
-%As mentioned above, the lookup operator provided by the location-aware overlay requires an exact identifier, the AR message and the location to be routed.
-
 This component builds on top of the location-aware overlay to route messages. The content-based routing component maps AR profiles onto single identifiers or clusters of identifiers to enable information discovery using partial knowledge, as described in \cite{SCHMIDT2008962}.
 
 Content-based routing is achieved by performing two steps: The first step is to encode the set of attributes and/or attribute-value pairs of the AR message, into a set of unique base 10 ids. The second step is to use the set of base 10 numbers produced in the previous step and pass them to the Hilbert Space Filling Curve (SFC). The SFC~\cite{SFC} is used to map the n-dimensional space of the AR profile to the one-dimensional space ID of the location-aware overlay network. Content based routing can be performed in two ways using simple keyword profiles or complex keyword profiles, the routing process is described below.
@@ -64,12 +60,6 @@ Content-based routing is achieved by performing two steps: The first step is to 
 The streaming layer provides users and applications with efficient data-driven access to federated resources. This layer is composed of the serverless API, memory-mapped streaming analytics, and the rule-based programming components:
 
 \subsection{Serverless API Component}\label{sec:serverless}
-
-%\begin{figure}[!h]
-%  \centering
-%  \includegraphics[width=0.9\columnwidth]{Figures/multi-old.pdf}
-%  \caption{}\label{fig:Multiquad}
-%\end{figure}
 
 Serverless computing is a cloud computing model that aims to abstract server management and low-level infrastructure decisions away from developers. Allowing to deploy and execute pieces of code in response to events without the need to specify IP addresses. The serverless messaging layer implements the AR interaction model described in Chapter~\ref{chap:AR} and it consists of two components: the matching engine and the profile manager. 
 
@@ -99,16 +89,16 @@ The \textbf{stream}(AR Message, String Peer Id) operator is used to stream data 
 
 The \textbf{poll}() operator is used to retrieve the data other RPs are sending.
 
-The \textbf{post}(AR message) operator is used to route the messages without the need of specifying the recipient of the message, the recipient of the message is resolved by using the AR Message. To route a message using the post abstraction the following steps are performed:
+The \textbf{post}(AR message) operator is used to route the messages without the need of specifying the recipient of the message, the recipient of the message is resolved by using the AR Message.
 
 \subsection{Memory-mapped Streaming Analytics Component}
 The data pipeline is responsible for consolidating data from multiple sources, processing the data, and making them available to be used. State-of-the-art data pipelines are known to be data-intensive tasks, resulting in the inability to performing real-time data analytics when deployed on constrained devices. The memory-mapped streaming analytics pipeline component is motivated to overcome that issue. The streaming analytics pipeline comprises the following sub-components: 
 
 \begin{enumerate}
 
-\item The data collection layer gathers data from multiple sources and brings them to the pipeline.
-\item The stream processing layer processes the data and performs computations on the collected data.   
-\item The data storage and query layer reads and writes data to the main memory and disk.
+\item The data collection sub-component gathers data from multiple sources and brings them to the pipeline.
+\item The stream processing sub-component processes the data and performs computations on the collected data.   
+\item The data storage and query sub-component reads and writes data to the main memory and disk.
 
 \end{enumerate}
 
@@ -145,9 +135,9 @@ This sub-component leverages the AR programming abstraction and a key-value data
 For storing data, R-Pulsar relies on RocksDB~\cite{rocks}, an embedded key-value database optimized for fast and low-latency storage. The database keeps the most recently used data in the main memory and stores the least recently used data on disk.
 
 \subsection{Rule-based Programming Abstraction}\label{sec:programming-data}
-The rule-based programming abstraction makes it possible to build IoT applications and decide \textbf{when} data must be sent to the cloud for further postprocessing without having to manage any infrastructure.
+The rule-based programming abstraction makes it possible to build IoT applications and decide \textbf{when} data must be sent to the cloud for further post-processing without having to manage any infrastructure.
 
-It consists of a rule engine that allows developers to specify IF-THEN rules that can trigger other data-processing tasks when a condition is satisfied. The THEN clause of the conditions sends an AR message with a custom profile to start and stop data-processing tasks on demand. %The design and evaluation of the rule-based programming abstraction were illustrated in our previous paper~\cite{rules}.
+It consists of a rule engine that allows developers to specify IF-THEN rules that can trigger other data-processing tasks when a condition is satisfied. The THEN clause of the conditions sends an AR message with a custom profile to start and stop data-processing tasks on demand.
 
 We created a rule-based system, which contains all of the appropriate knowledge encoded into a set of If-Then rules. The system examines all the rule conditions (IF) and determines a subset, the conflict set, of the rules whose conditions are satisfied based on the data tuples. Out of this conflict set, one of those rules is triggered (fired). When a rule is fired, the action specified in its THEN clause is carried out. The loop for firing rules continues until one of two conditions are met: there are no more rules whose conditions are satisfied or a rule is fired. We allow to specify two different types of rules, ones that let you express data quality requirements which impose time constraints on the processing of the tuples, allowing the specification of a trade-off between the data quality and computational complexity. And the second one that offers the ability to express content-driven rules which complement the data quality requirements by triggering further stream-processing topologies either at the core or at the edge of the network if the data needs further processing due to quality of the data.
 

@@ -3,7 +3,7 @@
 
 \section{Implementation}
 
-In this section we describe the implementation of R-Pulsar, Figure~\ref{fig:diagram} depicts the interations that R-Pulsar performs when a the Post primitive is used:
+In this section we describe the implementation of R-Pulsar, Figure~\ref{fig:diagram} depicts the interactions that R-Pulsar performs when a the Post primitive is used:
 
 \begin{figure}[htb!]
   \centering
@@ -29,10 +29,12 @@ In this section we describe the implementation of R-Pulsar, Figure~\ref{fig:diag
 \end{itemize}
 
 
-The current implementation of R-Pulsar build upon the open source project TomP2P. TomP2P is a P2P library and a distributed hash table (DHT) implementation which provides a decentralized key-value infrastructure for distributed applications.
+The current implementation of R-Pulsar build upon the open source project TomP2P. TomP2P is a P2P library and a distributed hash table (DHT) implementation which provides a decentralized key-value infrastructure for distributed applications. The overall operation of the R-Pulsar overlay network consists of two phases: bootstrap and running.
 
-The overall operation of the R-Pulsar overlay network consists of two phases: bootstrap and running. During the bootstrap phase (or join phase), messages are exchanged between a joining RP and the rest of the group. During this phase, the joining RP attempts to discover RPs already existing in the system to build its routing table. The joining RP sends a discovery message to the group. If the message is unanswered after a set duration (in the order of seconds), the RP assumes that it is the first in the system and it becomes the master RP, creating a single overlay network (Peer-to-Peer network). Every time any other RP joins the overlay network and the master RP responds to the discovery message, the  RP is added to the system by using the location of the RP and determining which quadrant the RP occupies. Once the initial P2P network has a sufficient number of RPs to guarantee that in case of multiple failures the P2P network will not disappear, the quadtree subdivides the overlay network into four additional P2P rings, plus an extra ring that will allow all the master RPs of each ring to communicate. Each RP master keeps a copy of the quadtree, so in the case of an RP failure the overlay network structure will never be lost. In the case of a master RPs failure, a master RP election is performed using the Hirschberg and Sinclair algorithm~\cite{Hirschberg}.
+\subsection{Bootstrap Phase}
+During the bootstrap phase (or join phase), messages are exchanged between a joining RP and the rest of the group. During this phase, the joining RP attempts to discover RPs already existing in the system to build its routing table. The joining RP sends a discovery message to the group. If the message is unanswered after a set duration (in the order of seconds), the RP assumes that it is the first in the system and it becomes the master RP, creating a single overlay network (Peer-to-Peer network). Every time any other RP joins the overlay network and the master RP responds to the discovery message, the  RP is added to the system by using the location of the RP and determining which quadrant the RP occupies. Once the initial P2P network has a sufficient number of RPs to guarantee that in case of multiple failures the P2P network will not disappear, the quadtree subdivides the overlay network into four additional P2P rings, plus an extra ring that will allow all the master RPs of each ring to communicate. Each RP master keeps a copy of the quadtree, so in the case of an RP failure the overlay network structure will never be lost. In the case of a master RPs failure, a master RP election is performed using the Hirschberg and Sinclair algorithm~\cite{Hirschberg}.
 
+\subsection{Running Phase}
 The running phase consists of stabilization and user mode. In the stabilization mode, an RP responds to queries issued by other RPs in the system. The purpose of the stabilization mode is to ensure that routing tables are up to date and to verify that other RPs in the system have not failed or left the system. In the user mode, RPs allow external entities to use the serverless layer to communicate with each other to offer and request data and computation. These entities can include: a) users that might want to retrieve specific data or perform certain computation over data found using a query; b) IoT devices that can produce and consume data based on specific interests; and c) computational resources, such as data analytics and streaming platforms, clouds, or high performance computing clusters that offer their computational capabilities.
 
 In addition the user mode is also responsible for replicating the data. R-Pulsar uses an indirect replication method which is inherited from TomP2P. The indirect replication can be described as peers publishing content for others. The peer closest to a location ID is considered as the responsible peer and replicates data if necessary. Doing so allows data to never be lost, data will only be lost in the unlucky event that all the RPs fail at the same time or not RPs are up.
@@ -132,7 +134,7 @@ Figure~\ref{fig:qosRule} presents a brief code example of how developers will ex
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.7\textwidth]{Figures/qosRule.pdf}
-  \caption{}\label{fig:qosRule}
+  \caption{Tuple QoS rule definition}\label{fig:qosRule}
 \end{figure}
 
 
@@ -230,7 +232,7 @@ Figure~\ref{fig:rpDiscovery} shows that the time required to have a consistent v
 
 \section{Memory-mapped Streaming Analytics Pipeline Evaluation}
 
-In this section we evaluate two of the layers that the memory-mapped streaming analytics pipeline consists, the Data collection and the storage and query layers. The tests are evaluated using the same cloud resources as in the location-aware overlay network layer evaluation section. For the edge resources this set of experiments use the same as the content-based routing layer evaluation section. 
+In this section we evaluate two of the sub-components that the memory-mapped streaming analytics pipeline consists, the Data collection and the storage and query sub-component. The tests are evaluated using the same cloud resources as in the location-aware overlay network component evaluation section. For the edge resources this set of experiments use the same as the content-based routing component evaluation section. 
 
 \subsection{Performance of the Data Collection Layer Over Edge Systems}
 
