@@ -20,7 +20,7 @@ The federation layer is responsible for orchestrating the geographically distrib
 \begin{figure}[!h]
   \centering
   \includegraphics[width=1\columnwidth]{Figures/quadtree.pdf}
-  \caption{}\label{fig:quadT}
+  \caption{R-Pulsar quadtree geographical organization to multi layer P2P overlay network.}\label{fig:quadT}
 \end{figure}
 
 IoT data comes with temporal and spatial information, which is directly associated with their business value in a given context. Hence, IoT applications must process data in a timely fashion and from proper locations. In order to process data from the right location R-Pulsar uses a location-aware overlay network in conjunction with a point quadtree to logically groups of RPs that are physically close together. A point quadtree is a tree data structure in which each internal node has exactly four children. Each node represents a 2D bounded box covering a specific part of the space to index, using a root node to cover the entire area.
