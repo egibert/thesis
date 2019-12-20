@@ -217,8 +217,8 @@ The master RP is not a single point of failure in the strictest sense. This qual
 \subsection{Placement Strategy}\label{sec:strategies}
 The strategy for operator placement on R-Pulsar applies statistics collected by profiling the application and the location of sinks and sources. The operator placement aims to minimize the \textit{AggregateCost} (Equation~\ref{eq:objectivefunction}) by splitting the IoT application across edge and cloud by considering priorities of operators according to the infrastructure to which the sinks are assigned.
 The operator placement strategy comprises three phases: (i) application profiling; (ii) candidate placement and (iii) final placement. 
-
-\textbf{Phase 1 -- Application Profiling:}. 
+\\\\
+\noindent\textbf{Phase 1 -- Application Profiling:}. 
 In the first phase the worker RPs and the master RPs using the infrastructure controller component to continuously collect statistics~\cite{kaur:2017} from the running dataflow. The collected data includes the following information about the operators:
 \begin{itemize}
   \item The arrival rate of events.
@@ -323,7 +323,7 @@ Algorithm~\ref{alg:patterns} describes the function $GetCandidates$ used to iden
 }
 
 \end{algorithm}
-
+\hfill \break
 \textbf{Phase 3 -- Final Placement:} 
 Once phase two has completed and the profiling phase has established the requirements from the different operators, an operator placement strategy is created and deployed. The strategy reduces the combinatorial space by estimating only once the computation (Equation~\ref{eq:computation}) and communication (Equation~\ref{eq:communication}) overheads to operators targeted to cloud (Phase 2). Otherwise, operators to edge (edge candiate placements) have their overheads estimated for all edge devices evaluating their constraints (Equation~\ref{eq:comp_staturation} --~Equation~\ref{eq:edge_map}). The strategy gives high priority to edge since cloud sinks often store messages for batch processing, whereas the edge side hosts actuators.
 If edge devices cannot meet all operator requirements then the operator is moved to the cloud, hence, the cloud hosts its operator candidates and those that do not meet the constraints on edge. For instance, Operator 5 in Figure~\ref{fig:graph} was reallocated since the edge does not respect the resource constraints. Along with the overhead estimations, the strategy greedly uses the edge candiate placements for sequentially estimating the $AggregateCost$ (Equation~\ref{eq:placement}) and at each iteration, it picks the device with the minimal value (Equation~\ref{eq:objectivefunction}) to assign the operator.
@@ -365,9 +365,9 @@ Our experiments are performed using the following edge and cloud setup:
 
 \end{itemize}
 
-The 13 Raspberry Pis are connected to the same LAN. The Raspberry Pis use the external WAN~\cite{Ha:2013} (the Internet) for connecting to cloud. The LAN has a latency 0.523 ms and a bandwidth of 15 Mbits/sec. The WAN has latency 66.75 ms, and bandwidth of 87.0 Mbits/sec.
+\noindent The 13 Raspberry Pis are connected to the same LAN. The Raspberry Pis use the external WAN~\cite{Ha:2013} (the Internet) for connecting to cloud. The LAN has a latency 0.523 ms and a bandwidth of 15 Mbits/sec. The WAN has latency 66.75 ms, and bandwidth of 87.0 Mbits/sec.
 
-In addition to the setup, each of our experiments is evaluated using three other strategies. We compared our system with the following approaches:
+\noindent In addition to the setup, each of our experiments is evaluated using three other strategies. We compared our system with the following approaches:
 
 \begin{itemize}	
 \item \textbf{Cloud:} deploys all operators in the cloud, apart from operators provided in the initial placement.
@@ -377,7 +377,7 @@ In addition to the setup, each of our experiments is evaluated using three other
 \item \textbf{Random:} simulates the user trying to guess the best placement for the dataflow between the edge and the cloud. Random is the average of 15 different dataflow deployments between the edge and the cloud resources.
 \end{itemize}
 
-All the tests are evaluated using the ETL dataflow. The ETL dataflow is an implementation of the ETL RIoTBench topology, it consists of: a single data source outputting data every 5 seconds, 2 sinks one located at the edge and one located at the cloud, and 7 tasks that need to be deployed between the edge and the cloud of the network. The experiments were conducted using Sense Your City dataset\footnote{http://map.datacanvas.org} which consists of transmitting data each minute from sensors in 7 cities across 3 continents, with about 12 sensors per city. The data content includes metadata on the sensor ID, geolocation, and five timestamped observations (outdoor temperature, humidity, ambient light, dust, and air quality).
+\noindent All the tests are evaluated using the ETL dataflow. The ETL dataflow is an implementation of the ETL RIoTBench topology, it consists of: a single data source outputting data every 5 seconds, 2 sinks one located at the edge and one located at the cloud, and 7 tasks that need to be deployed between the edge and the cloud of the network. The experiments were conducted using Sense Your City dataset\footnote{http://map.datacanvas.org} which consists of transmitting data each minute from sensors in 7 cities across 3 continents, with about 12 sensors per city. The data content includes metadata on the sensor ID, geolocation, and five timestamped observations (outdoor temperature, humidity, ambient light, dust, and air quality).
 \subsection{End-to-end Tuple Latency Evaluation}
 
 The end-to-end tuple latency corresponds to the sum of the mean times from the two paths in ETL dataflow (cloud and edge). The conducted experiment evaluates the end-to-end tuple latency using Equation~\ref{eq:placement} where $w_l$ is equal to 1, and $w_w$ and $w_c$ are equal to 0. The experiment aims to evaluate how efficient the cloud, Random, and LB approaches are at minimizing the end-to-end tuple latency and compare the R-Pulsar operator placement approach. In addition, three failures were manually injected to showcase the dynamicity and flexibility to recover from node failures. The first failure makes 38\% of the edge cluster unavailable (100 ms). The second failure affects the remaining 62\% of the nodes (300 ms). Before the 62\% of the nodes fail, the 38\% of the nodes are back online. The third and last failure affects 50\% of the cloud instances (505 ms).
@@ -490,7 +490,7 @@ Figure~\ref{fig:scalefirst} depicts the scalability and the overhead of the init
   \caption{Evaluation of the cost of redeploying a subset of operators over edge and cloud resources.}\label{fig:scalesecond}
 \end{figure}
 
-Figure~\ref{fig:scalefirst} depicts the redeployment scalability and overhead of the algorithm. We can observer that since we do not need to redeploy all the operators when the workflow is not meeting the constraints, we can see that the cost of redeploying a subset of operators is very low and more important decisions can be done in real time since it the redeployment calculations are small.
+Figure~\ref{fig:scalesecond} depicts the redeployment scalability and overhead of the algorithm. We can observer that since we do not need to redeploy all the operators when the workflow is not meeting the constraints, we can see that the cost of redeploying a subset of operators is very low and more important decisions can be done in real time since it the redeployment calculations are small.
 
 \begin{figure}[h]
   \centering
@@ -498,4 +498,4 @@ Figure~\ref{fig:scalefirst} depicts the redeployment scalability and overhead of
   \caption{Evaluation of the real-time vs the modeled time as the number of operators increases.}\label{fig:validation} 
 \end{figure}
 
-The final result we wanted to validate the model by comparing the expected results and the actual results after deploying the workflow in a real setup, Figure~\ref{fig:validation} depicts the results. We can observe that when the number of operators is small the difference between the expected and the actual results only differs by at most 10\%, when the number of operators grows to 25 the difference slightly grows up to 15\%.
+For the final evaluation we wanted to validate the model by comparing the expected results and the actual results after deploying the workflow in a real setup, Figure~\ref{fig:validation} depicts the results. We can observe that when the number of operators is small the difference between the expected and the actual results only differs by at most 10\%, when the number of operators grows to 25 the difference slightly grows up to 15\%.

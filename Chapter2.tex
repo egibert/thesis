@@ -166,7 +166,7 @@ IF                                                                              
 }
 \end{table}
 
-The rule actions define what to do when the condition is satisfied, then the rule is fired and the action its performed. Each rule-entry has a single action associated with it; the three actions that are currently supported in our AR system are:
+\noindent The rule actions define what to do when the condition is satisfied, then the rule is fired and the action its performed. Each rule-entry has a single action associated with it; the three actions that are currently supported in our AR system are:
 
 \begin{enumerate}
   \item \textbf{Store} the results of the computation at the Edge or the Cloud. This allows the topology developers to seamlessly store the results of the topology based on the content of the data across a federated set of resources and have the ability to locate where those data results have been stored when needed.
@@ -174,16 +174,19 @@ The rule actions define what to do when the condition is satisfied, then the rul
   \item \textbf{Notify} action allows to notify any node part of the overlay network and stream the results to them.
 \end{enumerate}
 
-The rules can also be used to evaluate using a single tuple at a time or using window of tuples at a time. Windows is the concept in stream processing of splitting the infinite streams into finite chunks, and then apply computations to each chunk. There are two types of windows:
+\noindent The rules can also be used to evaluate using a single tuple at a time or using window of tuples at a time. Windows is the concept in stream processing of splitting the infinite streams into finite chunks, and then apply computations to each chunk. There are two types of windows:
 
 \begin{itemize}
     \item \textbf{Sliding Window:} tuples are grouped within a window that slides across the data stream according to a specified interval.
     \item \textbf{Tumbling Window:} tuples can be grouped in a single window according to a specified interval. Any tuple belongs to only one of the windows.
 \end{itemize}
 
-Windows can be specified accordingly to two different types of intervals: time and count.
+\noindent Windows can be specified accordingly to two different types of intervals: time and count.
 
-Time can be used for sliding and tumbling windows to group elements from a given time period using the timestamp of the tuples. Count can be used for sliding and tumbling windows can be used to create windows with a defined size. In such a case, all windows will have the same size and the window will not be emitted if there are fewer elements than the defined size.
+\begin{itemize}
+    \item \textbf{Time:} can be used for sliding and tumbling windows to group elements from a given time period using the timestamp of the tuples.
+    \item \textbf{Count:} can be used for sliding and tumbling windows can be used to create windows with a defined size. In such a case, all windows will have the same size and the window will not be emitted if there are fewer elements than the defined size.
+\end{itemize}
 
 \begin{figure}[h!]
   \centering

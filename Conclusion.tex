@@ -3,9 +3,9 @@ This thesis identified and addressed key problems and requirements of IoT applic
 
 \section{Perspectives}
 The research presented in this dissertation opens several research problems that need to be addressed in order to further advance on the edge computing area.
-
+\\\\
 \textbf{Energy Management:} A study published in 2017 determined that due to the large number of IoT devices connected to the internet by 2025 they will consume 20\% of all the worldwide electricity consuption~\cite{Energy}. For those reasons there is a need to implement energy management policies.  Energy management needs to be incorporated in the service layer in order to be able to schedule computations based on the energy consumption. A large amount of research exists focused on modeling and optimizing the energy consumption in the Cloud, but there is limited research targeting edge computing.  R-Pulsar does not have the ability to quantify the amount of energy spend or to schedule computations while being energy efficient. There is a need for tools that will give feedback on how energy efficient the code is. For those reasons energy management is a potential research direction.
-
+\\\\
 \textbf{Security and Privacy:} IoT data differentiates itself from any other type of data due that is mostly built upon personal and highly sensitive data. For those reasons security is an important research topic. There is a need for algorithms that provide strong security guarantees, while still being suitable for constrained environments. R-Pulsar does not address any security or privacy cancers, so a possible research direction is to create algorithms that provide strong security protection, while fitting within an acceptable footprint. It needs to be lightweight enough that will still leave room for the embedded OS and applications code. 
-
+\\\\
 \textbf{Edge based stream processing engines:} There is a need to develop more lightweight stream processing engine that can be deployed on constrained devices. Current stream processing engines (SPEs) such as Storm~\cite{storm}, Flink~\cite{flink}, Heron~\cite{heron} and Spark~\cite{spark} where designed to be deployed in the Cloud, with large number of clusters with powerful computing resources and plenty of memory. However, these assumptions do not hold at the Edge of the network. R-Pulsar does not offer a new SPE, it just simply uses Apache Edgent. For this reason there is a need to research a develop new SPE that are designed to run in constrained devices.
