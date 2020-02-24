@@ -10,11 +10,11 @@ IoT devices produce important and timely data that can lead to new and transform
 
 Making such applications a reality requires collecting data from sensors and instruments, processing this data individually or collectively in a timely manner, and making decisions based on the results. 
 
-Stream processing frameworks (SPFs) have proven to be very effective at processing large amounts of data at near-real-time, especially when combined with the elasticity and scalability of the cloud. Nonetheless, existing solutions were developed keeping in mind Big Data streams generated at the core of the infrastructure, such as those associated with web analytics. As a result, applying these solutions to IoT data stream requires transferring data from the edges to a data center located at the core of the infrastructure for processing. This model of moving data is quickly becoming unsustainable~\cite{intro}, due to the resulting impact on latency, network congestion, storage cost, and privacy, limiting the potential impact of IoT.
+Stream processing frameworks (SPFs) have proven to be very effective at processing large amounts of data in a timely manner, especially when combined with the elasticity and scalability of the cloud. Nonetheless, existing solutions were developed keeping in mind Big Data streams generated at the core of the infrastructure, such as those associated with web analytics. As a result, applying these solutions to IoT data stream requires transferring data from the edges to a data center located at the core of the infrastructure for processing. This model of moving data is quickly becoming unsustainable~\cite{intro}, due to the resulting impact on latency, network congestion, storage cost, and privacy, limiting the potential impact of IoT.
 
 However, in recent years, non-trivial computational capabilities have proliferated across the computing service landscape~\cite{continuum}. In particular, edge services are emerging closer to the data sources and can provide potential data-processing capabilities\cite{dastjerdi2016fog,bonomi2014fog}. 
 
-Edge computing extends the conventional centralized cloud infrastructures with an additional storage and processing layer that enables execution of application logic close to end-user. Edge computing foresees the deployment of edge nodes, which may range from IoT embedded devices featuring limited storage, memory, and processing capacity to whole data centers (i.e. "local clouds") which are deployed closer to end-users and physical infrastructures. Overall, the edge computing paradigm extends the cloud paradigm to the edge of the network. In this way, users can benefit from computing, storage and communication resources at their vicinity, instead of interfacing to a centralized back-end cloud. The proximity of resources helps to overcome the high-latency that is associated with the provision of cloud services to mobile users.
+Edge computing extends the traditional cloud infrastructure with additional computing resources enabling the execution of applications close to end-user. Edge computing uses edge nodes, which may range from IoT embedded devices featuring limited storage, memory, and processing capacity to whole data centers (i.e. "local clouds") which are deployed closer to end-users and physical infrastructures. Overall, the edge computing paradigm extends the cloud paradigm to the edge of the network. In this way, users can benefit from computing, storage and communication resources at their vicinity, instead of interfacing with the centralized cloud.
 
 IoT data feature certain characteristics, which distinguish them radically from other types of data sources and respective applications. The special characteristics and related challenges for IoT data processing applications can be listed as follows:
 
@@ -48,17 +48,16 @@ Solving the challenges presented above in a correct manner will allow for faster
 
 The popularity and proliferation of the Internet of Things (IoT) paradigm is resulting in a growing number of devices connected to the Internet. These devices are generating and consuming unprecedented amounts of data at the edges of the infrastructure, and are enabling new classes of applications, however, current approaches typically rely on cloud platforms located at the core of the infrastructure to process data. As the number of devices and the amount of data they generate and consume increases, such core-centric approaches are becoming increasingly inefficient as they need to transfer data back and forth between the edge and the core. Furthermore, not all the data produced is interesting or relevant, and only a part of it may need to be processed in the context of an application. These observations can be leveraged to design hybrid architectures that can effectively leverage both the edge and the cloud resources to process the data in an effective and timely manner\cite{ahmed2017role, satyanarayanan2015edge}.
 
-To address these limitations, we propose R-Pulsar, a software stack with a content- and location-based programming abstraction to perform and orchestrate data analytics between the edge and the cloud. The programming abstraction enables developers to address the \textbf{what}, \textbf{where}, and \textbf{when} data needs to be processed by specifying content and action descriptors. We also propose a programming model to provide developers with the ability to define \textbf{how} to automatically split the dataflow across the edge and the cloud by specifying a set of dataflow constraints. In addition we present an optimized data-processing pipeline for achieving real-time data analytics on constrained devices.
+To address these limitations, we propose R-Pulsar, an architecture with a content- and location-based programming abstraction to perform and orchestrate data analytics between the edge and the cloud. The programming abstraction enables developers to address the \textbf{what}, \textbf{where}, and \textbf{when} data needs to be processed by specifying content and action descriptors. We also propose a programming model to provide developers with the ability to define \textbf{how} to automatically split the dataflow across the edge and the cloud by specifying a set of dataflow constraints. In addition we present an optimized data-processing pipeline for achieving timely data analytics on constrained devices.
 
 \section{Problem Description}
 
+%Achieve an Edge-to-Cloud continuum system that can support the requirement of the IoT applications.
 With the increasing number of connected IoT devices, providing efficient and effective streaming analytics across the edge and the cloud for IoT applications is non-trivial due to the characteristics of IoT streams.
 \\\\
 \noindent\textbf{What data to consume}
 \\
-Due to the large number of IoT devices/sensors that are currently online, not all the data produced by the sensors is interesting or relevant, or only a part of it may need to be
-processed in the context of an application. Requiring all the data to be transported to the
-cloud for processing, will result in latencies that can prevent timely decision making or may reduce the amount of data processed. As a result there is a need for a programming model to help developers decide what data they want to consume.
+Due to the large number of IoT devices/sensors that are currently online, not all the data produced by the sensors is interesting or relevant, or only a part of it may need to be processed in the context of an application. Requiring all the data to be transported to the cloud for processing, will result in latencies that can prevent timely decision making or may reduce the amount of data processed. As a result there is a need for a programming model to help developers decide what data they want to consume.
 \\\\
 \noindent\textbf{Where to perform the computations}
 \\
@@ -71,7 +70,7 @@ Edge computing helps reduce the latency and the total amount of data and the loa
 \noindent\textbf{How to split IoT applications across the edge and the cloud}
 \\
 Cloud-based architectures often centralize storage and processing, generating high data
-movement overheads that penalize real-time applications. Edge and Cloud architecture pushes computation closer to where the data is generated, reducing the cost of data movements and improving the application response time. The heterogeneity among the edge devices and cloud servers introduces an important challenge for deciding how to split and orchestrate the IoT
+movement overheads that penalize timely applications. Edge and Cloud architecture pushes computation closer to where the data is generated, reducing the cost of data movements and improving the application response time. The heterogeneity among the edge devices and cloud servers introduces an important challenge for deciding how to split and orchestrate the IoT
 applications across the edge and the cloud. For those reasons there is a need for a programming model to provide developers with the ability to define how to automatically split the dataflow across the edge and the cloud by specifying a set of dataflow constraints.
 
 \section{Contributions}
@@ -81,8 +80,8 @@ The primary contributions of the research in this thesis are a programming model
   \item A rule-based programming abstraction for specifying \textbf{when} to trigger data-processing tasks based on data observations.
   \item A programming abstraction for specifying \textbf{how} to split a given dataflow and place operators across edge and cloud resources.
   \item An operator placement strategy that aims to minimize an aggregate cost which covers the end-to-end latency (time for an event to traverse the entire dataflow), the data transfer rate (amount of data transferred between the edge and the cloud) and the messaging cost (number of messages transferred between edge and the cloud).
-  \item Performance optimizations on the data-processing pipeline in order to achieve real-time performance on constrained devices.
-  \item An implementation of the above capabilities as part of the R-Pulsar software stack and its evaluation using embedded devices (Raspberry Pi and Android phone).
+  \item Performance optimizations on the data-processing pipeline in order to achieve high performance on constrained devices.
+  \item An implementation of the above capabilities as part of the R-Pulsar architecture and its evaluation using embedded devices (Raspberry Pi and Android phone).
 \end{itemize}
 
 \section{Outline}

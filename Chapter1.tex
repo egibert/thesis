@@ -2,12 +2,26 @@
 
 In this chapter, we describe the semantics and mechanisms that our programming abstraction builds upon, which enable developers to decide \textbf{what} and \textbf{where} data are collected and analyzed. 
 
-Publish/subscribe (pub/sub) systems are widely used in IoT applications, enabling event-driven and asynchronous parallel processing while improving performance, reliability, and scalability. Pub/sub-protocols, however, make some common task in IoT more challenging to achieve, for instance, it is not straightforward to discover potential sensors of a particular type in a particular location. The lack of a discovery mechanism in the pub/sub its a challenge that needs to be addressed in order to enable the interoperability of different IoT data providers and producers. For those reasons, we chose the Associative Rendezvous (AR) paradigm. AR differs from the traditional publish/subscribe paradigms in that it does not relay on topics, it relays on well-defined combinations of keywords (i.e. keywords, partial keywords, wildcards, ranges) from a semantic information space to enable the discovery mechanism.
+\begin{figure}[h]
+\centering
+\begin{subfigure}[b]{0.7\textwidth}
+   \includegraphics[width=1.1\linewidth]{Figures/AR.png}
+   \caption{AR Model}
+\end{subfigure}
+\begin{subfigure}[b]{0.7\textwidth}
+   \includegraphics[width=1.1\linewidth]{Figures/PUB.png}
+   \caption{Pub/Sub Model}\label{fig:ARExample2} 
+\end{subfigure}
+\caption{An illustration of the associative rendezvous and the pub/sub model.}\label{fig:ARPUB} 
+\end{figure}
 
-Associative Rendezvous (AR)~\cite{AR} is a paradigm for content based decoupled interactions with programmable reactive behaviors. A Rendezvous Point (RP) is the node where rendezvous interactions occur, and it can be an edge node or a cloud node. Senders transmit messages to an RP without knowledge of who or where the receivers are. The associative rendezvous interaction model consists of three elements, messages, associative selection, and reactive behaviors, which are described below. In the following sections, we will first describe the semantics and primitives of AR and then we present the adaptation of AR semantics and primitives to fit our model. The R-Pulsar AR approach is an adaptation of existing primitives from Meteor~\cite{meteor2008}.
+
+Publish/subscribe (pub/sub) systems are widely used in IoT applications, enabling event-driven and asynchronous parallel processing while improving performance, reliability, and scalability. Pub/sub-protocols, however, make some common task in IoT more challenging to achieve, for instance, it is not straightforward to discover potential sensors of a particular type in a particular location. The lack of a discovery mechanism in the pub/sub its a challenge that needs to be addressed in order to enable the interoperability of different IoT data providers and producers. For those reasons, we chose the Associative Rendezvous (AR) paradigm. AR differs from the traditional publish/subscribe paradigms in that it does not rely on topics, it relays on well-defined combinations of keywords (i.e. keywords, partial keywords, wildcards, ranges) from a semantic information space to enable the discovery mechanism.
+
+Associative Rendezvous (AR)~\cite{AR} is a paradigm for content based decoupled interactions with programmable reactive behaviors. A Rendezvous Point (RP) is the node where rendezvous interactions occur, and it can be an edge node or a cloud node. Senders transmit messages to an RP without knowledge of who or where the receivers are. The associative rendezvous interaction model consists of three elements, messages, associative selection, and reactive behaviors, which are described below. In the following sections, we will first describe the semantics and primitives of AR and then we present the adaptation of AR semantics and primitives to fit our model. The R-Pulsar AR approach is an adaptation of existing primitives from Meteor~\cite{meteor2008}. Figure~\ref{fig:ARPUB} illustrates how the AR and the pub/sub model work.
 
 \section{Original Associative Rendezvous} 
-Associative Rendezvous is a paradigm for content-based decoupled interactions with programmable reactive behaviors. Rendezvous-based interactions~\cite{AR} provide a mechanism for decoupling senders and receivers. The Rendezvous Point (RP) is the node where rendezvous interactions occur, and it can be an edge node or a cloud node. Senders transmit messages to an RP without knowledge of who or where the receivers are. The associative rendezvous interaction model consists of three elements, messages, associative selection, and reactive behaviors, which are described below. The AR interaction model consists of three elements: messages, associative selection, and reactive behaviors, which are described below~\cite{meteor2008}.
+Associative Rendezvous~\cite{meteor2008} is a paradigm for content-based decoupled interactions with programmable reactive behaviors. Rendezvous-based interactions~\cite{AR} provide a mechanism for decoupling senders and receivers. The Rendezvous Point (RP) is the node where rendezvous interactions occur, and it can be an edge node or a cloud node. Senders transmit messages to an RP without knowledge of who or where the receivers are. The associative rendezvous interaction model consists of three elements, messages, associative selection, and reactive behaviors, which are described below. The AR interaction model consists of three elements: messages, associative selection, and reactive behaviors, which are described below~\cite{meteor2008}.
 
 \begin{figure}
     \centering

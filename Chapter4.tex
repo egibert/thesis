@@ -407,7 +407,7 @@ Figure~\ref{fig:CDFLatency} shows that when R-Pulsar operator placement approach
 
 \subsection{Data Transfer Rate Evaluation}
 
-The Data transfer rate consists of the sum of all message sizes that traverse a WAN link per second. The values for Equation~\ref{eq:placement} are $w_w$ equal to 1, and $w_l$ and $w_c$ equal to 0. This third experiment aims to evaluate how efficient are the cloud, Random, and LB approaches at minimizing the transfer rate between the edge and the cloud and compare the results with R-Pulsar operator placement approach. Minimizing the transfer rate between the edge and the cloud is a critical point in order to achieve real-time analytics. 
+The Data transfer rate consists of the sum of all message sizes that traverse a WAN link per second. The values for Equation~\ref{eq:placement} are $w_w$ equal to 1, and $w_l$ and $w_c$ equal to 0. This third experiment aims to evaluate how efficient are the cloud, Random, and LB approaches at minimizing the transfer rate between the edge and the cloud and compare the results with R-Pulsar operator placement approach. Minimizing the transfer rate between the edge and the cloud is a critical point in order to achieve timely analytics. 
 
 \begin{figure}
   \centering
@@ -486,16 +486,17 @@ Figure~\ref{fig:scalefirst} depicts the scalability and the overhead of the init
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.8\textwidth]{Results/Redeploy.pdf}
+  \includegraphics[width=0.73\textwidth]{Results/Redeploy.pdf}
   \caption{Evaluation of the cost of redeploying a subset of operators over edge and cloud resources.}\label{fig:scalesecond}
 \end{figure}
 
 Figure~\ref{fig:scalesecond} depicts the redeployment scalability and overhead of the algorithm. We can observer that since we do not need to redeploy all the operators when the workflow is not meeting the constraints, we can see that the cost of redeploying a subset of operators is very low and more important decisions can be done in real time since it the redeployment calculations are small.
 
-\begin{figure}[h]
+\begin{figure}[h!]
   \centering
-  \includegraphics[width=0.8\textwidth]{Results/Time.pdf}
-  \caption{Evaluation of the real-time vs the modeled time as the number of operators increases.}\label{fig:validation} 
+  \includegraphics[width=0.73\textwidth]{Results/Time.pdf}
+  \caption{Evaluation of the actual deployment vs the modeled time as the number of operators increases.}\label{fig:validation} 
 \end{figure}
 
 For the final evaluation we wanted to validate the model by comparing the expected results and the actual results after deploying the workflow in a real setup, Figure~\ref{fig:validation} depicts the results. We can observe that when the number of operators is small the difference between the expected and the actual results only differs by at most 10\%, when the number of operators grows to 25 the difference slightly grows up to 15\%.
+

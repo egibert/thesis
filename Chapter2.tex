@@ -1,5 +1,5 @@
 %\section{Framework}
-In this chapter, we present our concepts in which R-Pulsar have been build upon. R-Pulsar is a software stack that extends cloud capabilities to edge devices, allowing to collect and analyze data closer to the source of information and react autonomously to local events. R-Pulsar consists of four layers: (1) the infrastructure layer, (2) the federation layer, (3) the streaming layer, and (4) the application layer. Each of the layers consists of multiple components.
+In this chapter, we present our concepts in which R-Pulsar have been build upon. R-Pulsar is an architecture that extends cloud capabilities to edge devices, allowing to collect and analyze data closer to the source of information and react autonomously to local events. R-Pulsar consists of four layers: (1) the infrastructure layer, (2) the federation layer, (3) the streaming layer, and (4) the application layer. Each of the layers consists of multiple components.
 
 \begin{figure}[!h]
   \centering
@@ -57,9 +57,9 @@ Content-based routing is achieved by performing two steps: The first step is to 
 
 \section{Streaming Layer}
 
-The streaming layer provides users and applications with efficient data-driven access to federated resources. This layer is composed of the serverless API, memory-mapped streaming analytics, and the rule-based programming components:
+The streaming layer provides users and applications with efficient data-driven access to federated resources. This layer is composed of the serverless messaging component, memory-mapped streaming analytics component, the rule-based programming component and the operator placement component:
 
-\subsection{Serverless API Component}\label{sec:serverless}
+\subsection{Serverless Messaging Component}\label{sec:serverless}
 
 Serverless computing is a cloud computing model that aims to abstract server management and low-level infrastructure decisions away from developers. Allowing to deploy and execute pieces of code in response to events without the need to specify IP addresses. The serverless messaging layer implements the AR interaction model described in Chapter~\ref{chap:AR} and it consists of two components: the matching engine and the profile manager. 
 
@@ -92,7 +92,7 @@ The \textbf{poll}() operator is used to retrieve the data other RPs are sending.
 The \textbf{post}(AR message) operator is used to route the messages without the need of specifying the recipient of the message, the recipient of the message is resolved by using the AR Message.
 
 \subsection{Memory-mapped Streaming Analytics Component}
-The data pipeline is responsible for consolidating data from multiple sources, processing the data, and making them available to be used. State-of-the-art data pipelines are known to be data-intensive tasks, resulting in the inability to performing real-time data analytics when deployed on constrained devices. The memory-mapped streaming analytics pipeline component is motivated to overcome that issue. The streaming analytics pipeline comprises the following sub-components: 
+The data pipeline is responsible for consolidating data from multiple sources, processing the data, and making them available to be used. State-of-the-art data pipelines are known to be data-intensive tasks, resulting in the inability to performing timely data analytics when deployed on constrained devices. The memory-mapped streaming analytics pipeline component is motivated to overcome that issue. The streaming analytics pipeline comprises the following sub-components: 
 
 \begin{enumerate}
 
@@ -106,7 +106,7 @@ The data pipeline is responsible for consolidating data from multiple sources, p
 
 Multiple data collection services are available, such as Apache Kafka~\cite{kafka}, Google Pub/Sub~\cite{google}, Amazon Firehose~\cite{amazon}, and Mosquitto~\cite{mosquitto}. Although some are designed to be deployed on edge devices, these services offer limited performance when deployed in constrained devices due to the limited read and write disk speeds.
 
-We designed and implemented a custom data collection sub-component designed specifically for constrained devices using a memory-mapped queue. A memory mapped file is a segment of virtual memory that has been assigned a direct correlation with some portion of a file. This file is physically present on disk, which allows the operating system to ensure data access operations with better performance than standard file access. The core principle of the R-Pulsar queue system emerges from the observation that random memory read is about 3.5x faster than sequential disk read, as measured in Table~\ref{tb:table1}. 
+We designed and implemented a custom data collection sub-component designed specifically for constrained devices using a memory-mapped queue. A memory mapped file is a segment of virtual memory that has been assigned a direct correlation with some portion of a file. This file is physically present on disk, which allows the operating system to ensure data access operations with better performance than standard file access. The core principle of the R-Pulsar queue system emerges from the observation that random memory read is about 3.5x faster than sequential disk read, as measured in Table~\ref{tb:table1}. To perform the tests we used the Linux tool sysbench~\cite{sysbench}, a multi-threaded benchmark tool that allows to quickly get an impression about system performance.
 
 The trade-off of using a memory mapped data collection system is that operating systems decides when to copy data from the main memory to disk.  
 \\
@@ -134,8 +134,8 @@ This sub-component leverages the AR programming abstraction and a key-value data
 
 For storing data, R-Pulsar relies on RocksDB~\cite{rocks}, an embedded key-value database optimized for fast and low-latency storage. The database keeps the most recently used data in the main memory and stores the least recently used data on disk.
 
-\subsection{Rule-based Programming Abstraction}\label{sec:programming-data}
-The rule-based programming abstraction makes it possible to build IoT applications and decide \textbf{when} data must be sent to the cloud for further post-processing without having to manage any infrastructure.
+\subsection{Rule-based Programming Abstraction Component}\label{sec:programming-data}
+The rule-based programming abstraction component makes it possible to build IoT applications and decide \textbf{when} data must be sent to the cloud for further post-processing without having to manage any infrastructure.
 
 It consists of a rule engine that allows developers to specify IF-THEN rules that can trigger other data-processing tasks when a condition is satisfied. The THEN clause of the conditions sends an AR message with a custom profile to start and stop data-processing tasks on demand.
 
@@ -230,4 +230,4 @@ The overall steps of the algorithm are depicted in Algorithm 1. In the first ste
 
 \section{Application Layer}
 
-The application layer is composed of data consumers. Data consumers are the IoT applications described in Chapter~\ref{chap:applications}. Data consumers process these the incoming data from the sensors/data producers and aggregate incoming data, send automatic alerts in real-time, or produce new streams of data that can be processed by other consumers.
+The application layer is composed of data consumers. Data consumers are the IoT applications described in Chapter~\ref{chap:applications}. Data consumers process these the incoming data from the sensors/data producers and aggregate incoming data, send automatic alerts in a timely manner, or produce new streams of data that can be processed by other consumers.

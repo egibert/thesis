@@ -1,9 +1,6 @@
-%\section{Introduction}
-%In this Chapter, we present the implementation, API examples of R-Pulsar and the evaluation of each of the layers and components of R-Pulsar. 
+\section{Design}
 
-\section{Implementation}
-
-In this section we describe the implementation of R-Pulsar, Figure~\ref{fig:diagram} depicts the interactions that R-Pulsar performs when a the Post primitive is used.
+In this section we describe the design of R-Pulsar, Figure~\ref{fig:diagram} depicts the interactions that R-Pulsar performs when a the Post primitive is used.
 
 \begin{figure}[htb!]
   \centering
@@ -30,8 +27,7 @@ In this section we describe the implementation of R-Pulsar, Figure~\ref{fig:diag
     \item \textbf{Step 5:} The base id of the SFC is used to route the message in to the P2P network obtained in step 4.1.1, and the message is forwarded to the right RP.
 \end{itemize}
 
-
-\noindent The current implementation of R-Pulsar build upon the open source project TomP2P. TomP2P is a P2P library and a distributed hash table (DHT) implementation which provides a decentralized key-value infrastructure for distributed applications. The overall operation of the R-Pulsar overlay network consists of two phases: bootstrap and running.
+\noindent The current design of R-Pulsar uses a P2P architecture and a distributed hash table (DHT) which provides a decentralized key-value infrastructure for distributed applications. The overall operation of the R-Pulsar overlay network consists of two phases: bootstrap and running.
 
 \subsection{Bootstrap Phase}
 During the bootstrap phase (or join phase), messages are exchanged between a joining RP and the rest of the group. During this phase, the joining RP attempts to discover RPs already existing in the system to build its routing table. The joining RP sends a discovery message to the group. If the message is unanswered after a set duration (in the order of seconds), the RP assumes that it is the first in the system and it becomes the master RP, creating a single overlay network (Peer-to-Peer network). Every time any other RP joins the overlay network and the master RP responds to the discovery message, the  RP is added to the system by using the location of the RP and determining which quadrant the RP occupies. Once the initial P2P network has a sufficient number of RPs to guarantee that in case of multiple failures the P2P network will not disappear, the quadtree subdivides the overlay network into four additional P2P rings, plus an extra ring that will allow all the master RPs of each ring to communicate. Each RP master keeps a copy of the quadtree, so in the case of an RP failure the overlay network structure will never be lost. In the case of a master RPs failure, a master RP election is performed using the Hirschberg and Sinclair algorithm~\cite{Hirschberg}.
@@ -39,7 +35,10 @@ During the bootstrap phase (or join phase), messages are exchanged between a joi
 \subsection{Running Phase}
 The running phase consists of stabilization and user mode. In the stabilization mode, an RP responds to queries issued by other RPs in the system. The purpose of the stabilization mode is to ensure that routing tables are up to date and to verify that other RPs in the system have not failed or left the system. In the user mode, RPs allow external entities to use the serverless layer to communicate with each other to offer and request data and computation. These entities can include: a) users that might want to retrieve specific data or perform certain computation over data found using a query; b) IoT devices that can produce and consume data based on specific interests; and c) computational resources, such as data analytics and streaming platforms, clouds, or high performance computing clusters that offer their computational capabilities.
 
-In addition the user mode is also responsible for replicating the data. R-Pulsar uses an indirect replication method which is inherited from TomP2P. The indirect replication can be described as peers publishing content for others. The peer closest to a location ID is considered as the responsible peer and replicates data if necessary. Doing so allows data to never be lost, data will only be lost in the unlucky event that all the RPs fail at the same time or not RPs are up.
+In addition the user mode is also responsible for replicating the data. R-Pulsar uses an indirect replication method, doing so allows data to never be lost. Data will only be lost in the unlucky event that all the RPs fail at the same time or not RPs are up.
+
+\section{Implementation}
+In this section we describe the implementation of R-Pulsar.
 
 \section{API Examples}
 In this section, we present two sets of API examples, they are based on the disaster recovery use case presented in Chapter~\ref{chap:applications}. The first set of API examples showcase the use of resource actions for sensor registration and discovery and the use of function actions for storing and triggering data-processing tasks. The second set of examples showcase the rule based programming abstraction.
@@ -200,7 +199,7 @@ In Figure~\ref{fig:profileQuery} we can observe that, for a moderate database si
 
 \subsection{Routing Overhead and Scalability Over Edge Systems}
 
-This second set of experiments measure the routing overhead, which represents the time interval between an AR message is created until it is forwarded to the recipient of the message. It is important to maintain the routing overhead in the order of milliseconds to achieve real-time analytics on constrained devices. The routing overhead was evaluated over Android and Raspberry PIs by simulating the storage or retrieval of data, as the number of RPs on a given region grows, and also as the AR profiles complexity grows. The profile complexity is defined in terms of the number of attribute-value pairs that make up the profile. For example, a 2D profile is composed of two properties, such as data type and location.
+This second set of experiments measure the routing overhead, which represents the time interval between an AR message is created until it is forwarded to the recipient of the message. It is important to maintain the routing overhead in the order of milliseconds to achieve timely analytics on constrained devices. The routing overhead was evaluated over Android and Raspberry PIs by simulating the storage or retrieval of data, as the number of RPs on a given region grows, and also as the AR profiles complexity grows. The profile complexity is defined in terms of the number of attribute-value pairs that make up the profile. For example, a 2D profile is composed of two properties, such as data type and location.
 
 \begin{figure}[h!]
   \centering
@@ -234,7 +233,13 @@ Figure~\ref{fig:rpDiscovery} shows that the time required to have a consistent v
 
 \section{Memory-mapped Streaming Analytics Pipeline Evaluation}
 
-In this section we evaluate two of the sub-components that the memory-mapped streaming analytics pipeline consists, the Data collection and the storage and query sub-component. The tests are evaluated using the same cloud resources as in the location-aware overlay network component evaluation section. For the edge resources this set of experiments use the same as the content-based routing component evaluation section. 
+In this section we evaluate two of the sub-components that the memory-mapped streaming analytics pipeline consists, the Data collection and the storage and query sub-component. The tests are evaluated using the same cloud resources as in the location-aware overlay network component evaluation section. For the edge resources this set of experiments use the following resources:
+
+\begin{itemize}
+\item Raspberry Pi System: Using 2 Raspberry Pi's 3 with 4x ARM Cortex-A53 1.2GHz, 1GB LPDDR2 of RAM and 10/100 Ethernet.
+
+\item Android System: Using 1 Motorola Moto G5 Plus with a Qualcomm Snapdragon 625 processor with 2.0 GHz octa-core CPU, 3GB of RAM
+\end{itemize}
 
 \subsection{Performance of the Data Collection Layer Over Edge Systems}
 
@@ -318,11 +323,17 @@ In the last two experiments, we can observe that Nitrite DB and SQLite are both 
 
 \section{Rule-based Programming Abstraction Evaluation}
 
-In this section we performed two sets of experiments to evaluate the rule-based programming abstraction. The tests are evaluated using two types of virtual nodes. The first node is our "drone" with computational capabilities with 1 vCPU and 2 GB of memory, we used a low CPU machine to simulate the overheads as if we used a small IoT device with reduced computational capacity. The second node is the "minivan" with 8 vCPU and 32 GB of memory.
+In this section we performed two sets of experiments to evaluate the rule-based programming abstraction. The tests are evaluated using edge and cloud virtual nodes.
+
+\begin{itemize}
+\item Edge System: Consists of two different Chameleon Cloud setups: The first node is our "drone" with computational capabilities with 1 vCPU and 2 GB of memory. The second node is the "minivan" with 8 vCPU and 32 GB of memory.
+
+\item Cloud System: Consists of three Chamelon Cloud instances of type m1.large (4 CPUs and 8 GB of memory)
+\end{itemize}
 
 \subsection{Scalability and Overhead Over Edge and Cloud Systems}
 
-To evaluate the scalability and overhead of the rule engine system we added different rule amounts and streamed our regular workload, forcing the evaluation of each of the tuples. The plotted graph in Figure  \ref{fig:RuleEngine} shows the scalability and overhead of our rule engine for two different machines described above. We can observe that the overhead is very minimal and can be used for processing real-time stream processing, we can also observe that as we add rules the overheads do not increase exponentially making it suitable to handle hundreds of rules.
+To evaluate the scalability and overhead of the rule engine system we added different rule amounts and streamed our regular workload, forcing the evaluation of each of the tuples. The plotted graph in Figure  \ref{fig:RuleEngine} shows the scalability and overhead of our rule engine for two different machines described above. We can observe that the overhead is very minimal, we can also observe that as we add rules the overheads do not increase exponentially making it suitable to handle hundreds of rules.
 
 \begin{figure}[h!]
   \centering
@@ -379,21 +390,21 @@ For the experiment in Figure \ref{fig:Edge_CoreVsCloud} we wanted to demonstrate
 
 Figures \ref{fig:SmallSpeed}, \ref{fig:MediumSpeed}, and \ref{fig:BigSpeed} showcase the speed-up that can be obtained by trading off some image "quality" for some computational complexity. Figure \ref{fig:SmallSpeed} is the graph for a workflow with 10 LiDAR images to be processed; one can observe that if we perform all the computations in the "drone" and only 10\% of those images need further processing we get a speed up of 44\% compared to sending all 10 images to the core of the network. We can observe from figures \ref{fig:MediumSpeed} \ref{fig:BigSpeed} that due to the small compute limitations, the drone gets a faster speed-up when the worflow size is small and a small percentage of tuples needs further processing, which makes it perfect for assessing affected areas where minivans can't get to due to road blocks. In the case of the minivan, it gets a higher speed-up in all three cases since it has higher computational resources and we can also observe that we can still send a large percentage of rules to the core and we still get a higher speed-up. In the best case the minivan is 71\% faster than the traditional approach where all the images are sent to the cloud.
 
-\subsection{Smart City Use Case}
+%\subsection{Smart City Use Case}
 
-For the smart city use case we performed a set of experiments to compare the proposed edge stream processing approach with a traditional approach in which the stream processing is located in a fixed location at the core of the infrastructure. To perform these experiments we deployed two streaming frameworks (based on Apache Kafka plus Apache Storm), one in our local cluster and another one in Amazon AWS. In both cases, Apache Kafka and Storm were deployed in a single machine to avoid any additional latency due to communication across machines of a Kafka or Storm cluster. In Amazon AWS, we used an instance of type  t2.2xlarge, which has similar characteristics to the machines in our local cluster (8 CPUs and 32 GB of memory). Note that we do not assume that the edge will be equipped with similar characteristics, we are only using this type of instance for computational comparison only. When using our approach, our framework was deployed across both infrastructures -- i.e. we had two RP nodes exposing the capabilities of each stream engine. We emulated a scenario inspired by the one described in Chapter~\ref{chap:applications} in which a client performs a request to obtain navigation indications. The data-processing workflow (i.e. topology) was composed by three sequential steps (i.e. bolts in Apache Storm terms) that performed some basic data transformations that did not require significant computational time. In our experiments we evaluated the performance of both approaches using three different anonymized workloads consisting of 100, 1000, and 10000 data elements. Each data element is around 1KB of size and is generated sequentially. The client and data source were close to our local cluster. Figures~\ref{fig:perf2} and~\ref{fig:perf1} collect the results of these experiments.
+%For the smart city use case we performed a set of experiments to compare the proposed edge stream processing approach with a traditional approach in which the stream processing is located in a fixed location at the core of the infrastructure. To perform these experiments we deployed two streaming frameworks (based on Apache Kafka plus Apache Storm), one in our local cluster and another one in Amazon AWS. In both cases, Apache Kafka and Storm were deployed in a single machine to avoid any additional latency due to communication across machines of a Kafka or Storm cluster. In Amazon AWS, we used an instance of type  t2.2xlarge, which has similar characteristics to the machines in our local cluster (8 CPUs and 32 GB of memory). Note that we do not assume that the edge will be equipped with similar characteristics, we are only using this type of instance for computational comparison only. When using our approach, our framework was deployed across both infrastructures -- i.e. we had two RP nodes exposing the capabilities of each stream engine. We emulated a scenario inspired by the one described in Chapter~\ref{chap:applications} in which a client performs a request to obtain navigation indications. The data-processing workflow (i.e. topology) was composed by three sequential steps (i.e. bolts in Apache Storm terms) that performed some basic data transformations that did not require significant computational time. In our experiments we evaluated the performance of both approaches using three different anonymized workloads consisting of 100, 1000, and 10000 data elements. Each data element is around 1KB of size and is generated sequentially. The client and data source were close to our local cluster. Figures~\ref{fig:perf2} and~\ref{fig:perf1} collect the results of these experiments.
 
-\begin{figure}[h]
-  \centering
-    \includegraphics[width=0.8\textwidth]{Figures/Latency.pdf}
-  \caption{Delay in processing a data element.} \label{fig:perf2}
-\end{figure}
-\begin{figure}[h]
-  \centering
-  	\includegraphics[width=0.8\textwidth]{Figures/EdgeVsCloud.pdf}
-  \caption{Completion time for different workloads.} \label{fig:perf1}
-\end{figure}
+%\begin{figure}[h]
+%  \centering
+%    \includegraphics[width=0.8\textwidth]{Figures/Latency.pdf}
+%  \caption{Delay in processing a data element.} \label{fig:perf2}
+%\end{figure}
+%\begin{figure}[h]
+%  \centering
+%  	\includegraphics[width=0.8\textwidth]{Figures/EdgeVsCloud.pdf}
+%  \caption{Completion time for different workloads.} \label{fig:perf1}
+%\end{figure}
 
-Figure~\ref{fig:perf2} shows the delay in processing a data element. The delay is measured as the time spent between the data producer generates the data element and the destination queue receives it for processing. We observe that in our case, the latency is up to 78\% less than a traditional approach consisting of sending data for processing to a cloud. The main reason is that our approach is able to dynamically identify different sources of computation and data using the location of the client. Therefore, it chooses to process the data in the place that is closest to the data source and the client. Our approach still incurs some small overheads as we have to identify the best processing site and data has to travel from source to destination. Nonetheless, these overheads are negligible compared with those incurred when transferring data between the edge and the core of the infrastructure.
+%Figure~\ref{fig:perf2} shows the delay in processing a data element. The delay is measured as the time spent between the data producer generates the data element and the destination queue receives it for processing. We observe that in our case, the latency is up to 78\% less than a traditional approach consisting of sending data for processing to a cloud. The main reason is that our approach is able to dynamically identify different sources of computation and data using the location of the client. Therefore, it chooses to process the data in the place that is closest to the data source and the client. Our approach still incurs some small overheads as we have to identify the best processing site and data has to travel from source to destination. Nonetheless, these overheads are negligible compared with those incurred when transferring data between the edge and the core of the infrastructure.
 
-Figure~\ref{fig:perf1} collects the computational time required to process a stream of data elements. We can observe that our approach is up to 56\% more efficient than a traditional cloud-based approach. In this particular case, this is directly related to the delay mentioned before that the system incurs when processing each data element. Since the delay of each data element is larger than its computational time, the system is often idle waiting for small periods of time until a new data element arrives.
+%Figure~\ref{fig:perf1} collects the computational time required to process a stream of data elements. We can observe that our approach is up to 56\% more efficient than a traditional cloud-based approach. In this particular case, this is directly related to the delay mentioned before that the system incurs when processing each data element. Since the delay of each data element is larger than its computational time, the system is often idle waiting for small periods of time until a new data element arrives.
